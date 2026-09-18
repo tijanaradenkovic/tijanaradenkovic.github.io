@@ -1,0 +1,61 @@
+name: Optimize headshot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/optimize-headshot.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: python -m pip install --quiet pillow
+
+      - name: Resize and convert headshot
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          src = Path("assets/tijana-radenkovic-headshot.png")
+          dst = Path("assets/tijana-radenkovic-headshot.webp")
+
+          with Image.open(src) as im:
+              im.thumbnail((600, 800), Image.Resampling.LANCZOS)
+              if im.mode not in ("RGB", "RGBA"):
+                  im = im.convert("RGBA")
+              im.save(dst, "WEBP", quality=80, method=6)
+
+          index = Path("index.html")
+          text = index.read_text(encoding="utf-8")
+          text = text.replace(
+              'src="assets/tijana-radenkovic-headshot.png"',
+              'src="assets/tijana-radenkovic-headshot.webp"'
+          )
+          text = text.replace('width="1086" height="1448"', 'width="600" height="800"')
+          index.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Commit optimized image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/tijana-radenkovic-headshot.webp
+          git rm assets/tijana-radenkovic-headshot.png
+          rm .github/workflows/optimize-headshot.yml
+          git add -A
+          git commit -m "Optimize profile image for faster loading"
+          git push
