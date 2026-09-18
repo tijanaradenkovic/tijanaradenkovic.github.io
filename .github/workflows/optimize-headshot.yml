@@ -28,16 +28,18 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          from PIL import Image
+          from PIL import Image, ImageFile
+          ImageFile.LOAD_TRUNCATED_IMAGES = True
 
           src = Path("assets/tijana-radenkovic-headshot.png")
           dst = Path("assets/tijana-radenkovic-headshot.webp")
 
           with Image.open(src) as im:
+              im.load()
               im.thumbnail((600, 800), Image.Resampling.LANCZOS)
               if im.mode not in ("RGB", "RGBA"):
                   im = im.convert("RGBA")
-              im.save(dst, "WEBP", quality=80, method=6)
+              im.save(dst, "WEBP", quality=78, method=6)
 
           index = Path("index.html")
           text = index.read_text(encoding="utf-8")
