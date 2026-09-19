@@ -76,10 +76,6 @@
     .research-card p{margin:.5rem 0 0;color:var(--muted)}
     .research-card .meta{color:var(--accent2);font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em}
     .tint{background:#EEEAE7;border-block:1px solid var(--line)}
-    .current{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-    .current .item{padding:1.4rem;border-left:3px solid var(--accent2);background:rgba(255,255,255,.48)}
-    .current strong{font-family:Georgia,serif;font-size:1.1rem}
-    .current p{margin:.45rem 0 0;color:var(--muted)}
     .actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
     .button{display:inline-block;padding:.72rem 1.05rem;border:1px solid var(--accent);border-radius:999px;color:var(--accent);text-decoration:none}
     .button.primary{background:var(--accent);color:#fff}
@@ -88,7 +84,7 @@
     @media(max-width:760px){
       .page-hero-inner{padding:4rem 1.4rem 3.3rem}
       .page-triangulation{opacity:.20}
-      .intro-grid,.research-grid,.current{grid-template-columns:1fr}
+      .intro-grid,.research-grid{grid-template-columns:1fr}
       .menu-toggle{display:flex}
       .links{
         display:none;
@@ -209,30 +205,7 @@
     </div>
   </section>
 
-  <section class="wrap">
-    <div class="eyebrow">Current work</div>
-    <h2>Questions I am working on now</h2>
-    <div class="current">
-      <div class="item">
-        <strong>Higher-group representation theory</strong>
-        <p>Developing a workable representation-theoretic framework for 2-groups and, subsequently, 3-groups, with applications to 3BF state sums.</p>
-      </div>
-      <div class="item">
-        <strong>3BF and geometric data</strong>
-        <p>Understanding how discrete higher-gauge variables can be rewritten in terms of geometric variables, with particular interest in edge-length formulations.</p>
-      </div>
-      <div class="item">
-        <strong>Higher-dimensional transport</strong>
-        <p>Clarifying the role of higher holonomies and higher curvatures in generalized geometry and their interpretation in higher-dimensional and emergent-spacetime settings.</p>
-      </div>
-    </div>
 
-    <div class="actions">
-      <a class="button primary" href="publications.html">View publications</a>
-      <a class="button" href="projects.html">Research projects</a>
-      <a class="button" href="talks.html">Talks & presentations</a>
-    </div>
-  </section>
 </main>
 
 <footer>© 2026 Tijana Radenković · Institute of Physics Belgrade</footer>
