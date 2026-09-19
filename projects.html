@@ -359,7 +359,53 @@
       font-size:.9rem;
     }
 
+    
+    .menu-toggle{
+      display:none;
+      width:42px;
+      height:42px;
+      padding:9px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:rgba(255,255,255,.72);
+      cursor:pointer;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .menu-toggle span{
+      display:block;
+      width:20px;
+      height:2px;
+      background:var(--ink);
+      border-radius:2px;
+      transition:transform .2s ease,opacity .2s ease;
+    }
+
+    .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
     @media(max-width:760px){
+
+      .menu-toggle{display:flex}
+      .links{
+        position:absolute;
+        top:100%;
+        left:0;
+        right:0;
+        padding:.75rem 1.4rem 1rem;
+        background:rgba(247,244,239,.98);
+        border-bottom:1px solid var(--line);
+        box-shadow:0 12px 24px rgba(23,32,51,.08);
+        flex-direction:column;
+        gap:.15rem;
+      }
+      .links.open{display:flex}
+      .links a{padding:.42rem 0;font-size:.96rem}
+
       .page-hero-inner{padding:4rem 1.4rem 3.3rem}
       .page-triangulation{opacity:.20}
       .about-grid,.two-col{grid-template-columns:1fr}
@@ -368,7 +414,8 @@
     }
 
   </style>
-</head><body><nav><div class="inner"><a class="brand" href="index.html">Tijana Radenković</a><div class="links"><a href="index.html">Home</a><a href="experience.html">Experience & Education</a><a href="publications.html">Publications</a><a href="talks.html">Talks</a><a href="conferences.html">Conferences</a><a href="projects.html">Projects</a><a href="profiles.html">Profiles</a></div></div></nav><header class="page-hero">
+</head><body><nav><div class="inner"><a class="brand" href="index.html">Tijana Radenković</a><button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button><div class="links" id="site-menu"><a href="index.html">Home</a>
+<a href="research.html">Research</a><a href="experience.html">Experience & Education</a><a href="publications.html">Publications</a><a href="talks.html">Talks</a><a href="conferences.html">Conferences</a><a href="projects.html">Projects</a><a href="profiles.html">Profiles</a></div></div></nav><header class="page-hero">
 
     <svg class="page-triangulation" viewBox="0 0 1400 360" preserveAspectRatio="none" aria-hidden="true">
       <line x1="520" y1="320" x2="690" y2="105"></line>
@@ -405,4 +452,24 @@
       <p class="intro">National and international research projects and scientific collaborations.</p>
       <a class="back-link" href="index.html">← Back to home</a>
     </div>
-  </header><main><section class="wrap" id="projects"><div class="eyebrow">Collaboration</div><h2>Research projects</h2><div class="project"><div class="meta">2022 – 2024</div><h3>Quantum Gravity through Higher Gauge Theory 2021 (QGHG-2021)</h3><p>IDEAS programme, Science Fund of the Republic of Serbia · Project 7745968</p></div><div class="project"><div class="meta">2020 – 2022</div><h3>Symmetries and Quantization</h3><p>Bilateral Serbia–Portugal project · Project 337-00-00227/2019-09/57</p></div><div class="project"><div class="meta">2021 – 2022</div><h3>Symmetries and Quantization 2020</h3><p>Diaspora programme, Science Fund of the Republic of Serbia · Project 6427195</p></div><div class="project"><div class="meta">2017 – 2020</div><h3>Physical Implications of Modified Spacetime</h3><p>Ministry of Education, Science and Technological Development of the Republic of Serbia · Project ON 171031</p></div></section></main><footer>© 2026 Tijana Radenković · Institute of Physics Belgrade</footer></body></html>
+  </header><main><section class="wrap" id="projects"><div class="eyebrow">Collaboration</div><h2>Research projects</h2><div class="project"><div class="meta">2022 – 2024</div><h3>Quantum Gravity through Higher Gauge Theory 2021 (QGHG-2021)</h3><p>IDEAS programme, Science Fund of the Republic of Serbia · Project 7745968</p></div><div class="project"><div class="meta">2020 – 2022</div><h3>Symmetries and Quantization</h3><p>Bilateral Serbia–Portugal project · Project 337-00-00227/2019-09/57</p></div><div class="project"><div class="meta">2021 – 2022</div><h3>Symmetries and Quantization 2020</h3><p>Diaspora programme, Science Fund of the Republic of Serbia · Project 6427195</p></div><div class="project"><div class="meta">2017 – 2020</div><h3>Physical Implications of Modified Spacetime</h3><p>Ministry of Education, Science and Technological Development of the Republic of Serbia · Project ON 171031</p></div></section></main><footer>© 2026 Tijana Radenković · Institute of Physics Belgrade</footer>
+<script>
+  (function(){
+    const toggle=document.querySelector('.menu-toggle');
+    const menu=document.getElementById('site-menu');
+    if(!toggle || !menu) return;
+    toggle.addEventListener('click',function(){
+      const open=this.getAttribute('aria-expanded')==='true';
+      this.setAttribute('aria-expanded',String(!open));
+      menu.classList.toggle('open',!open);
+    });
+    menu.querySelectorAll('a').forEach(function(link){
+      link.addEventListener('click',function(){
+        toggle.setAttribute('aria-expanded','false');
+        menu.classList.remove('open');
+      });
+    });
+  })();
+</script>
+
+</body></html>
