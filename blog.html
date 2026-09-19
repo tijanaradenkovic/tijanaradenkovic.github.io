@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Physics blog by Tijana Radenković with notes and reflections on quantum gravity, higher gauge theory, topological field theory and mathematical physics.">
+  <title>Physics Blog | Tijana Radenković</title>
+  <meta name="author" content="Tijana Radenković">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://tijanaradenkovic.github.io/blog.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tijana Radenković">
+  <meta property="og:title" content="Physics Blog | Tijana Radenković">
+  <meta property="og:description" content="Physics notes and reflections on quantum gravity, higher gauge theory, topological field theory and mathematical physics.">
+  <meta property="og:url" content="https://tijanaradenkovic.github.io/blog.html">
+  <meta property="og:image" content="https://tijanaradenkovic.github.io/ChatGPT%20Image%20Sep%2018%2C%202026%2C%2011_39_14%20PM.png">
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Blog",
+    "@id":"https://tijanaradenkovic.github.io/blog.html#blog",
+    "url":"https://tijanaradenkovic.github.io/blog.html",
+    "name":"Physics Blog | Tijana Radenković",
+    "description":"Physics notes and reflections on quantum gravity, higher gauge theory, topological field theory and mathematical physics.",
+    "inLanguage":"en",
+    "author":{"@id":"https://tijanaradenkovic.github.io/#person"},
+    "isPartOf":{"@id":"https://tijanaradenkovic.github.io/#website"}
+  }
+  </script>
+
+  <style>
+    :root{
+      --ink:#172033; --muted:#657080; --paper:#F7F4EF; --card:#FFFFFF;
+      --accent:#6F3B63; --accent2:#2F7C7A; --line:#DDD4D8;
+      --soft:#EDE7EA; --soft-teal:#E4F0EF;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+    a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+    nav{position:sticky;top:0;z-index:20;background:rgba(247,244,239,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+    nav .inner{max-width:1080px;margin:auto;padding:.9rem 1.4rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+    .brand{font-family:Georgia,serif;font-weight:bold;color:var(--ink);text-decoration:none}
+    .links{display:flex;gap:1rem;flex-wrap:wrap}
+    .links a{color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s ease}
+    .links a:hover{color:var(--accent2)}
+    .menu-toggle{display:none;width:42px;height:42px;padding:9px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.72);cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+    .menu-toggle span{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px;transition:transform .2s ease,opacity .2s ease}
+    .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    h1,h2,h3{font-family:Georgia,serif;line-height:1.16;color:var(--ink)}
+    h1{font-size:clamp(3.2rem,7vw,5.4rem);margin:.35rem 0 .8rem;letter-spacing:-.04em}
+    h2{font-size:clamp(2rem,5vw,3rem);margin:0 0 1.8rem}
+    h3{font-size:1.35rem;margin:.2rem 0 .6rem}
+    .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:700;font-size:.76rem;color:var(--accent2)}
+    .page-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:
+      radial-gradient(circle at 82% 18%,rgba(47,124,122,.17),transparent 27%),
+      radial-gradient(circle at 18% 88%,rgba(111,59,99,.12),transparent 30%),
+      linear-gradient(135deg,#F7F4EF 0%,#F1ECE8 55%,#EAF1EF 100%)}
+    .page-hero-inner{position:relative;z-index:2;max-width:1080px;margin:auto;padding:5.4rem 1.4rem 4.6rem}
+    .page-hero .intro{max-width:760px;margin:0 0 1.35rem;color:#465164;font-size:1.12rem}
+    .back-link{font-size:.9rem;font-weight:600;text-decoration:none}
+    .page-triangulation{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;opacity:.30}
+    .page-triangulation line{stroke:var(--accent2);stroke-width:1.2;vector-effect:non-scaling-stroke}
+    .page-triangulation .plum{stroke:var(--accent);opacity:.72}
+    .page-triangulation circle{fill:var(--accent)}
+    .wrap{max-width:1080px;margin:auto;padding:4.5rem 1.4rem}
+    .intro-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:3rem;align-items:start}
+    .intro-grid p{margin-top:0;color:#465164;font-size:1.06rem}
+    .tags{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.35rem}
+    .tag{background:var(--soft-teal);color:#266866;padding:.35rem .7rem;border-radius:999px;font-size:.9rem;font-weight:600}
+    .posts{margin-top:1rem}
+    .empty-state{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:2rem;box-shadow:0 8px 24px rgba(23,32,51,.04)}
+    .empty-state p{margin:.5rem 0 0;color:var(--muted);max-width:720px}
+    footer{border-top:1px solid var(--line);padding:1.5rem;text-align:center;color:var(--muted);font-size:.9rem}
+
+    @media(max-width:760px){
+      .page-hero-inner{padding:4rem 1.4rem 3.3rem}
+      .page-triangulation{opacity:.20}
+      .intro-grid{grid-template-columns:1fr}
+      .menu-toggle{display:flex}
+      .links{
+        display:none;
+        position:absolute;
+        top:100%;
+        left:0;
+        right:0;
+        padding:.75rem 1.4rem 1rem;
+        background:rgba(247,244,239,.98);
+        border-bottom:1px solid var(--line);
+        box-shadow:0 12px 24px rgba(23,32,51,.08);
+        flex-direction:column;
+        gap:.15rem;
+      }
+      .links.open{display:flex}
+      .links a{padding:.42rem 0;font-size:.96rem}
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="inner">
+    <a class="brand" href="index.html">Tijana Radenković</a>
+    <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button>
+    <div class="links" id="site-menu">
+      <a href="index.html">Home</a>
+      <a href="research.html">Research</a>
+      <a href="blog.html">Blog</a>
+      <a href="experience.html">Experience & Education</a>
+      <a href="publications.html">Publications</a>
+      <a href="talks.html">Talks</a>
+      <a href="conferences.html">Conferences</a>
+      <a href="projects.html">Projects</a>
+      <a href="profiles.html">Profiles</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <svg class="page-triangulation" viewBox="0 0 1400 360" preserveAspectRatio="none" aria-hidden="true">
+    <line x1="520" y1="320" x2="690" y2="105"></line>
+    <line x1="690" y1="105" x2="850" y2="285"></line>
+    <line x1="520" y1="320" x2="850" y2="285"></line>
+    <line class="plum" x1="690" y1="105" x2="925" y2="45"></line>
+    <line x1="850" y1="285" x2="925" y2="45"></line>
+    <line x1="850" y1="285" x2="1080" y2="175"></line>
+    <line class="plum" x1="925" y1="45" x2="1080" y2="175"></line>
+    <line x1="925" y1="45" x2="1215" y2="80"></line>
+    <line x1="1080" y1="175" x2="1215" y2="80"></line>
+    <line class="plum" x1="1080" y1="175" x2="1310" y2="305"></line>
+    <line x1="1215" y1="80" x2="1310" y2="305"></line>
+    <circle cx="520" cy="320" r="3"></circle><circle cx="690" cy="105" r="3"></circle>
+    <circle cx="850" cy="285" r="3"></circle><circle cx="925" cy="45" r="3"></circle>
+    <circle cx="1080" cy="175" r="3"></circle><circle cx="1215" cy="80" r="3"></circle>
+  </svg>
+  <div class="page-hero-inner">
+    <div class="eyebrow">Tijana Radenković · Physics blog</div>
+    <h1>Physics notes &amp; reflections</h1>
+    <p class="intro">Short articles on quantum gravity, higher gauge theory, mathematical physics and the ideas behind my research.</p>
+    <a class="back-link" href="index.html">← Back to home</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap">
+    <div class="intro-grid">
+      <div>
+        <div class="eyebrow">About the blog</div>
+        <h2>Ideas, explained</h2>
+      </div>
+      <div>
+        <p>This is a space for conceptual explanations, research background and occasional reflections on theoretical and mathematical physics. The aim is to make some of the structures behind quantum gravity and higher gauge theory accessible without turning every post into a technical paper.</p>
+        <div class="tags">
+          <span class="tag">Quantum gravity</span>
+          <span class="tag">Higher gauge theory</span>
+          <span class="tag">2-groups &amp; 3-groups</span>
+          <span class="tag">TQFT</span>
+          <span class="tag">Mathematical physics</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-top:0">
+    <div class="eyebrow">Articles</div>
+    <h2>Latest posts</h2>
+    <div class="posts">
+      <div class="empty-state">
+        <h3>First notes coming soon.</h3>
+        <p>Articles will be added here gradually.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>© 2026 Tijana Radenković · Institute of Physics Belgrade</footer>
+
+<script>
+  (function(){
+    const toggle=document.querySelector('.menu-toggle');
+    const menu=document.getElementById('site-menu');
+    if(!toggle || !menu) return;
+    toggle.addEventListener('click',function(){
+      const open=this.getAttribute('aria-expanded')==='true';
+      this.setAttribute('aria-expanded',String(!open));
+      menu.classList.toggle('open',!open);
+    });
+    menu.querySelectorAll('a').forEach(function(link){
+      link.addEventListener('click',function(){
+        toggle.setAttribute('aria-expanded','false');
+        menu.classList.remove('open');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
