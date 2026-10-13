@@ -39,7 +39,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 .cal .h{font-size:12px;color:var(--mu);text-align:center}
 .cal .d{min-height:62px;border:1px solid var(--bd);border-radius:6px;padding:3px;font-size:12px;background:var(--card);overflow:hidden}
 .cal .d.today{border-color:var(--ac)}
-.cal .d.x{opacity:.35}
+.cal .d.x{opacity:.35}.cal .d.sel{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}.cal .d:hover{border-color:var(--ac)}
 .ev{display:block;font-size:11px;background:var(--ac);color:var(--on);border-radius:4px;padding:0 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev.g{background:var(--am)}.ev.n{background:var(--gr)}.ev.r{background:var(--rd)}
 .hide{display:none}a{color:var(--ac);text-decoration-thickness:2px;text-underline-offset:3px}summary{color:var(--ac);font-weight:700;cursor:pointer}
@@ -128,6 +128,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <button class="btn sm" id="pm">‹</button><strong id="ml"></strong><button class="btn sm" id="nm">›</button>
 </div>
 <div class="cal" id="cal"></div>
+<div id="dayp" style="margin-top:12px"></div>
 </section>
 
 <section id="expenses" class="hide">
@@ -367,8 +368,9 @@ var evs=S.events.map(function(c){var o='';if(c.start&&c.start<=k&&k<=(c.end&&c.e
 var nts=S.notes.filter(function(n){return n.date===k}).map(function(n){return '<span class="ev n" title="'+esc(n.title)+'">📝 '+esc(n.title)+'</span>'}).join('');
 var cfs=S.contacts.filter(function(c){return c.next===k&&c.status!=='Dormant'}).map(function(c){return '<span class="ev n" title="'+esc('Follow up: '+c.name)+'">☎ '+esc(c.name)+'</span>'}).join('');
 var pps=S.papers.filter(function(p){return p.deadline===k}).map(function(p){return '<span class="ev r" title="'+esc(p.title+' – deadline')+'">📄 '+esc(p.title)+'</span>'}).join('');
-h+='<div class="d'+(k===today?' today':'')+(d.getMonth()!==m?' x':'')+'">'+d.getDate()+evs+nts+pps+cfs+'</div>'}
+h+='<div class="d'+(k===today?' today':'')+(d.getMonth()!==m?' x':'')+(k===SELDAY?' sel':'')+'" data-day="'+k+'" style="cursor:pointer">'+d.getDate()+evs+nts+pps+cfs+'</div>'}
 document.getElementById('cal').innerHTML=h;
+renderDay();
 }
 
 var NV='notes',TAGF='';
@@ -691,6 +693,42 @@ document.getElementById('impprev').addEventListener('change',function(e){var t=e
 document.getElementById('impprev').addEventListener('click',function(e){if(e.target.closest('[data-go]'))doImport()});
 document.getElementById('impfile').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){loadIcs(r.result,f.name.replace(/\.[^.]+$/,''))};r.readAsText(f)};
 document.getElementById('impread').onclick=function(){loadIcs(document.getElementById('imppaste').value,'')};
+var SELDAY='',DTYPE='deadline',DMSG='';
+var DTYPES=[['deadline','Conference deadline'],['task','Task'],['milestone','Project milestone'],['note','Note'],['follow','Contact follow-up'],['paper','Paper deadline'],['conf','New conference starting this day']];
+function dayItems(k){var o=[],T=function(t,x){o.push('<div class="sub"><span class="tag">'+t+'</span><span>'+esc(x)+'</span></div>')};
+S.events.forEach(function(c){if(c.start&&c.start<=k&&k<=(c.end&&c.end>c.start?c.end:c.start))T('Conference',c.name);c.deadlines.forEach(function(d){if(d.date===k&&!d.done)T('Deadline',c.name+' — '+d.kind)});(c.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)T('Task',c.name+' — '+t.text)});(c.talks||[]).forEach(function(p){if(p.date===k)T('Presentation',p.title+' ('+c.name+')')})});
+S.grants.forEach(function(g){g.miles.forEach(function(m){if(m.date===k&&!m.done)T('Milestone',g.name+' — '+m.label)});(g.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)T('Task',g.name+' — '+t.text)})});
+S.papers.forEach(function(p){if(p.deadline===k)T('Paper',p.title+' — deadline')});
+S.contacts.forEach(function(c){if(c.next===k&&c.status!=='Dormant')T('Follow-up',c.name+(c.nextNote?' — '+c.nextNote:''))});
+S.notes.forEach(function(n){if(n.date===k)T('Note',n.title)});
+return o.join('')}
+function renderDay(){var el=document.getElementById('dayp');
+if(!SELDAY){el.innerHTML='<p class="mu">Click a day to see what is on it and to add something.</p>';return}
+var lab=new Date(SELDAY+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),it=dayItems(SELDAY);
+el.innerHTML='<div class="card"><div class="row"><strong>'+esc(lab)+'</strong><span class="mu">'+esc(SELDAY)+'</span></div>'+(it||'<div class="mu" style="margin-top:6px">Nothing on this day yet.</div>')+
+'<div class="mu" style="margin-top:10px">Add to this day</div><div class="sub"><select id="dtype" style="width:auto">'+DTYPES.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===DTYPE?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select><span id="dform" class="sub" style="margin:0"></span><button class="btn sm pri" id="dadd">Add</button></div><div class="mu" id="dmsg" style="margin-top:6px">'+esc(DMSG)+'</div></div>';
+DMSG='';drawDayForm();
+document.getElementById('dtype').onchange=function(){DTYPE=this.value;drawDayForm()};
+document.getElementById('dadd').onclick=dayAdd}
+function drawDayForm(){var f=document.getElementById('dform'),t=DTYPE,sel=function(id,opts){return '<select id="'+id+'" style="max-width:240px">'+opts+'</select>'},inp=function(ph){return '<input id="dtext" placeholder="'+ph+'" style="min-width:200px">'},none='<span class="mu">Add one first (see the other tabs).</span>';
+var cOpts=S.events.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join(''),gOpts=S.grants.map(function(g){return '<option value="'+g.id+'">'+esc(g.name)+'</option>'}).join('');
+if(t==='deadline')f.innerHTML=cOpts?sel('dtgt',cOpts)+sel('dkind',opts(DKS,'Abstract')):none;
+else if(t==='task')f.innerHTML=(cOpts||gOpts)?sel('dtgt',S.grants.map(function(g){return '<option value="g:'+g.id+'">Project: '+esc(g.name)+'</option>'}).join('')+S.events.map(function(c){return '<option value="c:'+c.id+'">Conference: '+esc(c.name)+'</option>'}).join(''))+inp('Task'):none;
+else if(t==='milestone')f.innerHTML=gOpts?sel('dtgt',gOpts)+inp('e.g. Interim report'):none;
+else if(t==='note')f.innerHTML=inp('Note title');
+else if(t==='follow')f.innerHTML=S.contacts.length?sel('dtgt',S.contacts.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join(''))+inp('What to do (optional)'):none;
+else if(t==='paper')f.innerHTML=S.papers.length?sel('dtgt',S.papers.map(function(p){return '<option value="'+p.id+'">'+esc(p.title)+'</option>'}).join('')):none;
+else if(t==='conf')f.innerHTML=inp('Conference name')}
+function dayAdd(){var k=SELDAY,ty=DTYPE,gv=function(id){var e=document.getElementById(id);return e?e.value:''},tg=gv('dtgt'),tx=gv('dtext').trim(),kd=gv('dkind'),m=document.getElementById('dmsg'),fail=function(x){m.textContent=x},ok='';
+if(ty==='deadline'){var c=S.events.find(function(x){return x.id===tg});if(!c)return fail('Choose a conference.');if(c.deadlines.some(function(d){return d.kind===kd&&d.date===k}))return fail('That deadline already exists.');c.deadlines.push({id:uid(),kind:kd,date:k,done:false});ok=kd+' deadline added to '+c.name+'.'}
+else if(ty==='task'){var o=tg?(tg[0]==='c'?S.events:S.grants).find(function(x){return x.id===tg.slice(2)}):null;if(!o)return fail('Choose where the task belongs.');if(!tx)return fail('Write the task.');(o.tasks=o.tasks||[]).push({id:uid(),text:tx,date:k,done:false});ok='Task added to '+o.name+'.'}
+else if(ty==='milestone'){var g=S.grants.find(function(x){return x.id===tg});if(!g)return fail('Choose a project.');if(!tx)return fail('Write the milestone.');g.miles.push({id:uid(),label:tx,date:k,done:false});ok='Milestone added to '+g.name+'.'}
+else if(ty==='note'){if(!tx)return fail('Write a title.');S.notes.push({id:uid(),title:tx,date:k,ref:'',proj:'',pres:'',cont:'',speaker:'',tags:'',body:'',refs:[],ideas:[]});ok='Note added. Open the Notes tab to write it.'}
+else if(ty==='follow'){var ct=S.contacts.find(function(x){return x.id===tg});if(!ct)return fail('Choose a contact.');ct.next=k;if(tx)ct.nextNote=tx;ok='Follow-up set for '+ct.name+'.'}
+else if(ty==='paper'){var p=S.papers.find(function(x){return x.id===tg});if(!p)return fail('Choose a paper.');p.deadline=k;ok='Deadline set for the paper.'}
+else if(ty==='conf'){if(!tx)return fail('Write the conference name.');S.events.push({id:uid(),name:tx,place:'',start:k,end:'',link:'',status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:'',talks:[],tasks:[]});ok='Conference added. Set its end date under Conferences → Edit conference details.'}
+DMSG=ok;save();render()}
+document.getElementById('cal').addEventListener('click',function(e){var d=e.target.closest('[data-day]');if(d){SELDAY=d.dataset.day;DMSG='';renderCal()}});
 function render(){renderUpcoming();renderContacts();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderNotes()}
 
 document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
