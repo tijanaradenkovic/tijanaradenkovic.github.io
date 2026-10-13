@@ -86,6 +86,14 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 </section>
 
 <section id="rokovi" class="hide">
+<details id="icsimp" style="margin-bottom:12px"><summary>Import dates from a conference calendar (.ics)</summary>
+<div class="card" style="margin-top:8px">
+<p class="mu" style="margin-top:0">Many conference websites have an "Add to calendar" or "Download .ics" link for their key dates. Download that file and choose it here, or paste its text.</p>
+<div class="sub"><input type="file" id="impfile" accept=".ics,.ical,text/calendar"></div>
+<details style="margin:8px 0"><summary class="mu">…or paste the .ics text</summary><textarea id="imppaste" placeholder="BEGIN:VCALENDAR ..." style="min-height:90px;margin-top:6px"></textarea><div class="sub"><button class="btn sm" id="impread">Read pasted text</button></div></details>
+<div id="impprev"></div>
+<div class="mu" id="impmsg" style="margin-top:6px"></div>
+</div></details>
 <form id="fr">
 <div class="full"><label>Conference name</label><input name="name" required placeholder="e.g. EGU 2027"></div>
 <div><label>Place</label><input name="place"></div>
@@ -353,7 +361,7 @@ document.getElementById('ml').textContent=cm.toLocaleDateString('en-GB',{month:'
 var first=(new Date(y,m,1).getDay()+6)%7,start=new Date(y,m,1-first),h='';
 ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(n){h+='<div class="h">'+n+'</div>'});
 for(var i=0;i<42;i++){var d=new Date(start);d.setDate(start.getDate()+i);var k=iso(d);
-var evs=S.events.map(function(c){var o='';if(c.start===k)o+='<span class="ev" title="'+esc(c.name)+'">&#127908; '+esc(c.name)+'</span>';c.deadlines.forEach(function(d){if(d.date===k&&!d.done)o+='<span class="ev" title="'+esc(c.name+' – '+d.kind)+'">'+esc(c.name+': '+d.kind)+'</span>'});(c.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)o+='<span class="ev" title="'+esc(c.name+' – '+t.text)+'">'+esc(c.name+': '+t.text)+'</span>'});(c.talks||[]).forEach(function(p){if(p.date===k&&p.status!=='Rejected'&&p.status!=='Presented')o+='<span class="ev" title="'+esc(c.name+' – '+p.title)+'">&#127908; '+esc(p.title)+'</span>'});return o}).join('')+S.grants.map(function(g){return g.miles.filter(function(m){return m.date===k&&!m.done}).map(function(m){return '<span class="ev g" title="'+esc(g.name+' – '+m.label)+'">'+esc(g.name+': '+m.label)+'</span>'}).join('')}).join('')+S.grants.map(function(g){return (g.tasks||[]).filter(function(t){return t.date===k&&!t.done}).map(function(t){return '<span class="ev g" title="'+esc(g.name+' – '+t.text)+'">'+esc(g.name+': '+t.text)+'</span>'}).join('')}).join('');
+var evs=S.events.map(function(c){var o='';if(c.start&&c.start<=k&&k<=(c.end&&c.end>c.start?c.end:c.start))o+='<span class="ev" title="'+esc(c.name+(c.end&&c.end>c.start?' ('+c.start+' – '+c.end+')':''))+'">'+(c.start===k?'&#127908; ':'↳ ')+esc(c.name)+'</span>';c.deadlines.forEach(function(d){if(d.date===k&&!d.done)o+='<span class="ev" title="'+esc(c.name+' – '+d.kind)+'">'+esc(c.name+': '+d.kind)+'</span>'});(c.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)o+='<span class="ev" title="'+esc(c.name+' – '+t.text)+'">'+esc(c.name+': '+t.text)+'</span>'});(c.talks||[]).forEach(function(p){if(p.date===k&&p.status!=='Rejected'&&p.status!=='Presented')o+='<span class="ev" title="'+esc(c.name+' – '+p.title)+'">&#127908; '+esc(p.title)+'</span>'});return o}).join('')+S.grants.map(function(g){return g.miles.filter(function(m){return m.date===k&&!m.done}).map(function(m){return '<span class="ev g" title="'+esc(g.name+' – '+m.label)+'">'+esc(g.name+': '+m.label)+'</span>'}).join('')}).join('')+S.grants.map(function(g){return (g.tasks||[]).filter(function(t){return t.date===k&&!t.done}).map(function(t){return '<span class="ev g" title="'+esc(g.name+' – '+t.text)+'">'+esc(g.name+': '+t.text)+'</span>'}).join('')}).join('');
 var nts=S.notes.filter(function(n){return n.date===k}).map(function(n){return '<span class="ev n" title="'+esc(n.title)+'">📝 '+esc(n.title)+'</span>'}).join('');
 var cfs=S.contacts.filter(function(c){return c.next===k&&c.status!=='Dormant'}).map(function(c){return '<span class="ev n" title="'+esc('Follow up: '+c.name)+'">☎ '+esc(c.name)+'</span>'}).join('');
 var pps=S.papers.filter(function(p){return p.deadline===k}).map(function(p){return '<span class="ev r" title="'+esc(p.title+' – deadline')+'">📄 '+esc(p.title)+'</span>'}).join('');
@@ -626,6 +634,58 @@ else if(a==='dellog'){k.log=(k.log||[]).filter(function(l){return l.id!==t.datas
 else if(a==='addlink'){var v=p.querySelector('[data-n=lk]').value;if(!v)return;k.links=k.links||[];if(k.links.indexOf(v)<0)k.links.push(v)}
 else if(a==='unlink')k.links=(k.links||[]).filter(function(x){return x!==t.dataset.v});
 else return;save();render()});
+var IMP=null,IKINDS=['Abstract','Talk submission','Registration','Funding application','Other','Conference dates','Skip'];
+function icsUnesc(v){return String(v||'').replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1')}
+function icsDate(v){var m=String(v).trim().match(/^(\d{4})(\d{2})(\d{2})/);return m?m[1]+'-'+m[2]+'-'+m[3]:''}
+function prevDay(d){var t=new Date(d+'T00:00:00');t.setDate(t.getDate()-1);return iso(t)}
+function icsKind(t){t=(t||'').toLowerCase();
+if(/abstract/.test(t))return 'Abstract';
+if(/regist/.test(t))return 'Registration';
+if(/fund|grant|bursar|stipend|travel support|scholarship|fellowship|financial/.test(t))return 'Funding application';
+if(/(poster|talk|presentation|paper|contribution|speaker|proposal)/.test(t)&&/(deadline|due|submit|submission|closes?|call)/.test(t))return 'Talk submission';
+if(/(deadline|due|notification|notify|decision|closes?|camera|early.?bird|submission|acceptance)/.test(t))return 'Other';
+return 'Conference dates'}
+function icsParse(txt){
+var lines=String(txt||'').replace(/\r\n[ \t]/g,'').replace(/\n[ \t]/g,'').split(/\r?\n/),evs=[],cur=null,name='';
+lines.forEach(function(l){
+if(l.trim()==='BEGIN:VEVENT'){cur={};return}
+if(l.trim()==='END:VEVENT'){if(cur&&cur.start)evs.push(cur);cur=null;return}
+var i=l.indexOf(':');if(i<0)return;
+var head=l.slice(0,i),val=l.slice(i+1),nm=head.split(';')[0].toUpperCase(),pr=head.toUpperCase();
+if(!cur){if(nm==='X-WR-CALNAME')name=icsUnesc(val);return}
+if(nm==='SUMMARY')cur.title=icsUnesc(val).trim();
+else if(nm==='LOCATION')cur.loc=icsUnesc(val).trim();
+else if(nm==='DESCRIPTION')cur.desc=icsUnesc(val);
+else if(nm==='URL')cur.url=val.trim();
+else if(nm==='DTSTART'){cur.start=icsDate(val);cur.allDay=/^\d{8}$/.test(val.trim())||pr.indexOf('VALUE=DATE')>-1&&pr.indexOf('DATE-TIME')<0}
+else if(nm==='DTEND')cur.end=icsDate(val)});
+evs.forEach(function(e){e.title=e.title||'(untitled)';if(e.end&&e.allDay&&e.end>e.start)e.end=prevDay(e.end);if(!e.end||e.end<=e.start)e.end='';e.kind=icsKind(e.title);e.on=e.kind==='Conference dates'||e.start>=today});
+evs.sort(function(a,b){return a.start<b.start?-1:1});
+return{events:evs,name:name}}
+function loadIcs(txt,fname){var r=icsParse(txt),m=document.getElementById('impmsg');
+if(!r.events.length){IMP=null;renderImp();m.textContent='No events found. Is this a calendar (.ics) file?';return}
+r.name=r.name||fname||'';IMP=r;m.textContent='';renderImp()}
+function renderImp(){var el=document.getElementById('impprev');if(!IMP){el.innerHTML='';return}
+var nm=(IMP.name||'').toLowerCase(),guess=S.events.find(function(c){var n=c.name.toLowerCase();return nm&&(nm.indexOf(n)>-1||n.indexOf(nm)>-1)});
+el.innerHTML='<div class="mu" style="margin-bottom:6px">'+IMP.events.length+' event'+(IMP.events.length===1?'':'s')+' found. Choose what each one is; past dates are unchecked.</div>'+
+IMP.events.map(function(e,i){return '<div class="sub"><input type="checkbox" style="width:auto" data-ii="'+i+'" data-f="on"'+(e.on?' checked':'')+'><span style="min-width:200px;flex:1">'+esc(e.title)+'</span><span class="mu">'+esc(e.start)+(e.end?' → '+esc(e.end):'')+'</span><select data-ii="'+i+'" data-f="kind" style="width:auto">'+opts(IKINDS,e.kind)+'</select></div>'}).join('')+
+'<div class="sub" style="margin-top:10px"><label style="margin:0">Add to</label><select id="imptarget"><option value="new">New conference</option>'+S.events.map(function(c){return '<option value="'+c.id+'"'+(guess&&guess.id===c.id?' selected':'')+'>'+esc(c.name)+'</option>'}).join('')+'</select><input id="impname" placeholder="New conference name" value="'+esc(IMP.name)+'" style="min-width:200px"><button class="btn sm pri" data-go="1">Import selected</button></div>'}
+function doImport(){if(!IMP)return;var tv=document.getElementById('imptarget').value,m=document.getElementById('impmsg'),c;
+var rows=IMP.events.filter(function(e){return e.on&&e.kind!=='Skip'&&e.start});
+if(!rows.length){m.textContent='Nothing selected.';return}
+if(tv==='new'){c={id:uid(),name:document.getElementById('impname').value.trim()||IMP.name||'New conference',place:'',start:'',end:'',link:'',status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:'',talks:[],tasks:[]};S.events.push(c)}else c=S.events.find(function(x){return x.id===tv});
+if(!c)return;var nd=0,dates=false;rows.sort(function(x,y){return (x.kind==='Conference dates'?0:1)-(y.kind==='Conference dates'?0:1)});
+rows.forEach(function(e){
+if(e.kind==='Conference dates'){if(!c.start){c.start=e.start;c.end=e.end||''}else if(!c.end&&e.end&&e.start===c.start)c.end=e.end;dates=true}
+else{var kind=e.kind==='Other'?e.title.slice(0,60):e.kind;if(!c.deadlines.some(function(d){return d.kind===kind&&d.date===e.start})){c.deadlines.push({id:uid(),kind:kind,date:e.start,done:false});nd++}}
+if(e.loc&&!c.place&&e.kind==='Conference dates')c.place=e.loc;
+if(/^https?:\/\//.test(e.url||'')&&!c.link)c.link=e.url});
+save();IMP=null;document.getElementById('impfile').value='';document.getElementById('imppaste').value='';render();renderImp();
+document.getElementById('impmsg').textContent='Imported into "'+c.name+'": '+nd+' deadline'+(nd===1?'':'s')+(dates?', conference dates updated':'')+'.'}
+document.getElementById('impprev').addEventListener('change',function(e){var t=e.target,i=t.dataset.ii;if(i===undefined||!IMP)return;var ev=IMP.events[+i];if(t.dataset.f==='on')ev.on=t.checked;else ev.kind=t.value});
+document.getElementById('impprev').addEventListener('click',function(e){if(e.target.closest('[data-go]'))doImport()});
+document.getElementById('impfile').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){loadIcs(r.result,f.name.replace(/\.[^.]+$/,''))};r.readAsText(f)};
+document.getElementById('impread').onclick=function(){loadIcs(document.getElementById('imppaste').value,'')};
 function render(){renderUpcoming();renderContacts();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderNotes()}
 
 document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
