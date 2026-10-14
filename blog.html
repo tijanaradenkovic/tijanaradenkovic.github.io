@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Physics blog by Tijana Radenković with notes and reflections on quantum gravity, higher gauge theory, topological field theory and mathematical physics.">
-  <title>Physics Blog | Tijana Radenković</title>
+  <meta name="description" content="Research ideas and personal reflections on physics, philosophy, books, life and everything in between.">
+  <title>Blog | Tijana Radenković</title>
   <meta name="author" content="Tijana Radenković">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://tijanaradenkovic.github.io/blog.html">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Tijana Radenković">
-  <meta property="og:title" content="Physics Blog | Tijana Radenković">
-  <meta property="og:description" content="Physics notes and reflections on quantum gravity, higher gauge theory, topological field theory and mathematical physics.">
+  <meta property="og:title" content="Blog | Tijana Radenković">
+  <meta property="og:description" content="Research ideas and personal reflections on physics, philosophy, books and life.">
   <meta property="og:url" content="https://tijanaradenkovic.github.io/blog.html">
   <meta property="og:image" content="https://tijanaradenkovic.github.io/ChatGPT%20Image%20Sep%2018%2C%202026%2C%2011_39_14%20PM.png">
 
@@ -22,8 +22,8 @@
     "@type":"Blog",
     "@id":"https://tijanaradenkovic.github.io/blog.html#blog",
     "url":"https://tijanaradenkovic.github.io/blog.html",
-    "name":"Physics Blog | Tijana Radenković",
-    "description":"Physics notes and reflections on quantum gravity, higher gauge theory, topological field theory and mathematical physics.",
+    "name":"Blog | Tijana Radenković",
+    "description":"Research ideas and personal reflections on physics, philosophy, books and life.",
     "inLanguage":"en",
     "author":{"@id":"https://tijanaradenkovic.github.io/#person"},
     "isPartOf":{"@id":"https://tijanaradenkovic.github.io/#website"}
@@ -73,6 +73,11 @@
     .tags{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.35rem}
     .tag{background:var(--soft-teal);color:#266866;padding:.35rem .7rem;border-radius:999px;font-size:.9rem;font-weight:600}
     .posts{margin-top:1rem}
+    .blog-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem}
+    .blog-category{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:2rem;box-shadow:0 8px 24px rgba(23,32,51,.04)}
+    .blog-category p{color:var(--muted)}
+    .blog-category .tags{margin-bottom:1.4rem}
+    @media(max-width:760px){.blog-categories{grid-template-columns:1fr}.blog-category{padding:1.5rem}}
     .empty-state{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:2rem;box-shadow:0 8px 24px rgba(23,32,51,.04)}
     .empty-state p{margin:.5rem 0 0;color:var(--muted);max-width:720px}
 
@@ -145,41 +150,32 @@
     <circle cx="1080" cy="175" r="3"></circle><circle cx="1215" cy="80" r="3"></circle>
   </svg>
   <div class="page-hero-inner">
-    <div class="eyebrow">Tijana Radenković · Physics blog</div>
-    <h1>Physics notes &amp; reflections</h1>
-    <p class="intro">Short articles on quantum gravity, higher gauge theory, mathematical physics and the ideas behind my research.</p>
+    <div class="eyebrow">Tijana Radenković · Blog</div>
+    <h1>Ideas &amp; reflections</h1>
+    <p class="intro">A space for research ideas, philosophy, books, life, and everything in between.</p>
     <a class="back-link" href="index.html">← Back to home</a>
   </div>
 </header>
 
 <main>
-  <section class="wrap">
-    <div class="intro-grid">
-      <div>
-        <div class="eyebrow">About the blog</div>
-        <h2>Ideas, explained</h2>
-      </div>
-      <div>
-        <p>This is a space for conceptual explanations, research background and occasional reflections on theoretical and mathematical physics. The aim is to make some of the structures behind quantum gravity and higher gauge theory accessible without turning every post into a technical paper.</p>
-        <div class="tags">
-          <span class="tag">Quantum gravity</span>
-          <span class="tag">Higher gauge theory</span>
-          <span class="tag">2-groups &amp; 3-groups</span>
-          <span class="tag">TQFT</span>
-          <span class="tag">Mathematical physics</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap" style="padding-top:0">
-    <div class="eyebrow">Articles</div>
-    <h2>Latest posts</h2>
-    <div class="posts">
-      <div class="empty-state">
-        <h3>First notes coming soon.</h3>
-        <p>Articles will be added here gradually.</p>
-      </div>
+  <section class="wrap" aria-labelledby="categories-heading">
+    <div class="eyebrow">Explore the blog</div>
+    <h2 id="categories-heading">Two sides of curiosity</h2>
+    <div class="blog-categories">
+      <section class="blog-category" id="research-ideas" aria-labelledby="research-heading">
+        <div class="eyebrow">Academic notes</div>
+        <h3 id="research-heading">Research &amp; Ideas</h3>
+        <p>Thoughts on theoretical physics, mathematics, quantum gravity, higher gauge theory and academic life.</p>
+        <div class="tags"><span class="tag">Quantum gravity</span><span class="tag">Higher gauge theory</span><span class="tag">Mathematics</span><span class="tag">TQFT</span></div>
+        <div class="posts"><div class="empty-state"><h3>First notes coming soon.</h3><p>Research articles will appear here.</p></div></div>
+      </section>
+      <section class="blog-category" id="personal-reflections" aria-labelledby="personal-heading">
+        <div class="eyebrow">Beyond research</div>
+        <h3 id="personal-heading">Personal Reflections</h3>
+        <p>On books, philosophy, life, and everything in between.</p>
+        <div class="tags"><span class="tag">Philosophy</span><span class="tag">Books</span><span class="tag">Society</span><span class="tag">Life</span></div>
+        <div class="posts"><div class="empty-state"><h3>Reflections coming soon.</h3><p>Personal essays, reading reflections and other thoughts will appear here.</p></div></div>
+      </section>
     </div>
   </section>
 
