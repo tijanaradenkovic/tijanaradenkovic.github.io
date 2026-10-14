@@ -1,855 +1,1541 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex">
-<meta name="theme-color" content="#6b3a64">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Academic Planner</title>
-<style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#f6f3ee;--card:#fcfaf6;--tx:#16203a;--mu:#667085;--bd:#e4e0d9;--ac:#6b3a64;--on:#fff;--rd:#b4433a;--gr:#2a7f7c;--am:#b7791f;--k-conf:#6b3a64;--k-visit:#2a7f7c;--k-sem:#2f5d9e;--k-grant:#b7791f;--k-paper:#b4433a;--k-contact:#4f8a3a;--k-note:#6b7385}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a2b;--card:#1a2438;--tx:#ece8e1;--mu:#9aa3b5;--bd:#2b364d;--ac:#c79bc0;--on:#121a2b;--rd:#ef7f76;--gr:#5fc1bb;--am:#e0a84a;--k-conf:#c79bc0;--k-visit:#5fc1bb;--k-sem:#86a9e6;--k-grant:#e0a84a;--k-paper:#ef7f76;--k-contact:#8fcf7f;--k-note:#98a3b8}}
-:root[data-theme="dark"]{--bg:#121a2b;--card:#1a2438;--tx:#ece8e1;--mu:#9aa3b5;--bd:#2b364d;--ac:#c79bc0;--on:#121a2b;--rd:#ef7f76;--gr:#5fc1bb;--am:#e0a84a;--k-conf:#c79bc0;--k-visit:#5fc1bb;--k-sem:#86a9e6;--k-grant:#e0a84a;--k-paper:#ef7f76;--k-contact:#8fcf7f;--k-note:#98a3b8}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:900px;margin:0 auto;padding:16px}
-h1{font:700 34px/1.1 Georgia,"Times New Roman",serif;color:var(--tx);margin:0 0 16px}
-.eb{font:700 12px system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gr);margin:8px 0 6px}
-.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.tabs button,.btn{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit}
-.tabs button.on,.btn.pri{background:var(--ac);color:var(--on);border-color:var(--ac)}
-.btn.sm{padding:4px 10px;font-size:13px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:10px}
-.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.mu{color:var(--mu);font-size:13px}
-.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--bd);color:var(--mu);margin-right:4px}
-.due{font-weight:600}.due.late{color:var(--rd)}.due.soon{color:var(--am)}.due.ok{color:var(--gr)}
-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-bottom:14px}
-form .full{grid-column:1/-1}
-input,select,textarea{width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);font:inherit}
-textarea{min-height:90px;resize:vertical}
-label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cal .h{font-size:12px;color:var(--mu);text-align:center}
-.cal .d{min-height:62px;border:1px solid var(--bd);border-radius:6px;padding:3px;font-size:12px;background:var(--card);overflow:hidden}
-.cal .d.today{border-color:var(--ac)}
-.cal .d.x{opacity:.35}.cal .d.sel{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}.cal .d:hover{border-color:var(--ac)}
-.ev{display:block;font-size:11px;background:var(--ac);color:var(--on);border-radius:4px;padding:0 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ev.g{background:var(--am)}.ev.n{background:var(--gr)}.ev.r{background:var(--rd)}
-.hide{display:none}a{color:var(--ac);text-decoration-thickness:2px;text-underline-offset:3px}summary{color:var(--ac);font-weight:700;cursor:pointer}
-.scroll{overflow-x:auto}
-.sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}.sub select,.sub input:not([type=checkbox]){width:auto}
-.subnav{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.subnav button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit}.subnav button.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
-.tb{width:100%;border-collapse:collapse;font-size:14px}.tb th,.tb td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}.tb th:first-child,.tb td:first-child{text-align:left}.tb th{color:var(--mu);font-weight:600;font-size:12px}.tb tr.tot td{font-weight:700;border-top:2px solid var(--bd)}
-.ev.k-conf{background:var(--k-conf)}#cal.hide-conf .k-conf{display:none}.ev.k-visit{background:var(--k-visit)}#cal.hide-visit .k-visit{display:none}.ev.k-sem{background:var(--k-sem)}#cal.hide-sem .k-sem{display:none}.ev.k-grant{background:var(--k-grant)}#cal.hide-grant .k-grant{display:none}.ev.k-paper{background:var(--k-paper)}#cal.hide-paper .k-paper{display:none}.ev.k-contact{background:var(--k-contact)}#cal.hide-contact .k-contact{display:none}.ev.k-note{background:var(--k-note)}#cal.hide-note .k-note{display:none}.lg{cursor:pointer;display:inline-flex;gap:6px;align-items:center;font-size:13px;margin-right:10px}.lg i{width:12px;height:12px;border-radius:3px;display:inline-block}.lg.off{opacity:.4;text-decoration:line-through}.ev{cursor:pointer}@keyframes fl{0%,60%{box-shadow:0 0 0 3px var(--ac)}100%{box-shadow:0 0 0 0 transparent}}.flash{animation:fl 1.8s}
-</style>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="description" content="Academic website of Tijana Radenković, theoretical physicist and Research Associate at the Institute of Physics Belgrade, working on quantum gravity, higher gauge theory, 3-groups, 3BF theory and TQFT.">
+
+  <title>Tijana Radenković | Quantum Gravity &amp; Higher Gauge Theory</title>
+  <!-- SEO START -->
+  <meta name="author" content="Tijana Radenković">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+
+  <link rel="canonical" href="https://tijanaradenkovic.github.io/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tijana Radenković">
+  <meta property="og:title" content="Tijana Radenković | Quantum Gravity &amp; Higher Gauge Theory">
+  <meta property="og:description" content="Academic website of Tijana Radenković, theoretical physicist and Research Associate at the Institute of Physics Belgrade, working on quantum gravity, higher gauge theory, 3-groups, 3BF theory and TQFT.">
+  <meta property="og:url" content="https://tijanaradenkovic.github.io/">
+  <meta property="og:image" content="https://tijanaradenkovic.github.io/ChatGPT%20Image%20Sep%2018%2C%202026%2C%2011_39_14%20PM.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tijana Radenković | Quantum Gravity &amp; Higher Gauge Theory">
+  <meta name="twitter:description" content="Academic website of Tijana Radenković, theoretical physicist and Research Associate at the Institute of Physics Belgrade, working on quantum gravity, higher gauge theory, 3-groups, 3BF theory and TQFT.">
+  <meta name="twitter:image" content="https://tijanaradenkovic.github.io/ChatGPT%20Image%20Sep%2018%2C%202026%2C%2011_39_14%20PM.png">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://tijanaradenkovic.github.io/#person",
+      "name": "Tijana Radenković",
+      "alternateName": "Tijana Radenkovic",
+      "url": "https://tijanaradenkovic.github.io/",
+      "image": "https://tijanaradenkovic.github.io/ChatGPT%20Image%20Sep%2018%2C%202026%2C%2011_39_14%20PM.png",
+      "jobTitle": "Research Associate and Theoretical Physicist",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Institute of Physics Belgrade"
+      },
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Belgrade, Faculty of Physics"
+      },
+      "knowsAbout": [
+        "Quantum gravity",
+        "Higher gauge theory",
+        "2-groups",
+        "3-groups",
+        "2BF theory",
+        "3BF theory",
+        "Topological quantum field theory",
+        "Gauge symmetry",
+        "Spinfoam quantization"
+      ],
+      "sameAs": [
+        "https://github.com/tijanaradenkovic",
+        "https://www.gravity.ipb.ac.rs/Radenkovic.html",
+        "https://inspirehep.net/authors/1778027?ui-citation-summary=true",
+        "https://orcid.org/0000-0002-2310-5281",
+        "https://arxiv.org/search/hep-th?searchtype=author&query=Radenkovic,+T",
+        "https://scholar.google.com/citations?user=EqmN4YUAAAAJ&hl=sr",
+        "https://www.researchgate.net/profile/Tijana-Radenkovic",
+        "https://rs.linkedin.com/in/tijana-radenkovic"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://tijanaradenkovic.github.io/#website",
+      "url": "https://tijanaradenkovic.github.io/",
+      "name": "Tijana Radenković",
+      "description": "Academic website of Tijana Radenković, theoretical physicist and Research Associate at the Institute of Physics Belgrade, working on quantum gravity, higher gauge theory, 3-groups, 3BF theory and TQFT.",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://tijanaradenkovic.github.io/#person"
+      }
+    }
+  ]
+}
+  </script>
+  <!-- SEO END -->
+
+
+  <style>
+
+    :root{
+      --ink:#172033;
+      --muted:#657080;
+      --paper:#F7F4EF;
+      --card:#FFFFFF;
+
+      --accent:#6F3B63;
+      --accent2:#2F7C7A;
+
+      --line:#DDD4D8;
+      --soft:#EDE7EA;
+      --soft-teal:#E4F0EF;
+    }
+
+
+    *{
+      box-sizing:border-box;
+    }
+
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+
+    body{
+      margin:0;
+
+      background:var(--paper);
+      color:var(--ink);
+
+      font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif;
+    }
+
+
+    a{
+      color:var(--accent);
+      text-decoration-thickness:1px;
+      text-underline-offset:3px;
+    }
+
+
+
+    /* NAVIGATION */
+
+
+    nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+
+      background:rgba(247,244,239,.94);
+
+      border-bottom:1px solid var(--line);
+
+      backdrop-filter:blur(10px);
+    }
+
+
+    nav .inner{
+      max-width:1080px;
+      margin:auto;
+
+      padding:.9rem 1.4rem;
+
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+
+      gap:1rem;
+    }
+
+
+    .brand{
+      font-family:Georgia,serif;
+
+      font-weight:bold;
+
+      color:var(--ink);
+
+      text-decoration:none;
+    }
+
+
+    .links{
+      display:flex;
+
+      gap:1rem;
+
+      flex-wrap:wrap;
+    }
+
+
+    .links a{
+      color:var(--muted);
+
+      text-decoration:none;
+
+      font-size:.9rem;
+
+      transition:color .2s ease;
+    }
+
+
+    .links a:hover{
+      color:var(--accent2);
+    }
+
+
+
+    /* HERO */
+
+
+    .hero-shell{
+      position:relative;
+
+      overflow:hidden;
+    }
+
+
+    .hero{
+      position:relative;
+
+      z-index:2;
+
+      max-width:1080px;
+
+      margin:auto;
+
+      padding:6rem 1.4rem 5rem;
+
+      display:grid;
+
+      grid-template-columns:1.3fr .7fr;
+
+      gap:4rem;
+
+      align-items:center;
+    }
+
+
+    .hero-triangulation{
+      position:absolute;
+
+      inset:0;
+
+      width:100%;
+      height:100%;
+
+      z-index:1;
+
+      pointer-events:none;
+
+      opacity:.16;
+    }
+
+
+    .hero-triangulation line{
+      stroke:var(--accent2);
+
+      stroke-width:1;
+    }
+
+
+    .hero-triangulation circle{
+      fill:var(--accent);
+    }
+
+
+    .eyebrow{
+      text-transform:uppercase;
+
+      letter-spacing:.16em;
+
+      font-weight:700;
+
+      font-size:.76rem;
+
+      color:var(--accent2);
+    }
+
+
+
+    h1,
+    h2,
+    h3{
+      font-family:Georgia,serif;
+
+      line-height:1.16;
+
+      color:var(--ink);
+    }
+
+
+    h1{
+      font-size:clamp(3rem,8vw,6rem);
+
+      margin:.35rem 0 1rem;
+
+      letter-spacing:-.04em;
+    }
+
+
+    h2{
+      font-size:clamp(2rem,5vw,3rem);
+
+      margin:0 0 1.8rem;
+    }
+
+
+    h3{
+      font-size:1.25rem;
+
+      margin:.2rem 0;
+    }
+
+
+    .lead{
+      font-size:1.25rem;
+
+      max-width:700px;
+
+      color:#465164;
+    }
+
+
+
+    /* PORTRAIT */
+
+
+    .portrait{
+      aspect-ratio:1;
+
+      border:1px solid var(--line);
+
+      border-radius:50%;
+
+      overflow:hidden;
+
+      background:var(--soft);
+
+      box-shadow:20px 20px 0 #DCE8E6;
+
+      position:relative;
+
+      z-index:3;
+    }
+
+
+    .portrait img{
+      display:block;
+
+      width:100%;
+      height:100%;
+
+      object-fit:cover;
+
+      object-position:center 23%;
+    }
+
+
+
+    /* BUTTONS */
+
+
+    .actions{
+      display:flex;
+
+      gap:1rem;
+
+      margin-top:1.8rem;
+
+      flex-wrap:wrap;
+    }
+
+
+    .button{
+      display:inline-block;
+
+      padding:.72rem 1.05rem;
+
+      border:1px solid var(--accent);
+
+      border-radius:999px;
+
+      color:var(--accent);
+
+      text-decoration:none;
+
+      transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+    }
+
+
+    .button:hover{
+      transform:translateY(-1px);
+    }
+
+
+    .button.primary{
+      background:var(--accent);
+
+      color:white;
+    }
+
+
+    .button.primary:hover{
+      background:#5F3155;
+    }
+
+    .profile-links{
+      margin-top:1rem;
+      display:flex;
+      gap:.45rem;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    .profile-links a{
+      color:var(--accent2);
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    .profile-links a:hover{
+      color:var(--accent);
+    }
+
+
+
+    /* SECTIONS */
+
+
+    .wrap{
+      max-width:1080px;
+
+      margin:auto;
+
+      padding:4.5rem 1.4rem;
+    }
+
+
+    .tint{
+      background:#EEEAE7;
+
+      border-block:1px solid var(--line);
+    }
+
+
+    .about-grid,
+    .two-col{
+      display:grid;
+
+      grid-template-columns:1fr 1fr;
+
+      gap:3rem;
+    }
+
+
+
+    /* TAGS */
+
+
+    .tags{
+      display:flex;
+
+      gap:.6rem;
+
+      flex-wrap:wrap;
+
+      margin-top:1.4rem;
+    }
+
+
+    .tag{
+      background:var(--soft-teal);
+
+      color:#266866;
+
+      padding:.35rem .7rem;
+
+      border-radius:999px;
+
+      font-size:.9rem;
+
+      font-weight:600;
+    }
+
+
+
+    /* CARDS */
+
+
+    .project{
+      position:relative;
+
+      overflow:hidden;
+
+      background:var(--card);
+
+      border:1px solid var(--line);
+
+      padding:1.5rem;
+
+      border-radius:14px;
+
+      margin-bottom:1rem;
+
+      box-shadow:
+        0 8px 24px rgba(23,32,51,.04);
+
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+    }
+
+
+    .project:before{
+      content:"";
+
+      position:absolute;
+
+      width:70px;
+      height:70px;
+
+      border:1px solid rgba(47,124,122,.16);
+
+      transform:rotate(45deg);
+
+      right:-40px;
+      top:-40px;
+    }
+
+
+    .project:hover{
+      transform:translateY(-2px);
+
+      border-color:#CFC3CA;
+
+      box-shadow:
+        0 12px 28px rgba(23,32,51,.07);
+    }
+
+
+    .project h3 a{
+      color:var(--accent);
+
+      text-decoration:none;
+    }
+
+
+    .project h3 a:hover{
+      color:var(--accent2);
+    }
+
+
+
+    /* GENERAL ELEMENTS */
+
+
+    .item{
+      padding:1.4rem 0;
+
+      border-top:1px solid var(--line);
+    }
+
+
+    .item:first-child{
+      border-top:0;
+
+      padding-top:0;
+    }
+
+
+    .meta{
+      color:var(--accent2);
+
+      font-weight:700;
+
+      font-size:.9rem;
+    }
+
+
+    .subtle{
+      color:var(--muted);
+    }
+
+
+
+    /* PUBLICATIONS */
+
+
+    .pubs{
+      counter-reset:pub;
+
+      list-style:none;
+
+      padding:0;
+
+      margin:0;
+    }
+
+
+    .pubs li{
+      counter-increment:pub;
+
+      position:relative;
+
+      padding:1.35rem 0 1.35rem 3rem;
+
+      border-top:1px solid var(--line);
+    }
+
+
+    .pubs li:before{
+      content:counter(pub,decimal-leading-zero);
+
+      position:absolute;
+
+      left:0;
+
+      color:var(--accent2);
+
+      font-family:Georgia,serif;
+    }
+
+
+    .pub-title{
+      font-weight:700;
+    }
+
+
+
+    /* EVENTS */
+
+
+    .events{
+      columns:2;
+
+      column-gap:3rem;
+    }
+
+
+    .event{
+      break-inside:avoid;
+
+      padding:0 0 1.25rem;
+    }
+
+
+
+    /* CONTACT */
+
+
+    .contact{
+      text-align:center;
+
+      max-width:720px;
+    }
+
+
+    .contact h2{
+      font-size:clamp(2.5rem,7vw,4.8rem);
+    }
+
+
+
+    /* FOOTER */
+
+
+    footer{
+      border-top:1px solid var(--line);
+
+      padding:1.5rem;
+
+      text-align:center;
+
+      color:var(--muted);
+
+      font-size:.9rem;
+    }
+
+
+
+    /* MOBILE */
+
+
+    
+    .menu-toggle{
+      display:none;
+      width:42px;
+      height:42px;
+      padding:9px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:rgba(255,255,255,.72);
+      cursor:pointer;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .menu-toggle span{
+      display:block;
+      width:20px;
+      height:2px;
+      background:var(--ink);
+      border-radius:2px;
+      transition:transform .2s ease,opacity .2s ease;
+    }
+
+    .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+    @media(max-width:760px){
+
+      .menu-toggle{display:flex}
+      .links{
+        position:absolute;
+        top:100%;
+        left:0;
+        right:0;
+        padding:.75rem 1.4rem 1rem;
+        background:rgba(247,244,239,.98);
+        border-bottom:1px solid var(--line);
+        box-shadow:0 12px 24px rgba(23,32,51,.08);
+        flex-direction:column;
+        gap:.15rem;
+      }
+      .links.open{display:flex}
+      .links a{padding:.42rem 0;font-size:.96rem}
+
+
+      .hero{
+        grid-template-columns:1fr;
+
+        padding-top:4rem;
+      }
+
+
+      .portrait{
+        width:190px;
+
+        order:-1;
+      }
+
+
+      .about-grid,
+      .two-col{
+        grid-template-columns:1fr;
+      }
+
+
+      .events{
+        columns:1;
+      }
+
+
+      .links{
+        display:none;
+      }
+
+
+      .hero-triangulation{
+        opacity:.10;
+      }
+
+    }
+
+  </style>
+
 </head>
+
+
+
 <body>
-<div class="wrap">
-<div class="eb">Conferences · Grants · Papers · Notes</div>
-<h1>Academic Planner</h1>
-<div class="mu" id="sync" style="margin-bottom:12px">Data is saved in this browser.</div>
-<div id="backup" class="card" style="display:none;border-color:var(--am)"><div class="row"><div id="bkmsg"></div><div class="sub" style="margin:0"><button class="btn sm pri" id="bkgo">Export backup now</button><button class="btn sm" id="bklater">Remind me in a week</button></div></div></div>
-<div class="tabs">
-<button data-t="upcoming" class="on">Upcoming</button>
-<button data-t="kalendar">Calendar</button>
-<button data-t="rokovi">Conferences &amp; Visits</button>
-<button data-t="visits">Lectures &amp; Seminars</button>
-<button data-t="grants">Projects &amp; Grants</button>
-<button data-t="expenses">Expenses</button>
-<button data-t="cvx">Export</button>
-<button data-t="radovi">Papers</button>
-<button data-t="abs">Abstracts</button>
-<button data-t="beleske">Notes</button>
-<button data-t="contacts">Contacts</button>
-<button data-t="podaci">Data</button>
-</div>
 
-<section id="upcoming">
-<div class="row" style="margin-bottom:10px"><div class="mu" id="usum"></div><select id="uw" style="width:auto"><option value="30">Next 30 days</option><option value="60" selected>Next 60 days</option><option value="90">Next 90 days</option><option value="all">Everything</option></select></div>
-<div id="uattn"></div>
-<div id="ulist"></div>
-<details id="icsd" style="margin-top:16px"><summary>Export to calendar (.ics)</summary>
-<div class="card" style="margin-top:8px">
-<div class="mu">Include</div>
-<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-c" checked style="width:auto">Conference deadlines &amp; tasks</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-t" checked style="width:auto">Conference dates &amp; my presentations</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-g" checked style="width:auto">Grant milestones &amp; tasks</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-p" checked style="width:auto">Paper deadlines</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-f" checked style="width:auto">Contact follow-ups</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-v" checked style="width:auto">Visits &amp; meetings</label></div>
-<div class="mu" style="margin-top:10px">Reminders (each at 09:00)</div>
-<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ia-w" checked style="width:auto">1 week before</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ia-d" checked style="width:auto">1 day before</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ia-0" style="width:auto">On the day</label></div>
-<div class="sub" style="margin-top:10px"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-past" style="width:auto">Include dates in the past</label></div>
-<div class="sub" style="margin-top:10px"><button class="btn sm" id="icssave">Save .ics file</button><button class="btn sm" id="icscopy">Copy text</button><span class="mu" id="icsinfo"></span></div>
-<p class="mu">Import the file into Google Calendar, Apple Calendar or Outlook. Events have fixed IDs, so importing again after changes should update the same events instead of duplicating them. Apple Calendar and Outlook use the reminders in the file; Google Calendar may apply its own default notifications instead.</p>
-</div></details>
-</section>
 
-<section id="rokovi" class="hide">
-<div class="sub" style="margin-bottom:10px"><label style="margin:0">What do you want to add?</label><select id="ctype" style="width:auto"><option value="conf">Conference</option><option value="visit">Research visit (I travel)</option><option value="host">Visit I host</option></select></div>
-<div id="addconf">
-<details id="icsimp" style="margin-bottom:12px"><summary>Import dates from a conference calendar (.ics)</summary>
-<div class="card" style="margin-top:8px">
-<p class="mu" style="margin-top:0">Many conference websites have an "Add to calendar" or "Download .ics" link for their key dates. Download that file and choose it here, or paste its text.</p>
-<div class="sub"><input type="file" id="impfile" accept=".ics,.ical,text/calendar"></div>
-<details style="margin:8px 0"><summary class="mu">…or paste the .ics text</summary><textarea id="imppaste" placeholder="BEGIN:VCALENDAR ..." style="min-height:90px;margin-top:6px"></textarea><div class="sub"><button class="btn sm" id="impread">Read pasted text</button></div></details>
-<div id="impprev"></div>
-<div class="mu" id="impmsg" style="margin-top:6px"></div>
-</div></details>
-<form id="fr">
-<div class="full"><label>Conference name</label><input name="name" required placeholder="e.g. EGU 2027"></div>
-<div><label>Place</label><input name="place"></div>
-<div><label>Starts</label><input type="date" name="start"></div>
-<div><label>Ends</label><input type="date" name="end"></div>
-<div class="full"><label>Website / note</label><input name="link" placeholder="https://..."></div>
-<div><label>First deadline</label><select name="kind"><option>Abstract</option><option>Talk submission</option><option>Registration</option><option>Funding application</option><option>Other</option></select></div>
-<div><label>Deadline date</label><input type="date" name="date"></div>
-<div class="full"><button class="btn pri" type="submit">Add conference</button></div>
-</form>
-</div>
-<div id="addvisit" style="display:none">
-<form id="fv">
-<div class="full"><label>Title</label><input name="name" required placeholder="e.g. Visit to ETH Zurich"></div>
-<div><label>Status</label><select name="status"><option>Idea</option><option>Planned</option><option>Confirmed</option><option>Done</option><option>Cancelled</option></select></div>
-<div><label>Place / institution</label><input name="place"></div>
-<div><label>Person (contact)</label><select name="cont" id="vcont"></select></div>
-<div><label>Starts</label><input type="date" name="start"></div>
-<div><label>Ends</label><input type="date" name="end"></div>
-<div class="full"><label>Link / note</label><input name="note"></div>
-<div class="full"><button class="btn pri" type="submit">Add visit</button></div>
-</form>
-</div>
-<div class="sub" style="margin:6px 0 10px"><select id="cvfilter" style="width:auto"><option value="all">Conferences and visits</option><option value="conf">Conferences only</option><option value="visit">Visits only</option></select><input id="cq" placeholder="Search..." style="flex:1;min-width:160px"></div>
-<div id="list"></div>
-</section>
+  <!-- NAVIGATION -->
 
-<section id="grants" class="hide">
-<form id="fg">
-<div class="full"><label>Project / grant name</label><input name="name" required></div>
-<div><label>Funder</label><input name="funder" placeholder="e.g. Ministry, ERC, institute"></div>
-<div><label>Type</label><select name="gkind"><option>Project</option><option>Grant</option><option>Fellowship</option><option>Travel award</option></select></div>
-<div><label>Status</label><select name="status"><option>Planned</option><option>Applying</option><option>Submitted</option><option>Awarded</option><option>Active</option><option>Completed</option><option>Rejected</option></select></div>
-<div><label>Amount</label><input type="number" min="0" step="any" name="amount"></div>
-<div><label>Currency</label><select name="cur"><option>EUR</option><option>USD</option><option>RSD</option><option>GBP</option></select></div>
-<div><label>Starts</label><input type="date" name="start"></div>
-<div><label>Ends</label><input type="date" name="end"></div>
-<div class="full"><label>Note</label><input name="note"></div>
-<div class="full"><button class="btn pri" type="submit">Add project / grant</button></div>
-</form>
-<div id="glist"></div>
-</section>
 
-<section id="kalendar" class="hide">
-<div class="row" style="margin-bottom:8px">
-<button class="btn sm" id="pm">‹</button><strong id="ml"></strong><button class="btn sm" id="nm">›</button>
-</div>
-<div id="legend" style="margin:8px 0"><span class="lg" data-cat="conf"><i style="background:var(--k-conf)"></i>Conferences</span><span class="lg" data-cat="visit"><i style="background:var(--k-visit)"></i>Visits</span><span class="lg" data-cat="sem"><i style="background:var(--k-sem)"></i>Lectures &amp; seminars</span><span class="lg" data-cat="grant"><i style="background:var(--k-grant)"></i>Projects &amp; grants</span><span class="lg" data-cat="paper"><i style="background:var(--k-paper)"></i>Papers</span><span class="lg" data-cat="contact"><i style="background:var(--k-contact)"></i>Contact follow-ups</span><span class="lg" data-cat="note"><i style="background:var(--k-note)"></i>Notes</span></div>
-<div class="cal" id="cal"></div>
-<div id="dayp" style="margin-top:12px"></div>
-</section>
+  <nav>
 
-<section id="expenses" class="hide">
-<div class="row" style="margin-bottom:10px"><div class="mu">Estimated conference costs by funding source and status. Costs are entered on each conference or visit, under Funding.</div><select id="ey" style="width:auto"></select></div>
-<div id="exlist"></div>
-</section>
+    <div class="inner">
 
-<section id="cvx" class="hide">
-<div class="card">
-<div class="sub"><label style="margin:0">Period</label><select id="xp"><option value="all">All time</option><option value="12m">Last 12 months</option><option value="ly">Last year (calendar year)</option><option value="lm">Last month (calendar month)</option><option value="custom">Custom range</option></select><span id="xcustom" class="sub" style="display:none;margin:0"><input type="date" id="xf"><input type="date" id="xt"></span></div>
-<div class="sub"><label style="margin:0">Format</label><select id="xfmt"><option value="txt">Plain text</option><option value="md">Markdown</option><option value="html">HTML (for a website)</option><option value="bib">BibTeX (papers only)</option></select></div>
-<div class="sub">
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-p" checked style="width:auto">Papers</label>
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-t" checked style="width:auto">Presentations</label>
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-c" checked style="width:auto">Conferences</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-v" checked style="width:auto">Seminars &amp; visits</label>
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-g" checked style="width:auto">Projects &amp; grants</label>
-</div>
-<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xpend" style="width:auto">Include pending items (submitted / under review)</label></div>
-</div>
-<div class="sub" style="margin:10px 0"><button class="btn sm" id="xcopy">Copy</button><button class="btn sm" id="xsave">Save as file</button><span class="mu" id="xinfo"></span></div>
-<textarea id="xout" readonly style="min-height:340px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px"></textarea>
-<p class="mu">Papers are dated by when you moved them to their current stage (accepted, published...), presentations by their date or the conference start.</p>
-</section>
+      <a
+        class="brand"
+        href="index.html"
+      >
+        Tijana Radenković
+      </a>
 
-<section id="contacts" class="hide">
-<form id="fk">
-<div class="full"><label>Name</label><input name="name" required placeholder="First name Last name"></div>
-<div><label>Affiliation</label><input name="affil" placeholder="Institute, university"></div>
-<div><label>Email</label><input name="email" type="email"></div>
-<div class="full"><label>Link (website, ORCID, Google Scholar)</label><input name="link" placeholder="https://..."></div>
-<div><label>Purpose</label><select name="purpose"><option>Collaboration</option><option>Visit / host</option><option>Joint grant</option><option>Met at conference</option><option>Co-author</option><option>Other</option></select></div>
-<div><label>Status</label><select name="status"><option>Want to contact</option><option>Contacted</option><option>In touch</option><option>Collaborating</option><option>Dormant</option></select></div>
-<div><label>Follow-up date</label><input type="date" name="next"></div>
-<div><label>Follow-up</label><input name="nextNote" placeholder="e.g. Ask about a joint application"></div>
-<div class="full"><label>Note</label><textarea name="note" style="min-height:60px"></textarea></div>
-<div class="full"><button class="btn pri" type="submit">Add contact</button></div>
-</form>
-<div class="sub" style="margin-bottom:10px"><input id="kq" placeholder="Search contacts..." style="flex:1;min-width:160px"><select id="kst"></select><select id="kpu"></select></div>
-<div id="klist"></div>
-</section>
 
-<section id="visits" class="hide">
-<form id="fs">
-<div class="full"><label>Title</label><input name="name" required placeholder="e.g. Seminar at ICTP, lecture series, project meeting"></div>
-<div><label>Type</label><select name="kind"><option>Lecture (I give)</option><option>Lecture (I attend)</option><option>Seminar (I give)</option><option>Seminar (I attend)</option><option>Meeting</option><option>Other</option></select></div>
-<div><label>Status</label><select name="status"><option>Idea</option><option>Planned</option><option>Confirmed</option><option>Done</option><option>Cancelled</option></select></div>
-<div><label>Place / institution / room</label><input name="place"></div>
-<div><label>Person (host, speaker, contact)</label><select name="cont" id="scont"></select></div>
-<div><label>Date</label><input type="date" name="start"></div>
-<div><label>Ends (optional)</label><input type="date" name="end"></div>
-<div class="full"><label>Link / note</label><input name="note"></div>
-<div class="full"><button class="btn pri" type="submit">Add</button></div>
-</form>
-<div class="sub" style="margin-bottom:10px"><input id="vq" placeholder="Search lectures, seminars, meetings..." style="flex:1;min-width:160px"><select id="vfk"></select><select id="vfs"></select></div>
-<div id="vlist"></div>
-</section>
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span></button><div class="links" id="site-menu">
 
-<section id="radovi" class="hide">
-<div class="sub" style="margin-bottom:10px"><label style="margin:0">Flag papers waiting for a decision longer than</label><input type="number" id="wd" min="1" style="width:80px"><span class="mu">days</span></div>
-<form id="fp">
-<div class="full"><label>Paper title</label><input name="title" required></div>
-<div class="full"><label>Authors</label><input name="authors" placeholder="Surname, Name and Surname, Name"></div>
-<div><label>Journal / conference</label><input name="venue"></div>
-<div><label>DOI / arXiv ID / link</label><input name="doi"></div>
-<div><label>Stage</label><select name="stage"><option>Draft</option><option>Submitted</option><option>Under review</option><option>Minor revision</option><option>Major revision</option><option>Accepted</option><option>Published</option><option>Rejected</option></select></div>
-<div><label>Date submitted</label><input type="date" name="sent"></div>
-<div><label>Deadline (response / revision)</label><input type="date" name="deadline"></div>
-<div><label>Review round</label><select name="round"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
-<div><label>Funded by project</label><select name="proj" id="ppsel"></select></div>
-<div class="full"><label>Co-authors / note</label><input name="note"></div>
-<div class="full"><button class="btn pri" type="submit">Add paper</button></div>
-</form>
-<div id="plist"></div>
-</section>
+        <a href="index.html">
+          Home
+        </a>
+<a href="research.html">Research</a><a href="blog.html">Blog</a>
 
-<section id="abs" class="hide"><input id="aq" placeholder="Search abstracts..." style="margin-bottom:10px"><div id="alist"></div></section>
+        <a href="experience.html">
+          Experience & Education
+        </a>
 
-<section id="beleske" class="hide">
-<div class="subnav" id="nvtabs"></div>
-<div id="nv-notes">
-<form id="fn">
-<div class="full"><label>Talk / note title</label><input name="title" required></div>
-<div><label>Conference / visit</label><select name="ref" id="refsel"></select></div>
-<div><label>Project / grant</label><select name="proj" id="projsel"></select></div>
-<div><label>My presentation</label><select name="pres" id="pressel"></select></div>
-<div><label>Contact</label><select name="cont" id="contsel"></select></div>
-<div><label>Speaker</label><input name="speaker"></div>
-<div><label>Date</label><input type="date" name="date"></div>
-<div class="full"><label>Topics / tags (comma-separated)</label><input name="tags" placeholder="higher gauge theory, methods"></div>
-<div class="full"><label>Notes</label><textarea name="body"></textarea></div>
-<div class="full"><label>Papers mentioned (one per line: title and DOI, arXiv ID or link)</label><textarea name="refs" style="min-height:60px" placeholder="Henneaux–Teitelboim gauge symmetry, 10.3390/universe9060281"></textarea></div>
-<div class="full"><label>Ideas / things to try (one per line)</label><textarea name="ideas" style="min-height:60px"></textarea></div>
-<div class="full"><button class="btn pri" type="submit">Save note</button></div>
-</form>
-<div id="tagcloud" class="sub" style="margin:0 0 10px"></div>
-<div class="sub" style="margin-bottom:10px"><input id="q" placeholder="Search notes..." style="flex:1;min-width:160px"><select id="nfc"></select><select id="nfp"></select></div>
-<div id="nlist"></div>
-</div>
-<div id="nv-lit" class="hide"><input id="lq" placeholder="Search literature..." style="margin-bottom:10px"><div id="litlist"></div></div>
-<div id="nv-ideas" class="hide"><div id="ideaslist"></div></div>
-</section>
+        <a href="publications.html">
+          Publications
+        </a>
 
-<section id="podaci" class="hide">
-<div class="card">
-<p>Your data is saved only in this browser, on this device. Nobody else can see it, but clearing the browser data deletes it, and it does not appear on other devices. Export a backup file regularly: it is also how you move your data to another computer or phone (use Import JSON there).</p>
-<p class="mu">Install as an app: in Chrome or Edge click the install icon in the address bar (or menu → Install). On iPhone use Share → Add to Home Screen.</p>
-<button class="btn" id="exp">Export JSON</button><span class="mu" id="bkinfo" style="margin-left:8px"></span>
-<label style="margin-top:10px">Import JSON</label><input type="file" id="imp" accept=".json">
-</div>
-</section>
-</div>
+        <a href="talks.html">
+          Talks
+        </a>
+
+        <a href="conferences.html">
+          Conferences
+        </a>
+
+        <a href="projects.html">
+          Projects
+        </a>
+
+        <a href="profiles.html">
+          Profiles
+        </a>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+
+
+  <!-- HERO -->
+
+
+  <div class="hero-shell">
+
+
+    <!-- TRIANGULATION BACKGROUND -->
+
+
+    <svg
+      class="hero-triangulation"
+      viewBox="0 0 1400 500"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+
+
+      <!-- LEFT REGION -->
+
+
+      <line
+        x1="0"
+        y1="390"
+        x2="150"
+        y2="220"
+      />
+
+      <line
+        x1="150"
+        y1="220"
+        x2="320"
+        y2="400"
+      />
+
+      <line
+        x1="0"
+        y1="390"
+        x2="320"
+        y2="400"
+      />
+
+
+
+      <!-- CENTRAL REGION -->
+
+
+      <line
+        x1="150"
+        y1="220"
+        x2="390"
+        y2="90"
+      />
+
+      <line
+        x1="320"
+        y1="400"
+        x2="390"
+        y2="90"
+      />
+
+      <line
+        x1="320"
+        y1="400"
+        x2="600"
+        y2="300"
+      />
+
+      <line
+        x1="390"
+        y1="90"
+        x2="600"
+        y2="300"
+      />
+
+
+
+      <!-- RIGHT REGION -->
+
+
+      <line
+        x1="390"
+        y1="90"
+        x2="720"
+        y2="130"
+      />
+
+      <line
+        x1="600"
+        y1="300"
+        x2="720"
+        y2="130"
+      />
+
+      <line
+        x1="600"
+        y1="300"
+        x2="880"
+        y2="430"
+      />
+
+      <line
+        x1="720"
+        y1="130"
+        x2="880"
+        y2="430"
+      />
+
+      <line
+        x1="720"
+        y1="130"
+        x2="1040"
+        y2="70"
+      />
+
+      <line
+        x1="880"
+        y1="430"
+        x2="1040"
+        y2="70"
+      />
+
+      <line
+        x1="880"
+        y1="430"
+        x2="1220"
+        y2="280"
+      />
+
+      <line
+        x1="1040"
+        y1="70"
+        x2="1220"
+        y2="280"
+      />
+
+      <line
+        x1="1040"
+        y1="70"
+        x2="1400"
+        y2="150"
+      />
+
+      <line
+        x1="1220"
+        y1="280"
+        x2="1400"
+        y2="150"
+      />
+
+
+
+      <!-- VERTICES -->
+
+
+      <circle
+        cx="150"
+        cy="220"
+        r="3"
+      />
+
+      <circle
+        cx="320"
+        cy="400"
+        r="3"
+      />
+
+      <circle
+        cx="390"
+        cy="90"
+        r="3"
+      />
+
+      <circle
+        cx="600"
+        cy="300"
+        r="3"
+      />
+
+      <circle
+        cx="720"
+        cy="130"
+        r="3"
+      />
+
+      <circle
+        cx="880"
+        cy="430"
+        r="3"
+      />
+
+      <circle
+        cx="1040"
+        cy="70"
+        r="3"
+      />
+
+      <circle
+        cx="1220"
+        cy="280"
+        r="3"
+      />
+
+    </svg>
+
+
+
+    <header
+      class="hero"
+      id="top"
+    >
+
+
+      <div>
+
+
+        <div class="eyebrow">
+
+          Theoretical physicist · Belgrade
+
+        </div>
+
+
+        <h1>
+
+          Tijana<br>
+
+          Radenković
+
+        </h1>
+
+
+        <p class="lead">
+
+          Research Associate at the Institute of Physics Belgrade,
+          working on quantum gravity, higher gauge theory,
+          higher groups and topological field theories.
+
+        </p>
+
+
+        <div class="actions">
+
+
+          <a
+            class="button primary"
+            href="publications.html"
+          >
+
+            View publications
+
+          </a>
+
+
+          <a
+            class="button"
+            href="mailto:rtijana@ipb.ac.rs"
+          >
+
+            Email me
+
+          </a>
+
+
+        </div>
+
+        <div class="profile-links" aria-label="Academic profiles">
+          <a href="https://orcid.org/0000-0002-2310-5281">ORCID</a>
+          <span>·</span>
+          <a href="https://inspirehep.net/authors/1778027?ui-citation-summary=true">INSPIRE</a>
+          <span>·</span>
+          <a href="https://arxiv.org/search/hep-th?searchtype=author&amp;query=Radenkovic,+T">arXiv</a>
+          <span>·</span>
+          <a href="https://www.scopus.com/authid/detail.uri?authorId=57211475600">Scopus</a>
+          <span>·</span>
+          <a href="https://scholar.google.com/citations?user=EqmN4YUAAAAJ&amp;hl=sr">Google Scholar</a>
+          <span>·</span>
+          <a href="https://www.researchgate.net/profile/Tijana-Radenkovic">ResearchGate</a>
+          <span>·</span>
+          <a href="https://rs.linkedin.com/in/tijana-radenkovic">LinkedIn</a>
+        </div>
+
+
+      </div>
+
+
+
+      <div class="portrait">
+
+
+        <img
+          src="assets/tijana-radenkovic-headshot.webp"
+          alt="Portrait of Tijana Radenković"
+          width="720"
+          height="960"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        >
+
+
+      </div>
+
+
+    </header>
+
+
+  </div>
+
+
+
+  <main>
+
+
+
+    <!-- ABOUT -->
+
+
+    <section
+      class="tint"
+      id="about"
+    >
+
+
+      <div class="wrap about-grid">
+
+
+        <div>
+
+
+          <div class="eyebrow">
+
+            About
+
+          </div>
+
+
+          <h2>
+
+            Geometry, symmetry and quantum spacetime
+
+          </h2>
+
+
+        </div>
+
+
+
+        <div>
+
+
+          <p>
+
+            I am a theoretical physicist at the Institute of Physics Belgrade.
+            My research focuses on mathematical structures for quantum gravity,
+            particularly higher gauge theories based on 2-groups and 3-groups,
+            BF-type theories, and topological invariants of manifolds.
+
+          </p>
+
+
+          <p>
+
+            I completed my PhD in Physics at the University of Belgrade in 2023
+            with a thesis on higher gauge theories and quantum gravity.
+
+          </p>
+
+
+
+          <div class="tags">
+
+
+            <span class="tag">
+
+              Quantum gravity
+
+            </span>
+
+
+            <span class="tag">
+
+              Higher gauge theory
+
+            </span>
+
+
+            <span class="tag">
+
+              3-groups
+
+            </span>
+
+
+            <span class="tag">
+
+              3BF theory
+
+            </span>
+
+
+            <span class="tag">
+
+              TQFT
+
+            </span>
+
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+    </section>
+
+
+
+    <!-- EXPLORE -->
+
+
+    <section class="wrap">
+
+
+      <div class="eyebrow">
+
+        Explore
+
+      </div>
+
+
+      <h2>
+
+        Research & academic activity
+
+      </h2>
+
+
+
+      <div class="two-col">
+
+        <div class="project">
+          <h3><a href="research.html">Research</a></h3>
+          <p>Current research directions in higher gauge theory, 3BF/TQFT, quantum gravity and higher-group representation theory.</p>
+        </div>
+
+
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="experience.html">
+
+              Experience & education
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            Appointments, degrees and academic background.
+
+          </p>
+
+        </div>
+
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="publications.html">
+
+              Publications
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            Journal articles and conference papers.
+
+          </p>
+
+        </div>
+
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="talks.html">
+
+              Talks & presentations
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            Conference talks, seminars and posters.
+
+          </p>
+
+        </div>
+
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="conferences.html">
+
+              Conferences & schools
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            Selected meetings and advanced schools.
+
+          </p>
+
+        </div>
+
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="projects.html">
+
+              Research projects
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            National and international collaborations.
+
+          </p>
+
+        </div>
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="profiles.html">
+
+              Academic profiles
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            Scholarly databases, author profiles and professional links.
+
+          </p>
+
+        </div>
+
+
+        <div class="project">
+
+          <h3>
+
+            <a href="blog.html">
+
+              Physics blog
+
+            </a>
+
+          </h3>
+
+
+          <p>
+
+            Physics notes & reflections on quantum gravity, higher gauge theory and mathematical physics.
+
+          </p>
+
+        </div>
+
+
+      </div>
+
+
+    </section>
+
+
+
+    <!-- CONTACT -->
+
+
+    <section
+      class="wrap contact"
+      id="contact"
+    >
+
+
+      <div class="eyebrow">
+
+        Contact
+
+      </div>
+
+
+      <h2>
+
+        Let’s talk physics.
+
+      </h2>
+
+
+      <p>
+
+        Institute of Physics Belgrade<br>
+
+        Pregrevica 118, 11080 Belgrade, Serbia
+
+      </p>
+
+
+      <p>
+
+        <a
+          class="button primary"
+          href="mailto:rtijana@ipb.ac.rs"
+        >
+
+          rtijana@ipb.ac.rs
+
+        </a>
+
+      </p>
+
+
+      <p>
+
+        <a
+          href="http://www.gravity.ipb.ac.rs/Radenkovic.html"
+        >
+
+          Research group profile
+
+        </a>
+
+      </p>
+
+
+    </section>
+
+
+  </main>
+
+
+
+  <footer>
+
+    © 2026 Tijana Radenković · Institute of Physics Belgrade
+
+  </footer>
+
+
 
 <script>
-var S={events:[],notes:[]};
-try{var raw=localStorage.getItem('np1');if(raw)S=JSON.parse(raw);}catch(e){}
-S.events=S.events||[];S.notes=S.notes||[];S.papers=S.papers||[];
-function migrate(){S.events=S.events||[];S.grants=S.grants||[];S.contacts=S.contacts||[];S.visits=S.visits||[];S.papers=S.papers||[];S.notes=S.notes||[];var M={'Planirano':'Planned','U izradi':'In progress','Poslato':'Submitted','Prihvaćeno':'Accepted','Odbijeno':'Rejected','Priprema':'Draft','Pod recenzijom':'Under review','Male izmene':'Minor revision','Velike izmene':'Major revision','Objavljeno':'Published'};
-var K={'Apstrakt':'Abstract','Prijava predavanja':'Talk submission','Registracija':'Registration','Prijava granta':'Grant application','Izveštaj':'Report','Događaj':'Event'};
-S.events.forEach(function(e){if(M[e.status])e.status=M[e.status];if(K[e.kind])e.kind=K[e.kind]});
-S.papers.forEach(function(p){if(M[p.stage])p.stage=M[p.stage];(p.log||[]).forEach(function(l){if(M[l.text])l.text=M[l.text]})})
-var old=S.events.filter(function(e){return !e.deadlines}),idMap={};
-if(old.length){var byName={};S.events=S.events.filter(function(e){return e.deadlines});S.events.forEach(function(e){byName[(e.name||'').toLowerCase()]=e});
-old.forEach(function(e){var done=['Submitted','Accepted','Rejected'].indexOf(e.status)>-1,isUrl=/^https?:\/\//.test(e.note||'');
-if(e.type==='g'){S.grants.push({id:e.id,name:e.name,funder:'',gkind:'Grant',status:e.status==='Accepted'?'Awarded':e.status==='Rejected'?'Rejected':e.status==='Submitted'?'Submitted':'Planned',amount:'',cur:'EUR',start:'',end:'',note:e.note||'',miles:[{id:uid(),label:e.kind,date:e.date,done:done}]});return}
-var c=byName[(e.name||'').toLowerCase()];
-if(!c){c={id:e.id,name:e.name,place:'',start:'',end:'',link:isUrl?e.note:'',status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:isUrl?'':(e.note||'')};S.events.push(c);byName[(e.name||'').toLowerCase()]=c}
-idMap[e.id]=c.id;c.deadlines.push({id:uid(),kind:e.kind,date:e.date,done:done});if(e.status==='Accepted')c.status='Accepted'});
-S.notes.forEach(function(n){if(idMap[n.ref])n.ref=idMap[n.ref]})}
-}
-migrate();
-var REM=null,remTimer=null,remBusy=false,remDirty=false;
-function setStatus(t){var e=document.getElementById('sync');if(e)e.textContent=t}
-function schedRemote(){if(!REM)return;remDirty=true;clearTimeout(remTimer);remTimer=setTimeout(flushRemote,800)}
-function flushRemote(){if(remBusy){remTimer=setTimeout(flushRemote,500);return}remBusy=true;remDirty=false;setStatus('Saving to your account…');
-REM.set({events:S.events,notes:S.notes,papers:S.papers,grants:S.grants,contacts:S.contacts,visits:S.visits,waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}).then(function(){setStatus('Saved to your account')},function(err){setStatus('Saving to your account failed ('+((err&&err.code)||'error')+'). Data is saved in this browser.')}).then(function(){remBusy=false;if(remDirty)schedRemote()})}
-function save(){S.updated=Date.now();try{localStorage.setItem('np1',JSON.stringify(S));}catch(e){}schedRemote()}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
-function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-var today=iso(new Date());
-function daysTo(s){return Math.round((new Date(s+'T00:00:00')-new Date(today+'T00:00:00'))/864e5)}
-
-var TABS=['upcoming','rokovi','visits','kalendar','grants','expenses','cvx','radovi','abs','beleske','contacts','podaci'];
-function showTab(t){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.toggle('on',x.dataset.t===t)});TABS.forEach(function(id){document.getElementById(id).classList.toggle('hide',id!==t)});render()}
-document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){showTab(b.dataset.t)}});
-function openFromStr(s){var a=String(s).split('|');openItem(a[0],a[1])}
-function openItem(t,id){['vq','vfk','vfs','cq','kq','kst','kpu','q','nfc','nfp'].forEach(function(x){var e=document.getElementById(x);if(e)e.value=''});var cf=document.getElementById('cvfilter');if(cf)cf.value='all';TAGF='';NV='notes';showTab(t);
-var e=document.getElementById('it-'+id);if(e){if(e.scrollIntoView)e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.add('flash');setTimeout(function(){e.classList.remove('flash')},2000)}}
-
-var CST=['Considering','Submitted','Accepted','Rejected','Attended'],FS=['Not requested','Requested','Approved','Rejected','Paid'],CUR=['EUR','USD','RSD','GBP'],DKS=['Abstract','Talk submission','Registration','Funding application','Other'];
-function opts(a,v){return a.map(function(x){return '<option'+(x===v?' selected':'')+'>'+x+'</option>'}).join('')}
-function cd(s){var d=daysTo(s);return d<0?(-d)+' d overdue':d===0?'today':'in '+d+' d'}
-function cl(s){var d=daysTo(s);return d<0?'late':d<=14?'soon':''}
-function nextDl(c){var u=c.deadlines.filter(function(d){return !d.done&&d.date}).map(function(d){return d.date}).sort();return u[0]||c.start||'9999'}
-function nextM(g){var u=g.miles.filter(function(m){return !m.done&&m.date}).map(function(m){return m.date}).sort();return u[0]||g.end||'9999'}
-function srcOpts(v){return '<option value="">— funding source —</option>'+S.grants.map(function(g){return '<option value="'+g.id+'"'+(g.id===v?' selected':'')+'>'+esc(g.name)+'</option>'}).join('')+['Institute','Own funds','Travel award','Other'].map(function(x){return '<option'+(x===v?' selected':'')+'>'+x+'</option>'}).join('')}
-function rows(arr,ids,del){return arr.slice().sort(function(a,b){return a.date<b.date?-1:1}).map(function(d){return '<div class="sub"><input type="checkbox" style="width:auto" '+ids+' data-d="'+d.id+'"'+(d.done?' checked':'')+'><span style="min-width:140px">'+esc(d.kind||d.label)+'</span><span class="due '+(d.done?'ok':cl(d.date))+'">'+esc(d.date)+' · '+(d.done?'done':cd(d.date))+'</span><button class="btn sm" data-act="'+del+'" '+ids+' data-d="'+d.id+'">×</button></div>'}).join('')}
-var CT=['Check visa requirements','Register','Book flights','Book accommodation','Prepare talk / poster','Travel order / budget approval','Submit expense report'],GT=['Prepare budget','Collect letters of support','Update CV / bio','Internal approval','Submit application','Draft interim report'];
-var PST=['Submitted','Accepted','Rejected','Presented'],PTY=['Talk','Invited talk','Poster','Other'];
-function allTalks(){var o=[];S.events.forEach(function(c){(c.talks||[]).forEach(function(p){o.push({c:c,p:p})})});return o}
-function wc(t){t=(t||'').trim();return t?t.split(/\s+/).length:0}
-function copyTa(t,ta){ta=ta||t.closest('details').querySelector('textarea');ta.select();try{navigator.clipboard.writeText(ta.value).then(function(){t.textContent='Copied'},function(){try{document.execCommand('copy')}catch(e){}})}catch(e){try{document.execCommand('copy')}catch(e2){}}}
-function fromOpts(){return '<option value="">— reuse abstract from… —</option>'+allTalks().filter(function(x){return x.p.abstract}).map(function(x){return '<option value="'+x.p.id+'">'+esc(x.p.title)+' ('+esc(x.c.name)+')</option>'}).join('')}
-function talkRows(c,id){return (c.talks||[]).map(function(p){var a=id+' data-p="'+p.id+'"',nn=S.notes.filter(function(n){return n.pres===p.id}),lk=/^https?:\/\//.test(p.link||'')?' <a href="'+esc(p.link)+'" target="_blank" rel="noopener">slides ↗</a>':'';
-return '<div class="card" style="margin:6px 0;background:var(--bg)"><div class="row"><div><strong>'+esc(p.title)+'</strong> <span class="tag">'+esc(p.type)+'</span>'+lk+'</div><div><select '+a+' data-f="status" style="width:auto">'+opts(PST,p.status)+'</select> <button class="btn sm" data-act="delp" '+a+'>×</button></div></div><div class="sub"><input placeholder="Title" '+a+' data-f="title" value="'+esc(p.title)+'" style="min-width:240px"><select '+a+' data-f="type" style="width:auto">'+opts(PTY,p.type)+'</select></div><div class="sub"><label style="margin:0">Date</label><input type="date" '+a+' data-f="date" value="'+esc(p.date)+'"><input placeholder="Slides / poster link" '+a+' data-f="link" value="'+esc(p.link)+'" style="min-width:200px"></div>'+'<details data-o="a'+p.id+'"'+(OPEN['a'+p.id]?' open':'')+' style="margin-top:6px"><summary>Abstract ('+wc(p.abstract)+' words)</summary><textarea '+a+' data-f="abstract" placeholder="Paste or write the abstract here" style="min-height:130px;margin-top:6px">'+esc(p.abstract||'')+'</textarea><div class="sub"><button class="btn sm" data-act="copya">Copy abstract</button></div></details>'+(nn.length?'<div class="mu" style="margin-top:6px">Notes: '+nn.map(function(n){return esc(n.title)}).join(', ')+'</div>':'')+'</div>'}).join('')}
-function presBlock(c,id){return '<div class="mu" style="margin-top:10px">My presentations ('+(c.talks||[]).length+')</div>'+talkRows(c,id)+'<div class="sub"><input placeholder="Talk / poster title" data-n="pt" style="min-width:200px"><select data-n="ptype">'+opts(PTY,'Talk')+'</select><select data-n="pstat">'+opts(PST,'Submitted')+'</select><input type="date" data-n="pdate"><input placeholder="Slides / poster link" data-n="plink"><select data-n="pfrom" style="width:auto">'+fromOpts()+'</select><button class="btn sm" data-act="addp" '+id+'>Add</button></div>'}
-function tdone(o){var a=o.tasks||[];return a.filter(function(x){return x.done}).length+'/'+a.length}
-function trows(arr,ids,del){return arr.map(function(t){return '<div class="sub"><input type="checkbox" style="width:auto" '+ids+' data-t="'+t.id+'"'+(t.done?' checked':'')+'><span style="min-width:140px;'+(t.done?'text-decoration:line-through;opacity:.6':'')+'">'+esc(t.text)+'</span>'+(t.date?'<span class="due '+(t.done?'ok':cl(t.date))+'">'+esc(t.date)+' · '+(t.done?'done':cd(t.date))+'</span>':'')+'<button class="btn sm" data-act="'+del+'" '+ids+' data-t="'+t.id+'">×</button></div>'}).join('')}
-function taskBlock(o,ids){var has=o.tasks&&o.tasks.length;return '<div class="mu" style="margin-top:10px">Tasks ('+tdone(o)+')</div>'+trows(o.tasks||[],ids,'delt')+(has?'':'<div class="sub"><button class="btn sm" data-act="tpl" '+ids+'>Add standard checklist</button></div>')+'<div class="sub"><input placeholder="e.g. Book flights" data-n="text"><input type="date" data-n="tdate"><button class="btn sm" data-act="addt" '+ids+'>Add task</button></div>'}
-function confEdit(c,id){return '<details data-o="x'+c.id+'"'+(OPEN['x'+c.id]?' open':'')+' style="margin-top:10px"><summary>Edit conference details</summary><div class="sub"><input placeholder="Name" '+id+' data-f="name" value="'+esc(c.name)+'" style="min-width:240px"><input placeholder="Place" '+id+' data-f="place" value="'+esc(c.place)+'"></div><div class="sub"><label style="margin:0">Starts</label><input type="date" '+id+' data-f="start" value="'+esc(c.start)+'"><label style="margin:0">Ends</label><input type="date" '+id+' data-f="end" value="'+esc(c.end)+'"></div><div class="sub"><input placeholder="Website" '+id+' data-f="link" value="'+esc(c.link)+'" style="min-width:260px"><input placeholder="Note" '+id+' data-f="note" value="'+esc(c.note)+'" style="min-width:200px"></div></details>'}
-function gEdit(g,id){return '<details data-o="x'+g.id+'"'+(OPEN['x'+g.id]?' open':'')+' style="margin-top:10px"><summary>Edit project details</summary><div class="sub"><input placeholder="Name" '+id+' data-f="name" value="'+esc(g.name)+'" style="min-width:220px"><input placeholder="Funder" '+id+' data-f="funder" value="'+esc(g.funder)+'"><select '+id+' data-f="gkind" style="width:auto">'+opts(['Project','Grant','Fellowship','Travel award'],g.gkind)+'</select></div><div class="sub"><label style="margin:0">Amount</label><input type="number" min="0" step="any" '+id+' data-f="amount" value="'+esc(g.amount)+'" style="width:130px"><select '+id+' data-f="cur" style="width:auto">'+opts(CUR,g.cur||'EUR')+'</select><label style="margin:0">Starts</label><input type="date" '+id+' data-f="start" value="'+esc(g.start)+'"><label style="margin:0">Ends</label><input type="date" '+id+' data-f="end" value="'+esc(g.end)+'"></div><div class="sub"><input placeholder="Note" '+id+' data-f="note" value="'+esc(g.note)+'" style="min-width:300px"></div></details>'}
-function renderList(){
-var el=document.getElementById('list'),f=document.getElementById('cvfilter').value,q=document.getElementById('cq').value.toLowerCase(),items=[];
-if(f!=='visit')S.events.forEach(function(c){if((c.name+' '+(c.place||'')+' '+(c.note||'')).toLowerCase().indexOf(q)>-1)items.push({k:nextDl(c),h:confCard(c)})});
-if(f!=='conf')S.visits.filter(isVisit).forEach(function(v){if((v.name+' '+(v.place||'')+' '+(v.note||'')).toLowerCase().indexOf(q)>-1)items.push({k:(v.status==='Done'||v.status==='Cancelled'?'z':'')+(v.start||'9999'),h:visitCard(v)})});
-items.sort(function(a,b){return a.k<b.k?-1:1});
-el.innerHTML=items.length?items.map(function(i){return i.h}).join(''):'<p class="mu">'+(S.events.length+S.visits.filter(isVisit).length?'Nothing matches.':'Nothing here yet. Add the first conference or visit above.')+'</p>'}
-function confCard(c){
-var when=c.start?esc(c.start)+(c.end?' → '+esc(c.end):''):'';
-var link=/^https?:\/\//.test(c.link||'')?'<a href="'+esc(c.link)+'" target="_blank" rel="noopener">website</a>':esc(c.link);
-var id='data-c="'+c.id+'"';
-return '<div class="card" id="it-'+c.id+'"><div class="row"><div><strong>'+esc(c.name)+'</strong><br>'+(c.place?'<span class="tag">'+esc(c.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+'<span class="mu">'+link+' '+esc(c.note)+'</span></div>'+
-'<div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(CST,c.status)+'</select> <button class="btn sm" data-act="delc" '+id+'>Delete</button></div></div>'+
-peopleLine('c',c.id)+'<div class="mu" style="margin-top:8px">Deadlines</div>'+rows(c.deadlines,id,'deld')+
-'<div class="sub"><select data-n="kind">'+opts(DKS,'Abstract')+'</select><input type="date" data-n="date"><button class="btn sm" data-act="addd" '+id+'>Add deadline</button></div>'+
-presBlock(c,id)+taskBlock(c,id)+'<div class="mu" style="margin-top:10px">Funding</div><div class="sub"><input type="number" min="0" step="any" placeholder="Estimated cost" style="width:140px" '+id+' data-f="cost" value="'+esc(c.cost)+'"><select '+id+' data-f="cur">'+opts(CUR,c.cur||'EUR')+'</select><select '+id+' data-f="fundSrc">'+srcOpts(c.fundSrc)+'</select><select '+id+' data-f="fundStatus">'+opts(FS,c.fundStatus)+'</select></div>'+confEdit(c,id)+'</div>'}
-function pjSel(p){return '<select data-pp="'+p.id+'" style="width:auto;margin-top:4px" title="Funded by project"><option value="">— no project —</option>'+S.grants.map(function(g){return '<option value="'+g.id+'"'+(g.id===p.proj?' selected':'')+'>'+esc(g.name)+'</option>'}).join('')+'</select> '}
-function fmt(v,cur){return (+v||0).toLocaleString('en-GB')+' '+cur}
-function projReport(g){var cur=g.cur||'EUR',L=[],cs=costItems().filter(function(c){return c.fundSrc===g.id}),ps=S.papers.filter(function(p){return p.proj===g.id}),ns=S.notes.filter(function(n){return n.proj===g.id}),com=0,pen=0;
-cs.forEach(function(c){if((c.cur||'EUR')===cur){var v=+c.cost||0;if(c.fundStatus==='Approved'||c.fundStatus==='Paid')com+=v;else if(c.fundStatus==='Requested')pen+=v}});
-L.push(g.name+' ('+g.gkind+(g.funder?', '+g.funder:'')+')');
-L.push('Status: '+g.status+(g.start?' · '+g.start+' → '+(g.end||''):''));
-if(+g.amount)L.push('Budget: '+fmt(g.amount,cur)+' · committed '+fmt(com,cur)+' · pending '+fmt(pen,cur)+' · remaining '+fmt(g.amount-com,cur));
-L.push('');L.push('Conferences, visits and meetings supported ('+cs.length+')');
-cs.forEach(function(c){L.push('- '+c.name+(c.place?', '+c.place:'')+(c.start?', '+c.start+(c.end?' → '+c.end:''):'')+(c.cost?' · cost '+fmt(c.cost,c.cur||'EUR')+' ('+c.fundStatus+')':' ('+c.fundStatus+')'));(c.talks||[]).forEach(function(t){L.push('    '+t.type+': "'+t.title+'" ('+t.status+')'+(t.link?' '+t.link:''))})});
-L.push('');L.push('Papers acknowledging the project ('+ps.length+')');
-ps.forEach(function(p){L.push('- '+p.title+(p.venue?' — '+p.venue:'')+' ['+p.stage+']')});
-L.push('');L.push('Notes linked to the project ('+ns.length+')');
-ns.forEach(function(n){L.push('- '+n.title+(n.date?' ('+n.date+')':''))});
-if(g.miles.length){L.push('');L.push('Milestones');g.miles.forEach(function(m){L.push('- ['+(m.done?'x':' ')+'] '+m.label+' — '+m.date)})}
-if((g.tasks||[]).length){L.push('');L.push('Tasks done: '+tdone(g))}
-return L.join('\n')}
-function reportBlock(g){var txt=projReport(g);return '<details data-o="r'+g.id+'"'+(OPEN['r'+g.id]?' open':'')+' style="margin-top:10px"><summary>Project report summary</summary><div class="sub"><button class="btn sm" data-act="copy" data-g="'+g.id+'">Copy text</button></div><textarea readonly style="min-height:'+Math.min(420,80+txt.split('\n').length*18)+'px;margin-top:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px">'+esc(txt)+'</textarea></details>'}
-function renderGrants(){
-var el=document.getElementById('glist');
-if(!S.grants.length){el.innerHTML='<p class="mu">No projects or grants yet. Add the first one above.</p>';return}
-el.innerHTML=S.grants.slice().sort(function(a,b){return nextM(a)<nextM(b)?-1:1}).map(function(g){
-var com=0,pen=0,lk=[],cur=g.cur||'EUR';
-costItems().forEach(function(c){if(c.fundSrc===g.id){lk.push(esc(c.name));if((c.cur||'EUR')===cur){var v=+c.cost||0;if(c.fundStatus==='Approved'||c.fundStatus==='Paid')com+=v;else if(c.fundStatus==='Requested')pen+=v}}});
-var amt=+g.amount||0,n=function(v){return v.toLocaleString('en-GB')+' '+cur};
-var bud=amt?'<div class="mu" style="margin-top:6px">Budget '+n(amt)+' · committed '+n(com)+' · pending '+n(pen)+' · <strong>remaining '+n(amt-com)+'</strong></div>':'';
-var dates=g.start?esc(g.start)+(g.end?' → '+esc(g.end):''):'';
-var id='data-g="'+g.id+'"';
-return '<div class="card" id="it-'+g.id+'"><div class="row"><div><strong>'+esc(g.name)+'</strong><br><span class="tag">'+esc(g.gkind)+'</span>'+(g.funder?'<span class="tag">'+esc(g.funder)+'</span>':'')+(dates?'<span class="tag">'+dates+'</span>':'')+'<span class="mu">'+esc(g.note)+'</span></div>'+
-'<div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(['Planned','Applying','Submitted','Awarded','Active','Completed','Rejected'],g.status)+'</select> <button class="btn sm" data-act="delg" '+id+'>Delete</button></div></div>'+bud+peopleLine('g',g.id)+
-(lk.length?'<div class="mu" style="margin-top:6px">Funds: '+lk.join(', ')+'</div>':'')+
-'<div class="mu" style="margin-top:8px">Milestones and deadlines</div>'+rows(g.miles,id,'delm')+
-'<div class="sub"><input placeholder="e.g. Interim report" data-n="label"><input type="date" data-n="date"><button class="btn sm" data-act="addm" '+id+'>Add milestone</button></div>'+taskBlock(g,id)+reportBlock(g)+gEdit(g,id)+'</div>'}).join('');
-}
-function cAct(t,type){var c=S.events.find(function(x){return x.id===t.dataset.c});if(!c)return;var a=t.dataset.act;
-if(type==='change'){if(t.dataset.d){var d=c.deadlines.find(function(x){return x.id===t.dataset.d});if(d)d.done=t.checked}else if(t.dataset.t){var k=(c.tasks||[]).find(function(x){return x.id===t.dataset.t});if(k)k.done=t.checked}else if(t.dataset.p){var pp=(c.talks||[]).find(function(x){return x.id===t.dataset.p});if(pp&&t.dataset.f){if(t.dataset.f==='title'&&!t.value.trim()){render();return}pp[t.dataset.f]=t.value}else return}else if(t.dataset.f){if(t.dataset.f==='name'&&!t.value.trim()){render();return}c[t.dataset.f]=t.value}else return}
-else if(a==='copya'){copyTa(t);return}
-else if(a==='delc')S.events=S.events.filter(function(x){return x!==c});
-else if(a==='deld')c.deadlines=c.deadlines.filter(function(x){return x.id!==t.dataset.d});
-else if(a==='addd'){var p=t.parentNode,dt=p.querySelector('[data-n=date]').value;if(!dt)return;c.deadlines.push({id:uid(),kind:p.querySelector('[data-n=kind]').value,date:dt,done:false})}
-else if(a==='addt'){var p2=t.parentNode,tx=p2.querySelector('[data-n=text]').value.trim();if(!tx)return;c.tasks=c.tasks||[];c.tasks.push({id:uid(),text:tx,date:p2.querySelector('[data-n=tdate]').value,done:false})}
-else if(a==='tpl'){c.tasks=c.tasks||[];CT.forEach(function(x){c.tasks.push({id:uid(),text:x,date:'',done:false})})}
-else if(a==='delt')c.tasks=(c.tasks||[]).filter(function(x){return x.id!==t.dataset.t})
-else if(a==='addp'){var p3=t.parentNode,fr=allTalks().find(function(x){return x.p.id===p3.querySelector('[data-n=pfrom]').value}),pt=p3.querySelector('[data-n=pt]').value.trim()||(fr?fr.p.title:'');if(!pt)return;(c.talks=c.talks||[]).push({id:uid(),title:pt,type:p3.querySelector('[data-n=ptype]').value,status:p3.querySelector('[data-n=pstat]').value,date:p3.querySelector('[data-n=pdate]').value,link:p3.querySelector('[data-n=plink]').value.trim(),abstract:fr?(fr.p.abstract||''):''})}
-else if(a==='delp'){c.talks=(c.talks||[]).filter(function(x){return x.id!==t.dataset.p});S.notes.forEach(function(n){if(n.pres===t.dataset.p)n.pres=''})}
-else return;save();render()}
-function gAct(t,type){var g=S.grants.find(function(x){return x.id===t.dataset.g});if(!g)return;var a=t.dataset.act;
-if(type==='change'){if(t.dataset.d){var m=g.miles.find(function(x){return x.id===t.dataset.d});if(m)m.done=t.checked}else if(t.dataset.t){var k=(g.tasks||[]).find(function(x){return x.id===t.dataset.t});if(k)k.done=t.checked}else if(t.dataset.f){if(t.dataset.f==='name'&&!t.value.trim()){render();return}g[t.dataset.f]=t.value}else return}
-else if(a==='copy'){var ta=t.closest('details').querySelector('textarea');ta.select();try{navigator.clipboard.writeText(ta.value).then(function(){t.textContent='Copied'},function(){try{document.execCommand('copy')}catch(e){}})}catch(e){try{document.execCommand('copy')}catch(e2){}}return}
-else if(a==='delg'){S.events.forEach(function(c){if(c.fundSrc===g.id)c.fundSrc=''});S.grants=S.grants.filter(function(x){return x!==g})}
-else if(a==='delm')g.miles=g.miles.filter(function(x){return x.id!==t.dataset.d});
-else if(a==='addm'){var p=t.parentNode,dt=p.querySelector('[data-n=date]').value,lb=p.querySelector('[data-n=label]').value.trim();if(!dt||!lb)return;g.miles.push({id:uid(),label:lb,date:dt,done:false})}
-else if(a==='addt'){var p2=t.parentNode,tx=p2.querySelector('[data-n=text]').value.trim();if(!tx)return;g.tasks=g.tasks||[];g.tasks.push({id:uid(),text:tx,date:p2.querySelector('[data-n=tdate]').value,done:false})}
-else if(a==='tpl'){g.tasks=g.tasks||[];GT.forEach(function(x){g.tasks.push({id:uid(),text:x,date:'',done:false})})}
-else if(a==='delt')g.tasks=(g.tasks||[]).filter(function(x){return x.id!==t.dataset.t})
-else return;save();render()}
-function bind(id,fn){var sec=document.getElementById(id);sec.addEventListener('change',function(e){fn(e.target,'change')});sec.addEventListener('click',function(e){var t=e.target.closest('[data-act]');if(t)fn(t,'click')})}
-bind('list',cAct);bind('list',vAct);bind('glist',gAct);
-document.getElementById('glist').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
-
-var cm=new Date();cm.setDate(1);
-document.getElementById('pm').onclick=function(){cm.setMonth(cm.getMonth()-1);renderCal()};
-document.getElementById('nm').onclick=function(){cm.setMonth(cm.getMonth()+1);renderCal()};
-var CATS=['conf','visit','sem','grant','paper','contact','note'];
-function isVisit(v){return /^Visit/.test(v.kind)}
-function calEntries(k){var o=[],A=function(cat,label,icon,text,tip,open){o.push({cat:cat,label:label,icon:icon,text:text,tip:tip||text,open:open})};
-S.events.forEach(function(c){var op='rokovi|'+c.id;if(c.start&&c.start<=k&&k<=(c.end&&c.end>c.start?c.end:c.start))A('conf','Conference',c.start===k?'&#127908; ':'↳ ',c.name,c.name+(c.end&&c.end>c.start?' ('+c.start+' – '+c.end+')':''),op);
-c.deadlines.forEach(function(d){if(d.date===k&&!d.done)A('conf','Deadline','&#9200; ',c.name+': '+d.kind,'',op)});
-(c.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)A('conf','Task','',c.name+': '+t.text,'',op)});
-(c.talks||[]).forEach(function(p){if(p.date===k&&p.status!=='Rejected'&&p.status!=='Presented')A('conf','Presentation','&#127908; ',p.title+' ('+c.name+')','',op)})});
-S.visits.forEach(function(v){if(v.status==='Cancelled')return;var vis=isVisit(v),cat=vis?'visit':'sem',op=(vis?'rokovi|':'visits|')+v.id;
-if(v.start&&v.start<=k&&k<=(v.end&&v.end>v.start?v.end:v.start))A(cat,v.kind,v.start===k?vIcon(v.kind):'↳ ',v.name,v.name+(v.place?' — '+v.place:''),op);
-(v.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)A(cat,'Task','',v.name+': '+t.text,'',op)})});
-S.grants.forEach(function(g){var op='grants|'+g.id;g.miles.forEach(function(m){if(m.date===k&&!m.done)A('grant','Milestone','',g.name+': '+m.label,'',op)});(g.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)A('grant','Task','',g.name+': '+t.text,'',op)})});
-S.papers.forEach(function(p){if(p.deadline===k)A('paper','Paper deadline','&#128196; ',p.title,'','radovi|'+p.id)});
-S.contacts.forEach(function(c){if(c.next===k&&c.status!=='Dormant')A('contact','Follow-up','&#9742; ',c.name+(c.nextNote?' — '+c.nextNote:''),'','contacts|'+c.id)});
-S.notes.forEach(function(n){if(n.date===k)A('note','Note','&#128221; ',n.title,'','beleske|'+n.id)});
-return o}
-function dayItems(k){return calEntries(k).map(function(e){return '<div class="sub" data-open="'+esc(e.open)+'" style="cursor:pointer"><span class="tag" style="background:var(--k-'+e.cat+');color:var(--on);border-color:transparent">'+esc(e.label)+'</span><span>'+e.icon+esc(e.text)+'</span></div>'}).join('')}
-function renderCal(){
-var y=cm.getFullYear(),m=cm.getMonth();
-document.getElementById('ml').textContent=cm.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-var first=(new Date(y,m,1).getDay()+6)%7,start=new Date(y,m,1-first),h='';
-['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(n){h+='<div class="h">'+n+'</div>'});
-for(var i=0;i<42;i++){var d=new Date(start);d.setDate(start.getDate()+i);var k=iso(d);
-var chips=calEntries(k).map(function(e){return '<span class="ev k-'+e.cat+'" data-open="'+esc(e.open)+'" title="'+esc(e.tip)+'">'+e.icon+esc(e.text)+'</span>'}).join('');
-h+='<div class="d'+(k===today?' today':'')+(d.getMonth()!==m?' x':'')+(k===SELDAY?' sel':'')+'" data-day="'+k+'" style="cursor:pointer">'+d.getDate()+chips+'</div>'}
-document.getElementById('cal').innerHTML=h;renderDay()}
-
-var NV='notes',TAGF='';
-function parseRef(line){line=(line||'').trim();if(!line)return null;var m=line.match(/(10\.\d{4,9}\/[^\s,;]+)|(arxiv:\s*\d{4}\.\d{4,5}(v\d+)?)|(\b\d{4}\.\d{4,5}(v\d+)?\b)|(https?:\/\/\S+)/i);var id=m?m[0].replace(/[.)\]]+$/,''):'';var dm=id.match(/doi\.org\/(10\.\d{4,9}\/\S+)/i),am=id.match(/arxiv\.org\/(?:abs|pdf)\/(\d{4}\.\d{4,5}(?:v\d+)?)/i);if(dm)id=dm[1];else if(am)id=am[1];var title=m?line.replace(m[0],''):line;title=title.replace(/^[\s,;—–-]+|[\s,;—–-]+$/g,'');return{id:uid(),title:title||id,ref:id.replace(/^arxiv:\s*/i,'')}}
-function refLink(r){var x=r.ref||'';if(/^10\./.test(x))return 'https://doi.org/'+x;if(/^\d{4}\.\d{4,5}/.test(x))return 'https://arxiv.org/abs/'+x;if(/^https?:\/\//.test(x))return x;return ''}
-function refLabel(r){var x=r.ref||'';return /^10\./.test(x)?'DOI':/^\d{4}\./.test(x)?'arXiv':'link'}
-function linkHtml(r){var u=refLink(r);return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+refLabel(r)+' ↗</a>':(r.ref?'<span class="mu">'+esc(r.ref)+'</span>':'')}
-function targetSel(){return '<select data-n="tgt" style="width:auto"><option value="">→ make it a task in…</option>'+S.grants.map(function(g){return '<option value="g:'+g.id+'">Project: '+esc(g.name)+'</option>'}).join('')+S.events.map(function(c){return '<option value="c:'+c.id+'">Conference: '+esc(c.name)+'</option>'}).join('')+S.visits.map(function(v){return '<option value="v:'+v.id+'">Visit: '+esc(v.name)+'</option>'}).join('')+'</select>'}
-function ideaRow(n,i){var a='data-nt="'+n.id+'" data-i="'+i.id+'"';return '<div class="sub"><input type="checkbox" style="width:auto" '+a+(i.done?' checked':'')+'><span style="min-width:160px;'+(i.done?'text-decoration:line-through;opacity:.6':'')+'">'+esc(i.text)+'</span>'+(i.moved?'<span class="tag">→ '+esc(i.moved)+'</span>':targetSel()+'<button class="btn sm" data-act="conv" '+a+'>Make task</button>')+'<button class="btn sm" data-act="deli" '+a+'>×</button></div>'}
-function tagList(n){return (n.tags||'').split(',').map(function(t){return t.trim()}).filter(Boolean)}
-function litMap(){var m={},order=[];S.notes.forEach(function(n){(n.refs||[]).forEach(function(r){var k=(r.ref||r.title).toLowerCase();if(!m[k]){m[k]={r:r,notes:[]};order.push(k)}m[k].notes.push(n.title)})});return order.map(function(k){return m[k]})}
-function openIdeas(){var c=0;S.notes.forEach(function(n){(n.ideas||[]).forEach(function(i){if(!i.done&&!i.moved)c++})});return c}
-function noteEdit(n,id){var f=function(k,ph,st){return '<input placeholder="'+ph+'" '+id+' data-nf="'+k+'" value="'+esc(n[k])+'"'+(st?' style="'+st+'"':'')+'>'};
-return '<details data-o="n'+n.id+'"'+(OPEN['n'+n.id]?' open':'')+' style="margin-top:8px"><summary>Edit note</summary><div class="sub">'+f('title','Title','min-width:240px')+f('speaker','Speaker')+'<input type="date" '+id+' data-nf="date" value="'+esc(n.date)+'">'+f('tags','Tags, comma-separated','min-width:220px')+'</div><textarea '+id+' data-nf="body" style="min-height:120px;margin-top:6px">'+esc(n.body)+'</textarea></details>'}
-document.getElementById('beleske').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
-function renderNotes(){
-var sel=document.getElementById('refsel'),ps=document.getElementById('projsel'),fc=document.getElementById('nfc'),fp=document.getElementById('nfp');
-var v1=sel.value,v2=ps.value,v3=fc.value,v4=fp.value;
-var co=costItems().map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join(''),po=S.grants.map(function(g){return '<option value="'+g.id+'">'+esc(g.name)+'</option>'}).join('');
-sel.innerHTML='<option value="">— no conference / visit —</option>'+co;sel.value=v1;
-ps.innerHTML='<option value="">— no project —</option>'+po;ps.value=v2;
-var pr0=document.getElementById('pressel'),v5=pr0.value;pr0.innerHTML='<option value="">— no presentation —</option>'+allTalks().map(function(x){return '<option value="'+x.p.id+'">'+esc(x.c.name+' — '+x.p.title)+'</option>'}).join('');pr0.value=v5;
-var ck0=document.getElementById('contsel'),v6=ck0.value;ck0.innerHTML='<option value="">— no contact —</option>'+S.contacts.map(function(k){return '<option value="'+k.id+'">'+esc(k.name)+'</option>'}).join('');ck0.value=v6;
-fc.innerHTML='<option value="">All conferences / visits</option>'+co;fc.value=v3;
-fp.innerHTML='<option value="">All projects</option>'+po;fp.value=v4;
-var tc={};S.notes.forEach(function(n){tagList(n).forEach(function(t){tc[t]=(tc[t]||0)+1})});
-document.getElementById('tagcloud').innerHTML=Object.keys(tc).length?'<span class="mu">Topics:</span>'+Object.keys(tc).sort().map(function(t){return '<span class="tag" style="cursor:pointer;'+(t===TAGF?'background:var(--ac);color:var(--on);border-color:var(--ac)':'')+'" data-tag="'+esc(t)+'">'+esc(t)+' ('+tc[t]+')</span>'}).join(''):'';
-var q=document.getElementById('q').value.toLowerCase();
-var ns=S.notes.filter(function(n){if(v3&&n.ref!==v3)return false;if(v4&&n.proj!==v4)return false;if(TAGF&&tagList(n).indexOf(TAGF)<0)return false;
-var hay=[n.title,n.body,n.speaker,n.tags].concat((n.refs||[]).map(function(r){return r.title+' '+r.ref}),(n.ideas||[]).map(function(i){return i.text})).join(' ').toLowerCase();return hay.indexOf(q)>-1}).sort(function(a,b){return (b.date||'')<(a.date||'')?-1:1});
-document.getElementById('nlist').innerHTML=ns.length?ns.map(function(n){
-var cf=costItems().find(function(e){return e.id===n.ref}),pr=S.grants.find(function(g){return g.id===n.proj}),pz=allTalks().find(function(x){return x.p.id===n.pres}),pk=S.contacts.find(function(k){return k.id===n.cont}),id='data-nt="'+n.id+'"',ideas=n.ideas||[];
-return '<div class="card" id="it-'+n.id+'"><div class="row"><strong>'+esc(n.title)+'</strong><span class="mu">'+esc(n.date)+'</span></div>'+
-'<div class="mu">'+(cf?esc(cf.name)+' · ':'')+(pr?esc(pr.name)+' · ':'')+(pz?'<span class="tag">'+esc(pz.p.title)+'</span> ':'')+(pk?'<span class="tag">'+esc(pk.name)+'</span> ':'')+(n.speaker?esc(n.speaker)+' · ':'')+tagList(n).map(function(t){return '<span class="tag" style="cursor:pointer" data-tag="'+esc(t)+'">'+esc(t)+'</span>'}).join('')+'</div>'+
-'<p style="white-space:pre-wrap">'+esc(n.body)+'</p>'+
-'<div class="mu" style="margin-top:8px">Papers mentioned ('+(n.refs||[]).length+')</div>'+(n.refs||[]).map(function(r){return '<div class="sub"><span>'+esc(r.title)+'</span>'+linkHtml(r)+'<button class="btn sm" data-act="delr" '+id+' data-r="'+r.id+'">×</button></div>'}).join('')+
-'<div class="sub"><input placeholder="Paper title" data-n="rt"><input placeholder="DOI / arXiv ID / link" data-n="rd"><button class="btn sm" data-act="addr" '+id+'>Add paper</button></div>'+
-'<div class="mu" style="margin-top:8px">Ideas / to try ('+ideas.filter(function(i){return !i.done&&!i.moved}).length+' open)</div>'+ideas.map(function(i){return ideaRow(n,i)}).join('')+
-'<div class="sub"><input placeholder="e.g. Try this method on our model" data-n="it" style="min-width:220px"><button class="btn sm" data-act="addi" '+id+'>Add idea</button></div>'+
-noteEdit(n,id)+'<button class="btn sm" style="margin-top:10px" data-act="deln" '+id+'>Delete note</button></div>'}).join(''):'<p class="mu">No notes found.</p>';
-var lm=litMap();
-document.getElementById('nvtabs').innerHTML=[['notes','Notes ('+S.notes.length+')'],['lit','Literature ('+lm.length+')'],['ideas','Ideas &amp; to-dos ('+openIdeas()+')']].map(function(x){return '<button data-nv="'+x[0]+'"'+(NV===x[0]?' class="on"':'')+'>'+x[1]+'</button>'}).join('');
-['notes','lit','ideas'].forEach(function(k){document.getElementById('nv-'+k).classList.toggle('hide',NV!==k)});
-renderLit(lm);renderIdeas();
-}
-function renderLit(lm){lm=lm||litMap();var q=document.getElementById('lq').value.toLowerCase();
-var arr=lm.filter(function(x){return (x.r.title+' '+x.r.ref+' '+x.notes.join(' ')).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return a.r.title.toLowerCase()<b.r.title.toLowerCase()?-1:1});
-document.getElementById('litlist').innerHTML=arr.length?arr.map(function(x){return '<div class="card"><div class="row"><strong>'+esc(x.r.title)+'</strong>'+linkHtml(x.r)+'</div><div class="mu">Mentioned in: '+x.notes.map(esc).join(', ')+'</div></div>'}).join(''):'<p class="mu">No papers yet. Add them under a note.</p>'}
-function renderIdeas(){var rows=[];S.notes.forEach(function(n){(n.ideas||[]).forEach(function(i){rows.push({n:n,i:i})})});
-var op=rows.filter(function(x){return !x.i.done&&!x.i.moved}),rest=rows.filter(function(x){return x.i.done||x.i.moved});
-var card=function(x){return '<div class="card">'+ideaRow(x.n,x.i)+'<div class="mu">From: '+esc(x.n.title)+'</div></div>'};
-document.getElementById('ideaslist').innerHTML=(op.length?'<div class="mu" style="margin-bottom:6px">Open ('+op.length+')</div>'+op.map(card).join(''):'<p class="mu">No open ideas.</p>')+(rest.length?'<div class="mu" style="margin:12px 0 6px">Done or turned into tasks</div>'+rest.map(card).join(''):'')}
-document.getElementById('q').oninput=renderNotes;
-document.getElementById('nfc').onchange=renderNotes;document.getElementById('nfp').onchange=renderNotes;
-document.getElementById('lq').oninput=function(){renderLit()};
-document.getElementById('beleske').addEventListener('click',function(e){
-var nv=e.target.closest('[data-nv]');if(nv){NV=nv.dataset.nv;renderNotes();return}
-var tg=e.target.closest('[data-tag]');if(tg){TAGF=TAGF===tg.dataset.tag?'':tg.dataset.tag;NV='notes';renderNotes();return}
-var t=e.target.closest('[data-act]');if(!t)return;var n=S.notes.find(function(x){return x.id===t.dataset.nt}),a=t.dataset.act;if(!n)return;var p=t.parentNode;
-if(a==='deln')S.notes=S.notes.filter(function(x){return x!==n});
-else if(a==='delr')n.refs=(n.refs||[]).filter(function(x){return x.id!==t.dataset.r});
-else if(a==='addr'){var ti=p.querySelector('[data-n=rt]').value.trim(),rd=p.querySelector('[data-n=rd]').value.trim();if(!ti&&!rd)return;var q=parseRef(rd);(n.refs=n.refs||[]).push({id:uid(),title:ti||(q?q.title:rd),ref:q?q.ref:''})}
-else if(a==='deli')n.ideas=(n.ideas||[]).filter(function(x){return x.id!==t.dataset.i});
-else if(a==='addi'){var tx=p.querySelector('[data-n=it]').value.trim();if(!tx)return;(n.ideas=n.ideas||[]).push({id:uid(),text:tx,done:false})}
-else if(a==='conv'){var v=p.querySelector('[data-n=tgt]').value;if(!v)return;var i=(n.ideas||[]).find(function(x){return x.id===t.dataset.i}),tg2=(v[0]==='g'?S.grants:v[0]==='v'?S.visits:S.events).find(function(x){return x.id===v.slice(2)});if(!i||!tg2)return;(tg2.tasks=tg2.tasks||[]).push({id:uid(),text:i.text,date:'',done:false});i.moved=tg2.name}
-else return;save();render()});
-document.getElementById('beleske').addEventListener('change',function(e){var t=e.target;if(t.dataset.nf){var n0=S.notes.find(function(x){return x.id===t.dataset.nt});if(n0){if(t.dataset.nf==='title'&&!t.value.trim()){render();return}n0[t.dataset.nf]=t.value;save();render()}return}if(t.type==='checkbox'&&t.dataset.nt){var n=S.notes.find(function(x){return x.id===t.dataset.nt}),i=n&&(n.ideas||[]).find(function(x){return x.id===t.dataset.i});if(i){i.done=t.checked;save();render()}}});
-
-var STG=['Draft','Submitted','Under review','Minor revision','Major revision','Accepted','Published','Rejected'];
-var OPEN={};
-function fr2(v){var a=v.split('|');var p=S.papers.find(function(x){return x.id===a[0]});return {p:p,r:p&&(p.reviews||[]).find(function(x){return x.id===a[1]})}}
-function revHtml(p){
-var rv=p.reviews||[],dn=rv.filter(function(r){return r.done}).length;
-return '<details data-o="'+p.id+'"'+(OPEN[p.id]?' open':'')+' style="margin-top:8px"><summary>Reviews and responses ('+dn+'/'+rv.length+' answered)</summary>'+
-rv.map(function(r){return '<div class="card" style="margin:8px 0;background:var(--bg)"><div class="row"><strong>'+esc(r.who||'Reviewer')+' \u00b7 round '+esc(r.round)+'</strong><label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" style="width:auto" data-rd="'+p.id+'|'+r.id+'"'+(r.done?' checked':'')+'> answered</label></div><p style="white-space:pre-wrap;margin:6px 0">'+esc(r.comment)+'</p><label>My response</label><textarea data-rr="'+p.id+'|'+r.id+'">'+esc(r.response)+'</textarea><button class="btn sm" style="margin-top:6px" data-rx="'+p.id+'|'+r.id+'">Delete comment</button></div>'}).join('')+
-'<div style="margin-top:8px"><label>New comment</label><input placeholder="Reviewer 1 / Editor" data-f="who"><textarea placeholder="Comment text" data-f="comment" style="margin-top:6px"></textarea><button class="btn sm" style="margin-top:6px" data-ra="'+p.id+'">Add comment</button></div></details>'}
-function renderPapers(){
-var el=document.getElementById('plist');
-document.getElementById('wd').value=S.waitDays||90;
-var pps2=document.getElementById('ppsel'),pv=pps2.value;pps2.innerHTML='<option value="">— none —</option>'+S.grants.map(function(g){return '<option value="'+g.id+'">'+esc(g.name)+'</option>'}).join('');pps2.value=pv;
-var ps=S.papers.slice().sort(function(a,b){return (a.deadline||'9999')<(b.deadline||'9999')?-1:1});
-if(!ps.length){el.innerHTML='<p class="mu">No papers yet. Add the first one above.</p>';return}
-el.innerHTML=ps.map(function(p){
-var fin=p.stage==='Published'||p.stage==='Rejected'||p.stage==='Accepted';
-var dl='';
-if(p.deadline&&!fin){var d=daysTo(p.deadline);dl='<div class="due '+(d<0?'late':d<=14?'soon':'')+'">due: '+esc(p.deadline)+' · '+(d<0?(-d)+' d overdue':d===0?'today':'in '+d+' d')+'</div>'}
-var wait=(p.sent&&(p.stage==='Submitted'||p.stage==='Under review'))?' · '+(-daysTo(p.sent))+' d since submission':'';
-var log=(p.log||[]).map(function(l){return esc(l.date)+' '+esc(l.text)}).join(' → ');
-var ws=waitSince(p),wdays=ws?-daysTo(ws):0,flag=wdays>(S.waitDays||90)?'<div class="due soon" style="font-size:13px">⏳ '+wdays+' days without a decision — consider writing to the editor</div>':'';
-return '<div class="card" id="it-'+p.id+'"><div class="row"><div><strong>'+esc(p.title)+'</strong>'+(p.authors?'<div class="mu">'+esc(p.authors)+'</div>':'<br>')+'<span class="tag">'+esc(p.venue||'no journal')+'</span>'+paperLink(p)+'<span class="tag">Round '+esc(p.round)+'</span><span class="mu">'+esc(p.note)+wait+'</span></div>'+
-'<div style="text-align:right">'+dl+flag+'<select data-ps="'+p.id+'" style="width:auto;margin-top:4px">'+STG.map(function(s){return '<option'+(s===p.stage?' selected':'')+'>'+s+'</option>'}).join('')+'</select> '+
-'<input type="date" data-pd="'+p.id+'" value="'+esc(p.deadline)+'" title="Deadline" style="width:auto;margin-top:4px"> '+pjSel(p)+
-'<button class="btn sm" data-px="'+p.id+'">Delete</button></div></div>'+
-'<div class="mu" style="margin-top:6px">'+log+'</div>'+peopleLine('p',p.id)+paperEdit(p)+revHtml(p)+'</div>'}).join('');
-el.querySelectorAll('[data-ps]').forEach(function(s){s.onchange=function(){var p=S.papers.find(function(x){return x.id===s.dataset.ps});p.stage=s.value;p.log=p.log||[];p.log.push({date:today,text:s.value});save();render()}});
-el.querySelectorAll('[data-pd]').forEach(function(s){s.onchange=function(){S.papers.find(function(x){return x.id===s.dataset.pd}).deadline=s.value;save();render()}});
-el.querySelectorAll('[data-pp]').forEach(function(s){s.onchange=function(){S.papers.find(function(x){return x.id===s.dataset.pp}).proj=s.value;save();render()}});
-el.querySelectorAll('[data-pf]').forEach(function(i){i.onchange=function(){var q=S.papers.find(function(x){return x.id===i.dataset.pid});if(q){if(i.dataset.pf==='title'&&!i.value.trim()){render();return}q[i.dataset.pf]=i.value;save();render()}}});
-el.querySelectorAll('[data-px]').forEach(function(b){b.onclick=function(){S.papers=S.papers.filter(function(x){return x.id!==b.dataset.px});save();render()}});
-el.querySelectorAll('details[data-o]').forEach(function(d){d.ontoggle=function(){OPEN[d.dataset.o]=d.open}});
-el.querySelectorAll('[data-rd]').forEach(function(c){c.onchange=function(){var o=fr2(c.dataset.rd);if(o.r){o.r.done=c.checked;save();render()}}});
-el.querySelectorAll('[data-rr]').forEach(function(t){t.onchange=function(){var o=fr2(t.dataset.rr);if(o.r){o.r.response=t.value;save()}}});
-el.querySelectorAll('[data-rx]').forEach(function(b){b.onclick=function(){var o=fr2(b.dataset.rx);if(o.p&&o.r){o.p.reviews=o.p.reviews.filter(function(x){return x.id!==o.r.id});save();render()}}});
-el.querySelectorAll('[data-ra]').forEach(function(b){b.onclick=function(){var box=b.parentNode,p=S.papers.find(function(x){return x.id===b.dataset.ra});var c=box.querySelector('[data-f=comment]').value.trim();if(!c||!p)return;p.reviews=p.reviews||[];p.reviews.push({id:uid(),who:box.querySelector('[data-f=who]').value,comment:c,response:'',done:false,round:p.round});OPEN[p.id]=true;save();render()}});
-}
-document.getElementById('fp').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={id:uid()};f.forEach(function(v,k){o[k]=v});o.log=[{date:(o.sent&&o.stage!=='Draft')?o.sent:today,text:o.stage}];S.papers.push(o);save();ev.target.reset();render()};
-function waitSince(p){if(['Submitted','Under review'].indexOf(p.stage)<0)return '';var l=p.log||[],i=l.length-1,d='';while(i>=0&&(l[i].text==='Submitted'||l[i].text==='Under review')){d=l[i].date;i--}if(i<0&&p.sent&&(!d||p.sent<d))d=p.sent;return d||p.sent||''}
-function lateWaiting(){var th=S.waitDays||90;return S.papers.map(function(p){var d=waitSince(p);return d?{p:p,since:d,days:-daysTo(d)}:null}).filter(function(x){return x&&x.days>th}).sort(function(a,b){return b.days-a.days})}
-function queryText(p,since){return 'Subject: Status inquiry: manuscript "'+p.title+'"\n\nDear Editor,\n\nI am writing to ask about the status of our manuscript "'+p.title+'", submitted'+(p.venue?' to '+p.venue:'')+(since?' on '+since+' ('+(-daysTo(since))+' days ago)':'')+'. We would be grateful for an update on the review process, and we are happy to provide any additional information if needed.\n\nThank you for your time.\n\nBest regards,'}
-function copyText(t,text){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var done=function(){t.textContent='Copied'};try{navigator.clipboard.writeText(text).then(done,function(){try{document.execCommand('copy');done()}catch(e){}})}catch(e){try{document.execCommand('copy');done()}catch(e2){}}document.body.removeChild(ta)}
-document.getElementById('wd').onchange=function(){S.waitDays=Math.max(1,+this.value||90);save();render()};
-document.getElementById('uattn').addEventListener('click',function(e){var t=e.target.closest('[data-act=qcopy]');if(!t){var oc=e.target.closest('[data-open]');if(oc)openFromStr(oc.dataset.open);return}var p=S.papers.find(function(x){return x.id===t.dataset.p});if(p)copyText(t,queryText(p,waitSince(p)))});
-var UPW='60';
-function renderUpcoming(){
-var el=document.getElementById('ulist'),items=[];
-S.events.forEach(function(c){c.deadlines.forEach(function(d){if(d.date&&!d.done)items.push({date:d.date,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:d.kind,k:'c',i:c.id,d:d.id})});(c.tasks||[]).forEach(function(t){if(t.date&&!t.done)items.push({date:t.date,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:'Task: '+t.text,k:'ct',i:c.id,d:t.id})});(c.talks||[]).forEach(function(p){if(p.date&&daysTo(p.date)>=0&&p.status!=='Rejected'&&p.status!=='Presented')items.push({date:p.date,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:'Your '+p.type.toLowerCase()+': '+p.title,k:''})});if(c.start&&daysTo(c.start)>=0)items.push({date:c.start,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:'Conference starts',k:''})});
-S.grants.forEach(function(g){g.miles.forEach(function(m){if(m.date&&!m.done)items.push({date:m.date,type:'Grant',o:'grants|'+g.id,title:g.name,label:m.label,k:'g',i:g.id,d:m.id})});(g.tasks||[]).forEach(function(t){if(t.date&&!t.done)items.push({date:t.date,type:'Grant',o:'grants|'+g.id,title:g.name,label:'Task: '+t.text,k:'gt',i:g.id,d:t.id})})});
-S.papers.forEach(function(p){var fin=['Published','Rejected','Accepted'].indexOf(p.stage)>-1;if(p.deadline&&!fin)items.push({date:p.deadline,type:'Paper',o:'radovi|'+p.id,title:p.title,label:'Deadline ('+p.stage+')',k:''})});
-S.visits.forEach(function(v){if(v.status==='Cancelled')return;if(v.start&&v.status!=='Done'&&daysTo(v.start)>=0)items.push({date:v.start,type:v.kind.split(' ')[0],o:(isVisit(v)?'rokovi|':'visits|')+v.id,title:v.name,label:v.kind+(v.place?' — '+v.place:'')+' starts',k:''});(v.tasks||[]).forEach(function(t){if(t.date&&!t.done)items.push({date:t.date,type:v.kind.split(' ')[0],o:(isVisit(v)?'rokovi|':'visits|')+v.id,title:v.name,label:'Task: '+t.text,k:'vt',i:v.id,d:t.id})})});
-S.contacts.forEach(function(k){if(k.next&&k.status!=='Dormant')items.push({date:k.next,type:'Contact',o:'contacts|'+k.id,title:k.name,label:'Follow-up'+(k.nextNote?': '+k.nextNote:''),k:'f',i:k.id})});
-items.sort(function(a,b){return a.date<b.date?-1:1});
-var lim=UPW==='all'?1e9:+UPW,shown=items.filter(function(it){return daysTo(it.date)<=lim});
-var od=items.filter(function(it){return daysTo(it.date)<0}).length,soon=items.filter(function(it){var d=daysTo(it.date);return d>=0&&d<=14}).length;
-var lw=lateWaiting();
-document.getElementById('uattn').innerHTML=lw.length?'<div class="mu" style="margin-bottom:6px">Needs attention</div>'+lw.map(function(x){return '<div class="card" data-open="radovi|'+x.p.id+'" style="cursor:pointer"><div class="row"><div><strong>'+esc(x.p.title)+'</strong><br><span class="tag">Paper</span><span class="mu">'+esc(x.p.venue||'')+' · '+esc(x.p.stage)+' since '+esc(x.since)+'</span></div><div style="text-align:right"><div class="due soon">'+x.days+' days waiting</div><button class="btn sm" data-act="qcopy" data-p="'+x.p.id+'">Copy status query to editor</button></div></div></div>'}).join('')+'<div class="mu" style="margin:12px 0 6px">Upcoming</div>':'';
-document.getElementById('usum').textContent=od+' overdue · '+soon+' in the next 14 days'+(lw.length?' · '+lw.length+' paper'+(lw.length===1?'':'s')+' waiting too long':'');
-if(!shown.length){el.innerHTML='<p class="mu">Nothing due in this period.</p>';return}
-el.innerHTML=shown.map(function(it){
-var d=daysTo(it.date),c=d<0?'late':d<=14?'soon':'',tx=d<0?(-d)+' d overdue':d===0?'today':'in '+d+' d';
-var chk=it.k?'<input type="checkbox" style="width:auto;margin-right:8px" title="Mark as done" data-u="'+it.k+'" data-i="'+it.i+'" data-d="'+it.d+'">':'';
-return '<div class="card"'+(it.o?' data-open="'+esc(it.o)+'" style="cursor:pointer"':'')+'><div class="row"><div>'+chk+'<strong>'+esc(it.title)+'</strong><br><span class="tag">'+it.type+'</span><span class="mu">'+esc(it.label)+'</span></div><div class="due '+c+'">'+esc(it.date)+' · '+tx+'</div></div></div>'}).join('');
-}
-document.getElementById('ulist').addEventListener('change',function(e){var t=e.target,u=t.dataset.u;if(!u)return;if(u==='f'){var ct=S.contacts.find(function(x){return x.id===t.dataset.i});if(ct){ct.next='';ct.nextNote='';save();render()}return}if(u==='vt'){var vv=S.visits.find(function(x){return x.id===t.dataset.i}),tk=vv&&(vv.tasks||[]).find(function(x){return x.id===t.dataset.d});if(tk){tk.done=t.checked;save();render()}return}var o=(u[0]==='c'?S.events:S.grants).find(function(x){return x.id===t.dataset.i});if(!o)return;var d=(u==='c'?o.deadlines:u==='g'?o.miles:(o.tasks||[])).find(function(x){return x.id===t.dataset.d});if(d){d.done=t.checked;save();render()}});
-document.getElementById('ulist').addEventListener('click',function(e){if(e.target.closest('input'))return;var oc=e.target.closest('[data-open]');if(oc)openFromStr(oc.dataset.open)});
-document.getElementById('uw').onchange=function(){UPW=this.value;renderUpcoming()};
-var EY='all',XST=['Not requested','Requested','Approved','Paid','Rejected'];
-function cYear(c){var d=c.start||(c.deadlines||[]).map(function(x){return x.date}).filter(Boolean).sort()[0]||'';return d?d.slice(0,4):'Undated'}
-function srcName(c){var g=S.grants.find(function(x){return x.id===c.fundSrc});return g?g.name:(c.fundSrc||'No source')}
-function nf(v){return v?v.toLocaleString('en-GB',{maximumFractionDigits:2}):'–'}
-function renderExpenses(){
-var ys={};costItems().forEach(function(c){if(+c.cost>0)ys[cYear(c)]=1});
-var sel=document.getElementById('ey'),yl=Object.keys(ys).sort();if(EY!=='all'&&!ys[EY])EY='all';
-sel.innerHTML='<option value="all">All years</option>'+yl.map(function(y){return '<option>'+y+'</option>'}).join('');sel.value=EY;
-var its=costItems().filter(function(c){return +c.cost>0&&(EY==='all'||cYear(c)===EY)}),el=document.getElementById('exlist');
-if(!its.length){el.innerHTML='<p class="mu">No costs entered yet. Add an estimated cost to a conference under Funding.</p>';return}
-var by={};its.forEach(function(c){var cur=c.cur||'EUR',src=srcName(c);by[cur]=by[cur]||{};by[cur][src]=by[cur][src]||{};var st=XST.indexOf(c.fundStatus)>-1?c.fundStatus:'Not requested';by[cur][src][st]=(by[cur][src][st]||0)+(+c.cost)});
-var out=Object.keys(by).sort().map(function(cur){
-var srcs=Object.keys(by[cur]).sort(),tot={};
-var rows=srcs.map(function(src){var r=by[cur][src],t=0;XST.forEach(function(k){tot[k]=(tot[k]||0)+(r[k]||0);if(k!=='Rejected')t+=r[k]||0});return '<tr><td>'+esc(src)+'</td>'+XST.map(function(k){return '<td>'+nf(r[k])+'</td>'}).join('')+'<td><strong>'+nf(t)+'</strong></td></tr>'}).join('');
-var all=0;XST.forEach(function(k){if(k!=='Rejected')all+=tot[k]||0});
-var secured=(tot.Approved||0)+(tot.Paid||0),open=(tot['Not requested']||0)+(tot.Requested||0);
-return '<div class="card"><strong>'+cur+'</strong><div class="mu" style="margin:4px 0 8px">Secured (approved + paid): <strong>'+nf(secured)+'</strong> · still open (requested + not requested): <strong>'+nf(open)+'</strong> · rejected: '+nf(tot.Rejected)+'</div><div class="scroll"><table class="tb"><tr><th>Funding source</th>'+XST.map(function(k){return '<th>'+k+'</th>'}).join('')+'<th>Total*</th></tr>'+rows+'<tr class="tot"><td>Total</td>'+XST.map(function(k){return '<td>'+nf(tot[k])+'</td>'}).join('')+'<td>'+nf(all)+'</td></tr></table></div><div class="mu" style="margin-top:6px">*Total does not include rejected requests.</div></div>'}).join('');
-var det=its.slice().sort(function(a,b){return (a.start||'9999')<(b.start||'9999')?-1:1}).map(function(c){return '<tr><td>'+esc(c.name)+'</td><td>'+esc(c.start||cYear(c))+'</td><td>'+nf(+c.cost)+' '+esc(c.cur||'EUR')+'</td><td>'+esc(srcName(c))+'</td><td>'+esc(c.fundStatus)+'</td></tr>'}).join('');
-el.innerHTML=out+'<div class="card"><strong>By conference / visit</strong><div class="scroll"><table class="tb"><tr><th>Conference / visit</th><th>Date</th><th>Cost</th><th>Source</th><th>Status</th></tr>'+det+'</table></div></div>';
-}
-document.getElementById('ey').onchange=function(){EY=this.value;renderExpenses()};
-async function saveFile(name,text,hint){try{var d=window.claude&&window.claude.use?await window.claude.use('downloads'):null;if(d){await d.save({filename:name,data:text});return 'ok'}}catch(e){var c=e&&e.code;if(c==='declined')return '';if(c==='rejected_extension'||c==='extension_not_enabled')return hint||'This file type can not be saved here. Use Copy instead.'}
-var a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(text);a.download=name;a.click();return 'ok'}
-function xRange(){var v=document.getElementById('xp').value,t=new Date(today+'T00:00:00'),Y=t.getFullYear(),M=t.getMonth();
-if(v==='12m'){var f=new Date(t);f.setFullYear(Y-1);return{from:iso(f),to:today}}
-if(v==='ly')return{from:(Y-1)+'-01-01',to:(Y-1)+'-12-31'};
-if(v==='lm')return{from:iso(new Date(Y,M-1,1)),to:iso(new Date(Y,M,0))};
-if(v==='custom')return{from:document.getElementById('xf').value,to:document.getElementById('xt').value};
-return{from:'',to:''}}
-function inR(R,d){if(!R.from&&!R.to)return true;if(!d)return false;return (!R.from||d>=R.from)&&(!R.to||d<=R.to)}
-function projInR(R,a,b){if(!R.from&&!R.to)return true;if(!a&&!b)return false;return (!R.to||(a||'0000')<=R.to)&&(!R.from||(b||'9999')>=R.from)}
-function pdate(p){var l=(p.log||[]).slice().reverse().find(function(x){return x.text===p.stage});return (l&&l.date)||p.sent||''}
-function byDate(a,b){return (b.d||'')<(a.d||'')?-1:1}
-function cvData(){var R=xRange(),pend=document.getElementById('xpend').checked,sec=[],want=function(k){return document.getElementById('xs-'+k).checked};
-var DONE=['Accepted','Published'],PEND=['Submitted','Under review','Minor revision','Major revision'];
-if(want('p'))sec.push({k:'p',title:'Publications',items:S.papers.filter(function(p){return (DONE.indexOf(p.stage)>-1||(pend&&PEND.indexOf(p.stage)>-1))&&inR(R,pdate(p))}).map(function(p){var d=pdate(p);return{d:d,p:p,t:(p.authors?p.authors+'. ':'')+p.title+(p.venue?' — '+p.venue:'')+(d?' ('+d.slice(0,4)+')':'')+(DONE.indexOf(p.stage)>-1?'':' ['+p.stage.toLowerCase()+']')+(paperUrl(p)?' '+paperUrl(p):'')}}).sort(byDate)});
-if(want('t')){var it=[];S.events.forEach(function(c){(c.talks||[]).forEach(function(p){var d=p.date||c.start||'';if((p.status==='Accepted'||p.status==='Presented'||(pend&&p.status==='Submitted'))&&inR(R,d))it.push({d:d,l:p.link,t:'"'+p.title+'" — '+p.type+', '+c.name+(c.place?', '+c.place:'')+(d?' ('+d+')':'')+(p.status==='Submitted'?' [submitted]':'')})})});sec.push({k:'t',title:'Presentations',items:it.sort(byDate)})}
-if(want('c'))sec.push({k:'c',title:'Conferences',items:S.events.filter(function(c){var pe=pend&&(c.status==='Accepted'||c.status==='Submitted');return (c.status==='Attended'||(c.talks||[]).some(function(p){return p.status==='Presented'})||pe)&&inR(R,c.start||'')}).map(function(c){var pe=c.status==='Accepted'||c.status==='Submitted';return{d:c.start||'',t:c.name+(c.place?', '+c.place:'')+(c.start?' ('+c.start+(c.end&&c.end!==c.start?' – '+c.end:'')+')':'')+(c.status!=='Attended'&&pe?' ['+c.status.toLowerCase()+']':'')}}).sort(byDate)});
-if(want('v'))sec.push({k:'v',title:'Seminars, visits and meetings',items:S.visits.filter(function(v){return (v.status==='Done'||(pend&&(v.status==='Confirmed'||v.status==='Planned')))&&inR(R,v.start||'')}).map(function(v){return{d:v.start||'',t:v.kind+': '+v.name+(v.place?', '+v.place:'')+(v.start?' ('+v.start+(v.end&&v.end>v.start?' – '+v.end:'')+')':'')+(v.status==='Done'?'':' ['+v.status.toLowerCase()+']')}}).sort(byDate)});
-if(want('g'))sec.push({k:'g',title:'Projects and grants',items:S.grants.filter(function(g){return (['Awarded','Active','Completed'].indexOf(g.status)>-1||(pend&&['Applying','Submitted'].indexOf(g.status)>-1))&&projInR(R,g.start,g.end)}).map(function(g){var pe=g.status==='Applying'||g.status==='Submitted';return{d:g.start||'',t:g.name+' — '+(g.funder?g.funder+', ':'')+g.gkind.toLowerCase()+(g.start?' ('+g.start+' – '+(g.end||'ongoing')+')':'')+(pe?' ['+g.status.toLowerCase()+']':'')}}).sort(byDate)});
-return sec.filter(function(x){return x.items.length})}
-function bibText(items){var used={};return '% Volume and pages are not stored in the planner. Add them by hand if needed.\n\n'+items.map(function(x){var p=x.p,y=(x.d||'').slice(0,4),fa=(p.authors||'').split(/\s+and\s+|;/)[0].trim(),sn=fa?(fa.indexOf(',')>-1?fa.split(',')[0]:fa.split(/\s+/).pop()):'',w=(sn||p.title.split(' ')[0]||'paper').toLowerCase().replace(/[^a-z0-9]/g,'')||'paper',k=w+y,n=1;while(used[k]){n++;k=w+y+String.fromCharCode(96+n)}used[k]=1;var e=function(v){return String(v||'').replace(/[{}]/g,'')},q=parseRef(p.doi||''),r=q?q.ref:'',f=[];
-f.push('  title = {'+e(p.title)+'}');if(p.authors)f.push('  author = {'+e(p.authors.replace(/\s*;\s*/g,' and '))+'}');if(p.venue)f.push('  journal = {'+e(p.venue)+'}');if(y)f.push('  year = {'+y+'}');
-if(/^10\./.test(r))f.push('  doi = {'+e(r)+'}');else if(/^\d{4}\.\d{4,5}/.test(r))f.push('  eprint = {'+e(r)+'},\n  archivePrefix = {arXiv}');else if(/^https?:/.test(r))f.push('  url = {'+e(r)+'}');
-f.push('  note = {'+e(p.stage)+'}');return '@article{'+k+',\n'+f.join(',\n')+'\n}'}).join('\n\n')}
-function renderCv(){
-var f=document.getElementById('xfmt').value,sec=cvData(),out='',n=0;
-document.getElementById('xcustom').style.display=document.getElementById('xp').value==='custom'?'flex':'none';
-sec.forEach(function(x){n+=x.items.length});
-if(f==='bib'){var ps=(sec.find(function(x){return x.k==='p'})||{items:[]}).items;out=ps.length?bibText(ps):'No papers in this period.';n=ps.length}
-else if(!sec.length)out='Nothing found for this period.';
-else out=sec.map(function(x){var lk=function(i){return i.l&&/^https?:\/\//.test(i.l)?i.l:''};
-if(f==='html')return '<h3>'+esc(x.title)+'</h3>\n<ul>\n'+x.items.map(function(i){return '<li>'+esc(i.t)+(lk(i)?' (<a href="'+esc(lk(i))+'">slides</a>)':'')+'</li>'}).join('\n')+'\n</ul>';
-if(f==='md')return '## '+x.title+'\n\n'+x.items.map(function(i){return '- '+i.t+(lk(i)?' ([slides]('+lk(i)+'))':'')}).join('\n');
-return x.title.toUpperCase()+' ('+x.items.length+')\n'+x.items.map(function(i){return '- '+i.t+(lk(i)?' '+lk(i):'')}).join('\n')}).join('\n\n');
-document.getElementById('xout').value=out;document.getElementById('xinfo').textContent=n+' item'+(n===1?'':'s');
-}
-['xp','xfmt','xf','xt','xpend','xs-p','xs-t','xs-c','xs-v','xs-g'].forEach(function(id){document.getElementById(id).onchange=renderCv});
-document.getElementById('xcopy').onclick=function(){var ta=document.getElementById('xout');ta.select();try{navigator.clipboard.writeText(ta.value).then(function(){document.getElementById('xinfo').textContent='Copied'},function(){try{document.execCommand('copy')}catch(e){}})}catch(e){try{document.execCommand('copy')}catch(e2){}}};
-document.getElementById('xsave').onclick=function(){var f=document.getElementById('xfmt').value,nm={txt:'cv-export.txt',md:'cv-export.md',html:'cv-export.html',bib:'papers-bibtex.txt'}[f];saveFile(nm,document.getElementById('xout').value).then(function(m){if(m&&m!=='ok')document.getElementById('xinfo').textContent=m})};
-function renderAbs(){
-var q=document.getElementById('aq').value.toLowerCase(),all=allTalks();
-var dt=function(x){return x.p.date||x.c.start||''};
-var rows=all.filter(function(x){return x.p.abstract&&(x.p.title+' '+x.p.abstract+' '+x.c.name).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return dt(b)<dt(a)?-1:1});
-var miss=all.filter(function(x){return !x.p.abstract}).length;
-document.getElementById('alist').innerHTML=(rows.length?rows.map(function(x){return '<div class="card"><div class="row"><div><strong>'+esc(x.p.title)+'</strong><br><span class="tag">'+esc(x.p.type)+'</span><span class="tag">'+esc(x.c.name)+'</span><span class="tag">'+esc(x.p.status)+'</span><span class="mu">'+esc(dt(x))+' · '+wc(x.p.abstract)+' words</span></div><button class="btn sm" data-act="copya">Copy</button></div><textarea readonly style="min-height:130px;margin-top:8px">'+esc(x.p.abstract)+'</textarea></div>'}).join(''):(q?'<p class="mu">No abstracts match your search.</p>':'<p class="mu">No abstracts yet. Open one of your presentations on a conference card and paste its abstract.</p>'))+(miss?'<p class="mu">'+miss+' presentation'+(miss===1?'':'s')+' without an abstract.</p>':'')}
-document.getElementById('aq').oninput=renderAbs;
-document.getElementById('alist').addEventListener('click',function(e){var t=e.target.closest('[data-act=copya]');if(t)copyTa(t,t.closest('.card').querySelector('textarea'))});
-document.getElementById('list').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
-function icsEsc(v){return String(v||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
-function icsFold(l){var o=[];while(l.length>70){o.push(l.slice(0,70));l=' '+l.slice(70)}o.push(l);return o.join('\r\n')}
-function d8(d){return d.replace(/-/g,'')}
-function nextDay(d){var t=new Date(d+'T00:00:00');t.setDate(t.getDate()+1);return iso(t)}
-function icsItems(){var it=[],K=function(id){return document.getElementById(id).checked};
-if(K('ic-c'))S.events.forEach(function(c){c.deadlines.forEach(function(d){if(d.date&&!d.done)it.push({uid:'dl-'+d.id,date:d.date,title:c.name+' — '+d.kind+' deadline',desc:c.name+(c.place?', '+c.place:''),cat:'Conference deadline'})});(c.tasks||[]).forEach(function(t){if(t.date&&!t.done)it.push({uid:'t-'+t.id,date:t.date,title:c.name+' — '+t.text,cat:'Task'})})});
-if(K('ic-t'))S.events.forEach(function(c){if(c.start&&c.status!=='Rejected')it.push({uid:'cs-'+c.id,date:c.start,end:c.end&&c.end>c.start?c.end:'',title:c.name+(c.status==='Considering'?' [considering]':''),loc:c.place,desc:/^https?:\/\//.test(c.link||'')?c.link:'',cat:'Conference'});(c.talks||[]).forEach(function(p){if(p.date&&p.status!=='Rejected'&&p.status!=='Presented')it.push({uid:'pr-'+p.id,date:p.date,title:p.type+': '+p.title+' ('+c.name+')',loc:c.place,cat:'Presentation'})})});
-if(K('ic-g'))S.grants.forEach(function(g){g.miles.forEach(function(m){if(m.date&&!m.done)it.push({uid:'m-'+m.id,date:m.date,title:g.name+' — '+m.label,cat:'Grant'})});(g.tasks||[]).forEach(function(t){if(t.date&&!t.done)it.push({uid:'gt-'+t.id,date:t.date,title:g.name+' — '+t.text,cat:'Task'})})});
-if(K('ic-p'))S.papers.forEach(function(p){var fin=['Published','Rejected','Accepted'].indexOf(p.stage)>-1;if(p.deadline&&!fin)it.push({uid:'pp-'+p.id,date:p.deadline,title:p.title+' — deadline ('+p.stage+')',desc:p.venue||'',cat:'Paper'})});
-if(K('ic-v'))S.visits.forEach(function(v){if(v.status==='Cancelled')return;if(v.start)it.push({uid:'vs-'+v.id,date:v.start,end:v.end&&v.end>v.start?v.end:'',title:v.kind+': '+v.name+(v.status==='Idea'||v.status==='Planned'?' ['+v.status.toLowerCase()+']':''),loc:v.place,cat:'Visit'});(v.tasks||[]).forEach(function(t){if(t.date&&!t.done)it.push({uid:'vt-'+t.id,date:t.date,title:v.name+' — '+t.text,cat:'Task'})})});
-if(K('ic-f'))S.contacts.forEach(function(c){if(c.next&&c.status!=='Dormant')it.push({uid:'ct-'+c.id,date:c.next,title:'Follow up: '+c.name+(c.nextNote?' — '+c.nextNote:''),desc:[c.affil,c.email].filter(Boolean).join(', '),cat:'Contact'})});
-if(!K('ic-past'))it=it.filter(function(e){return (e.end||e.date)>=today});
-return it.sort(function(a,b){return a.date<b.date?-1:1})}
-function buildIcs(){var its=icsItems(),L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Academic Planner//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Academic Planner'],now=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,''),seq=Math.floor(Date.now()/60000),al=[],K=function(id){return document.getElementById(id).checked};
-if(K('ia-w'))al.push('-P6DT15H');if(K('ia-d'))al.push('-PT15H');if(K('ia-0'))al.push('PT9H');
-its.forEach(function(e){var a=['BEGIN:VEVENT','UID:'+e.uid+'@academic-planner','DTSTAMP:'+now,'SEQUENCE:'+seq,'DTSTART;VALUE=DATE:'+d8(e.date),'DTEND;VALUE=DATE:'+d8(nextDay(e.end||e.date)),'SUMMARY:'+icsEsc(e.title)];if(e.desc)a.push('DESCRIPTION:'+icsEsc(e.desc));if(e.loc)a.push('LOCATION:'+icsEsc(e.loc));a.push('CATEGORIES:'+icsEsc(e.cat),'TRANSP:TRANSPARENT');al.forEach(function(t){a.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(e.title),'TRIGGER:'+t,'END:VALARM')});a.push('END:VEVENT');a.forEach(function(x){L.push(icsFold(x))})});
-L.push('END:VCALENDAR');return{text:L.join('\r\n')+'\r\n',n:its.length}}
-function renderIcs(){document.getElementById('icsinfo').textContent=buildIcs().n+' event'+(buildIcs().n===1?'':'s')}
-['ic-c','ic-t','ic-g','ic-p','ic-f','ic-v','ic-past','ia-w','ia-d','ia-0'].forEach(function(id){document.getElementById(id).onchange=renderIcs});
-document.getElementById('icscopy').onclick=function(){var t=this,l=t.textContent;copyText(t,buildIcs().text);setTimeout(function(){t.textContent=l},2000)};
-document.getElementById('icssave').onclick=function(){saveFile('academic-planner-deadlines.ics',buildIcs().text,'Saving .ics files is not possible in this view. Use Copy text, paste it into a text editor and save it as deadlines.ics.').then(function(m){if(m&&m!=='ok')document.getElementById('icsinfo').textContent=m})};
-var BK=30;
-function doBackup(){return saveFile('academic-planner.json',JSON.stringify(S,null,1)).then(function(m){if(m==='ok'){S.lastExport=today;S.snooze='';save();render()}else if(m)setStatus(m)})}
-function renderBackup(){var b=document.getElementById('backup'),n=S.events.length+S.notes.length+S.papers.length+S.grants.length;
-if(!S.created)S.created=today;
-var ref=S.lastExport||S.created,d=-daysTo(ref);
-document.getElementById('bkinfo').textContent=S.lastExport?'Last backup file: '+S.lastExport+' ('+(-daysTo(S.lastExport))+' days ago)':'No backup file saved yet.';
-if(!n||d<BK||(S.snooze&&S.snooze>today)){b.style.display='none';return}
-b.style.display='block';document.getElementById('bkmsg').textContent=(S.lastExport?'Your last backup file is '+d+' days old.':'You have not saved a backup file yet.')+' Save a copy in case something goes wrong with the browser or the device.'}
-document.getElementById('bklater').onclick=function(){var t=new Date(today+'T00:00:00');t.setDate(t.getDate()+7);S.snooze=iso(t);save();render()};
-var KST=['Want to contact','Contacted','In touch','Collaborating','Dormant'],KPU=['Collaboration','Visit / host','Joint grant','Met at conference','Co-author','Other'];
-function peopleLine(kind,id){var nm=S.contacts.filter(function(k){return (k.links||[]).indexOf(kind+':'+id)>-1}).map(function(k){return esc(k.name)});return nm.length?'<div class="mu" style="margin-top:6px">Contacts: '+nm.join(', ')+'</div>':''}
-function paperUrl(p){var q=parseRef(p.doi||'');return q?refLink({ref:q.ref}):''}
-function paperLink(p){var q=parseRef(p.doi||'');if(!q)return '';var u=refLink({ref:q.ref});return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+refLabel({ref:q.ref})+' ↗</a> ':''}
-function paperEdit(p){var a='data-pid="'+p.id+'"';return '<details data-o="e'+p.id+'"'+(OPEN['e'+p.id]?' open':'')+' style="margin-top:8px"><summary>Edit paper details</summary><div class="sub"><input placeholder="Title" style="min-width:300px" '+a+' data-pf="title" value="'+esc(p.title)+'"></div><div class="sub"><input placeholder="Authors: Surname, Name and Surname, Name" style="min-width:280px" '+a+' data-pf="authors" value="'+esc(p.authors)+'"><input placeholder="DOI / arXiv ID / link" '+a+' data-pf="doi" value="'+esc(p.doi)+'"></div><div class="sub"><input placeholder="Journal / conference" '+a+' data-pf="venue" value="'+esc(p.venue)+'"><label style="margin:0">Review round</label><select '+a+' data-pf="round" style="width:auto">'+opts(['1','2','3','4'],String(p.round||'1'))+'</select><label style="margin:0">Date submitted</label><input type="date" '+a+' data-pf="sent" value="'+esc(p.sent)+'"></div><div class="sub"><input placeholder="Co-authors / note" '+a+' data-pf="note" value="'+esc(p.note)+'" style="min-width:300px"></div></details>'}
-function chipName(v){var k=v[0],id=v.slice(2),o=(k==='c'?S.events:k==='v'?S.visits:k==='g'?S.grants:S.papers).find(function(x){return x.id===id});return o?(k==='c'?'Conference: ':k==='v'?(/^Visit/.test(o.kind)?'Visit: ':'Seminar / meeting: '):k==='g'?'Project: ':'Paper: ')+(o.name||o.title):null}
-function linkOpts(){return '<option value="">— link to a conference, visit, project or paper —</option>'+S.events.map(function(c){return '<option value="c:'+c.id+'">Conference: '+esc(c.name)+'</option>'}).join('')+S.grants.map(function(g){return '<option value="g:'+g.id+'">Project: '+esc(g.name)+'</option>'}).join('')+S.visits.map(function(v){return '<option value="v:'+v.id+'">'+(isVisit(v)?'Visit: ':'Seminar / meeting: ')+esc(v.name)+'</option>'}).join('')+S.papers.map(function(p){return '<option value="p:'+p.id+'">Paper: '+esc(p.title)+'</option>'}).join('')}
-function contactCard(k){var id='data-k="'+k.id+'"',mail=k.email?'<a href="mailto:'+esc(k.email)+'">'+esc(k.email)+'</a>':'',lk=/^https?:\/\//.test(k.link||'')?'<a href="'+esc(k.link)+'" target="_blank" rel="noopener">link ↗</a>':esc(k.link||'');
-var fu=k.next?'<div class="due '+(k.status==='Dormant'?'':cl(k.next))+'" style="font-size:13px;margin-top:4px">Follow-up '+esc(k.next)+' · '+cd(k.next)+(k.nextNote?' — '+esc(k.nextNote):'')+'</div>':'';
-var chips=(k.links||[]).map(function(v){var n=chipName(v);return n?'<span class="tag">'+esc(n)+' <span style="cursor:pointer" title="Remove link" data-act="unlink" '+id+' data-v="'+v+'">×</span></span>':''}).join('');
-var nn=S.notes.filter(function(n){return n.cont===k.id}).map(function(n){return esc(n.title)});
-var log=(k.log||[]).slice().sort(function(a,b){return b.date<a.date?-1:1}).map(function(l){return '<div class="sub"><span class="mu">'+esc(l.date)+'</span><span>'+esc(l.text)+'</span><button class="btn sm" data-act="dellog" '+id+' data-l="'+l.id+'">×</button></div>'}).join('');
-return '<div class="card" id="it-'+k.id+'"><div class="row"><div><strong>'+esc(k.name)+'</strong><br>'+(k.affil?'<span class="tag">'+esc(k.affil)+'</span>':'')+'<span class="mu">'+mail+' '+lk+'</span></div><div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(KST,k.status)+'</select> <select '+id+' data-f="purpose" style="width:auto">'+opts(KPU,k.purpose)+'</select> <button class="btn sm" data-act="delk" '+id+'>Delete</button></div></div>'+
-(k.last?'<div class="mu" style="margin-top:4px">Last contact: '+esc(k.last)+' ('+(-daysTo(k.last))+' d ago)</div>':'')+fu+
-(chips?'<div class="sub">'+chips+'</div>':'')+
-'<div class="sub"><select data-n="lk" style="max-width:260px">'+linkOpts()+'</select><button class="btn sm" data-act="addlink" '+id+'>Link</button></div>'+
-'<div class="mu" style="margin-top:8px">Communication log ('+(k.log||[]).length+')</div>'+log+
-'<div class="sub"><input type="date" data-n="ld" value="'+today+'"><input placeholder="What did you discuss or send?" data-n="lt" style="min-width:220px"><button class="btn sm" data-act="addlog" '+id+'>Log contact</button></div>'+
-'<div class="sub"><label style="margin:0">Follow-up</label><input type="date" '+id+' data-f="next" value="'+esc(k.next)+'"><input placeholder="What to do next" '+id+' data-f="nextNote" value="'+esc(k.nextNote)+'" style="min-width:220px"></div>'+
-'<textarea '+id+' data-f="note" placeholder="Notes: research interests, ideas for collaboration..." style="min-height:70px;margin-top:6px">'+esc(k.note)+'</textarea>'+
-(nn.length?'<div class="mu" style="margin-top:6px">Notes: '+nn.join(', ')+'</div>':'')+
-'<details data-o="k'+k.id+'"'+(OPEN['k'+k.id]?' open':'')+' style="margin-top:8px"><summary>Edit contact info</summary><div class="sub"><input placeholder="Name" '+id+' data-f="name" value="'+esc(k.name)+'"><input placeholder="Affiliation" '+id+' data-f="affil" value="'+esc(k.affil)+'"><input placeholder="Email" '+id+' data-f="email" value="'+esc(k.email)+'"><input placeholder="Link" '+id+' data-f="link" value="'+esc(k.link)+'"></div></details></div>'}
-function renderContacts(){
-var st=document.getElementById('kst'),pu=document.getElementById('kpu'),a=st.value,b=pu.value;
-st.innerHTML='<option value="">All statuses</option>'+KST.map(function(x){return '<option>'+x+'</option>'}).join('');st.value=a;
-pu.innerHTML='<option value="">All purposes</option>'+KPU.map(function(x){return '<option>'+x+'</option>'}).join('');pu.value=b;
-var q=document.getElementById('kq').value.toLowerCase();
-var ks=S.contacts.filter(function(k){if(a&&k.status!==a)return false;if(b&&k.purpose!==b)return false;var hay=[k.name,k.affil,k.email,k.note,k.nextNote].concat((k.log||[]).map(function(l){return l.text}),(k.links||[]).map(function(v){return chipName(v)||''})).join(' ').toLowerCase();return hay.indexOf(q)>-1}).sort(function(x,y){var nx=x.next||'9999',ny=y.next||'9999';return nx<ny?-1:nx>ny?1:(x.name.toLowerCase()<y.name.toLowerCase()?-1:1)});
-document.getElementById('klist').innerHTML=ks.length?ks.map(contactCard).join(''):'<p class="mu">'+(S.contacts.length?'No contacts match.':'No contacts yet. Add the first one above.')+'</p>'}
-document.getElementById('kq').oninput=renderContacts;document.getElementById('kst').onchange=renderContacts;document.getElementById('kpu').onchange=renderContacts;
-document.getElementById('fk').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={id:uid(),links:[],log:[],last:''};f.forEach(function(v,k){o[k]=v});S.contacts.push(o);save();ev.target.reset();render()};
-document.getElementById('klist').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
-document.getElementById('klist').addEventListener('change',function(e){var t=e.target,k=S.contacts.find(function(x){return x.id===t.dataset.k});if(k&&t.dataset.f){k[t.dataset.f]=t.value;save();render()}});
-document.getElementById('klist').addEventListener('click',function(e){var t=e.target.closest('[data-act]');if(!t)return;var k=S.contacts.find(function(x){return x.id===t.dataset.k});if(!k)return;var a=t.dataset.act,p=t.parentNode;
-if(a==='delk'){if(!t.dataset.armed){t.dataset.armed='1';t.textContent='Click again to delete';return}S.contacts=S.contacts.filter(function(x){return x!==k})}
-else if(a==='addlog'){var tx=p.querySelector('[data-n=lt]').value.trim();if(!tx)return;var d=p.querySelector('[data-n=ld]').value||today;(k.log=k.log||[]).push({id:uid(),date:d,text:tx});k.last=k.log.map(function(l){return l.date}).sort().pop();if(k.status==='Want to contact')k.status='Contacted'}
-else if(a==='dellog'){k.log=(k.log||[]).filter(function(l){return l.id!==t.dataset.l});k.last=k.log.map(function(l){return l.date}).sort().pop()||''}
-else if(a==='addlink'){var v=p.querySelector('[data-n=lk]').value;if(!v)return;k.links=k.links||[];if(k.links.indexOf(v)<0)k.links.push(v)}
-else if(a==='unlink')k.links=(k.links||[]).filter(function(x){return x!==t.dataset.v});
-else return;save();render()});
-var IMP=null,IKINDS=['Abstract','Talk submission','Registration','Funding application','Other','Conference dates','Skip'];
-function icsUnesc(v){return String(v||'').replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1')}
-function icsDate(v){var m=String(v).trim().match(/^(\d{4})(\d{2})(\d{2})/);return m?m[1]+'-'+m[2]+'-'+m[3]:''}
-function prevDay(d){var t=new Date(d+'T00:00:00');t.setDate(t.getDate()-1);return iso(t)}
-function icsKind(t){t=(t||'').toLowerCase();
-if(/abstract/.test(t))return 'Abstract';
-if(/regist/.test(t))return 'Registration';
-if(/fund|grant|bursar|stipend|travel support|scholarship|fellowship|financial/.test(t))return 'Funding application';
-if(/(poster|talk|presentation|paper|contribution|speaker|proposal)/.test(t)&&/(deadline|due|submit|submission|closes?|call)/.test(t))return 'Talk submission';
-if(/(deadline|due|notification|notify|decision|closes?|camera|early.?bird|submission|acceptance)/.test(t))return 'Other';
-return 'Conference dates'}
-function icsParse(txt){
-var lines=String(txt||'').replace(/\r\n[ \t]/g,'').replace(/\n[ \t]/g,'').split(/\r?\n/),evs=[],cur=null,name='';
-lines.forEach(function(l){
-if(l.trim()==='BEGIN:VEVENT'){cur={};return}
-if(l.trim()==='END:VEVENT'){if(cur&&cur.start)evs.push(cur);cur=null;return}
-var i=l.indexOf(':');if(i<0)return;
-var head=l.slice(0,i),val=l.slice(i+1),nm=head.split(';')[0].toUpperCase(),pr=head.toUpperCase();
-if(!cur){if(nm==='X-WR-CALNAME')name=icsUnesc(val);return}
-if(nm==='SUMMARY')cur.title=icsUnesc(val).trim();
-else if(nm==='LOCATION')cur.loc=icsUnesc(val).trim();
-else if(nm==='DESCRIPTION')cur.desc=icsUnesc(val);
-else if(nm==='URL')cur.url=val.trim();
-else if(nm==='DTSTART'){cur.start=icsDate(val);cur.allDay=/^\d{8}$/.test(val.trim())||pr.indexOf('VALUE=DATE')>-1&&pr.indexOf('DATE-TIME')<0}
-else if(nm==='DTEND')cur.end=icsDate(val)});
-evs.forEach(function(e){e.title=e.title||'(untitled)';if(e.end&&e.allDay&&e.end>e.start)e.end=prevDay(e.end);if(!e.end||e.end<=e.start)e.end='';e.kind=icsKind(e.title);e.on=e.kind==='Conference dates'||e.start>=today});
-evs.sort(function(a,b){return a.start<b.start?-1:1});
-return{events:evs,name:name}}
-function loadIcs(txt,fname){var r=icsParse(txt),m=document.getElementById('impmsg');
-if(!r.events.length){IMP=null;renderImp();m.textContent='No events found. Is this a calendar (.ics) file?';return}
-r.name=r.name||fname||'';IMP=r;m.textContent='';renderImp()}
-function renderImp(){var el=document.getElementById('impprev');if(!IMP){el.innerHTML='';return}
-var nm=(IMP.name||'').toLowerCase(),guess=S.events.find(function(c){var n=c.name.toLowerCase();return nm&&(nm.indexOf(n)>-1||n.indexOf(nm)>-1)});
-el.innerHTML='<div class="mu" style="margin-bottom:6px">'+IMP.events.length+' event'+(IMP.events.length===1?'':'s')+' found. Choose what each one is; past dates are unchecked.</div>'+
-IMP.events.map(function(e,i){return '<div class="sub"><input type="checkbox" style="width:auto" data-ii="'+i+'" data-f="on"'+(e.on?' checked':'')+'><span style="min-width:200px;flex:1">'+esc(e.title)+'</span><span class="mu">'+esc(e.start)+(e.end?' → '+esc(e.end):'')+'</span><select data-ii="'+i+'" data-f="kind" style="width:auto">'+opts(IKINDS,e.kind)+'</select></div>'}).join('')+
-'<div class="sub" style="margin-top:10px"><label style="margin:0">Add to</label><select id="imptarget"><option value="new">New conference</option>'+S.events.map(function(c){return '<option value="'+c.id+'"'+(guess&&guess.id===c.id?' selected':'')+'>'+esc(c.name)+'</option>'}).join('')+'</select><input id="impname" placeholder="New conference name" value="'+esc(IMP.name)+'" style="min-width:200px"><button class="btn sm pri" data-go="1">Import selected</button></div>'}
-function doImport(){if(!IMP)return;var tv=document.getElementById('imptarget').value,m=document.getElementById('impmsg'),c;
-var rows=IMP.events.filter(function(e){return e.on&&e.kind!=='Skip'&&e.start});
-if(!rows.length){m.textContent='Nothing selected.';return}
-if(tv==='new'){c={id:uid(),name:document.getElementById('impname').value.trim()||IMP.name||'New conference',place:'',start:'',end:'',link:'',status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:'',talks:[],tasks:[]};S.events.push(c)}else c=S.events.find(function(x){return x.id===tv});
-if(!c)return;var nd=0,dates=false;rows.sort(function(x,y){return (x.kind==='Conference dates'?0:1)-(y.kind==='Conference dates'?0:1)});
-rows.forEach(function(e){
-if(e.kind==='Conference dates'){if(!c.start){c.start=e.start;c.end=e.end||''}else if(!c.end&&e.end&&e.start===c.start)c.end=e.end;dates=true}
-else{var kind=e.kind==='Other'?e.title.slice(0,60):e.kind;if(!c.deadlines.some(function(d){return d.kind===kind&&d.date===e.start})){c.deadlines.push({id:uid(),kind:kind,date:e.start,done:false});nd++}}
-if(e.loc&&!c.place&&e.kind==='Conference dates')c.place=e.loc;
-if(/^https?:\/\//.test(e.url||'')&&!c.link)c.link=e.url});
-save();IMP=null;document.getElementById('impfile').value='';document.getElementById('imppaste').value='';render();renderImp();
-document.getElementById('impmsg').textContent='Imported into "'+c.name+'": '+nd+' deadline'+(nd===1?'':'s')+(dates?', conference dates updated':'')+'.'}
-document.getElementById('impprev').addEventListener('change',function(e){var t=e.target,i=t.dataset.ii;if(i===undefined||!IMP)return;var ev=IMP.events[+i];if(t.dataset.f==='on')ev.on=t.checked;else ev.kind=t.value});
-document.getElementById('impprev').addEventListener('click',function(e){if(e.target.closest('[data-go]'))doImport()});
-document.getElementById('impfile').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){loadIcs(r.result,f.name.replace(/\.[^.]+$/,''))};r.readAsText(f)};
-document.getElementById('impread').onclick=function(){loadIcs(document.getElementById('imppaste').value,'')};
-var SELDAY='',DTYPE='deadline',DMSG='';
-var DTYPES=[['deadline','Conference deadline'],['task','Task'],['milestone','Project milestone'],['note','Note'],['follow','Contact follow-up'],['paper','Paper deadline'],['conf','New conference starting this day'],['visit','New visit starting this day'],['seminar','New lecture / seminar / meeting starting this day']];
-function renderDay(){var el=document.getElementById('dayp');
-if(!SELDAY){el.innerHTML='<p class="mu">Click a day to see what is on it and to add something.</p>';return}
-var lab=new Date(SELDAY+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),it=dayItems(SELDAY);
-el.innerHTML='<div class="card"><div class="row"><strong>'+esc(lab)+'</strong><span class="mu">'+esc(SELDAY)+'</span></div>'+(it||'<div class="mu" style="margin-top:6px">Nothing on this day yet.</div>')+
-'<div class="mu" style="margin-top:10px">Add to this day</div><div class="sub"><select id="dtype" style="width:auto">'+DTYPES.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===DTYPE?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select><span id="dform" class="sub" style="margin:0"></span><button class="btn sm pri" id="dadd">Add</button></div><div class="mu" id="dmsg" style="margin-top:6px">'+esc(DMSG)+'</div></div>';
-DMSG='';drawDayForm();
-document.getElementById('dtype').onchange=function(){DTYPE=this.value;drawDayForm()};
-document.getElementById('dadd').onclick=dayAdd}
-function drawDayForm(){var f=document.getElementById('dform'),t=DTYPE,sel=function(id,opts){return '<select id="'+id+'" style="max-width:240px">'+opts+'</select>'},inp=function(ph){return '<input id="dtext" placeholder="'+ph+'" style="min-width:200px">'},none='<span class="mu">Add one first (see the other tabs).</span>';
-var cOpts=S.events.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join(''),gOpts=S.grants.map(function(g){return '<option value="'+g.id+'">'+esc(g.name)+'</option>'}).join('');
-if(t==='deadline')f.innerHTML=cOpts?sel('dtgt',cOpts)+sel('dkind',opts(DKS,'Abstract')):none;
-else if(t==='task')f.innerHTML=(cOpts||gOpts)?sel('dtgt',S.grants.map(function(g){return '<option value="g:'+g.id+'">Project: '+esc(g.name)+'</option>'}).join('')+S.events.map(function(c){return '<option value="c:'+c.id+'">Conference: '+esc(c.name)+'</option>'}).join(''))+inp('Task'):none;
-else if(t==='milestone')f.innerHTML=gOpts?sel('dtgt',gOpts)+inp('e.g. Interim report'):none;
-else if(t==='note')f.innerHTML=inp('Note title');
-else if(t==='follow')f.innerHTML=S.contacts.length?sel('dtgt',S.contacts.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join(''))+inp('What to do (optional)'):none;
-else if(t==='paper')f.innerHTML=S.papers.length?sel('dtgt',S.papers.map(function(p){return '<option value="'+p.id+'">'+esc(p.title)+'</option>'}).join('')):none;
-else if(t==='conf')f.innerHTML=inp('Conference name');
-else if(t==='visit'||t==='seminar')f.innerHTML=inp('Title')}
-function dayAdd(){var k=SELDAY,ty=DTYPE,gv=function(id){var e=document.getElementById(id);return e?e.value:''},tg=gv('dtgt'),tx=gv('dtext').trim(),kd=gv('dkind'),m=document.getElementById('dmsg'),fail=function(x){m.textContent=x},ok='';
-if(ty==='deadline'){var c=S.events.find(function(x){return x.id===tg});if(!c)return fail('Choose a conference.');if(c.deadlines.some(function(d){return d.kind===kd&&d.date===k}))return fail('That deadline already exists.');c.deadlines.push({id:uid(),kind:kd,date:k,done:false});ok=kd+' deadline added to '+c.name+'.'}
-else if(ty==='task'){var o=tg?(tg[0]==='c'?S.events:S.grants).find(function(x){return x.id===tg.slice(2)}):null;if(!o)return fail('Choose where the task belongs.');if(!tx)return fail('Write the task.');(o.tasks=o.tasks||[]).push({id:uid(),text:tx,date:k,done:false});ok='Task added to '+o.name+'.'}
-else if(ty==='milestone'){var g=S.grants.find(function(x){return x.id===tg});if(!g)return fail('Choose a project.');if(!tx)return fail('Write the milestone.');g.miles.push({id:uid(),label:tx,date:k,done:false});ok='Milestone added to '+g.name+'.'}
-else if(ty==='note'){if(!tx)return fail('Write a title.');S.notes.push({id:uid(),title:tx,date:k,ref:'',proj:'',pres:'',cont:'',speaker:'',tags:'',body:'',refs:[],ideas:[]});ok='Note added. Open the Notes tab to write it.'}
-else if(ty==='follow'){var ct=S.contacts.find(function(x){return x.id===tg});if(!ct)return fail('Choose a contact.');ct.next=k;if(tx)ct.nextNote=tx;ok='Follow-up set for '+ct.name+'.'}
-else if(ty==='paper'){var p=S.papers.find(function(x){return x.id===tg});if(!p)return fail('Choose a paper.');p.deadline=k;ok='Deadline set for the paper.'}
-else if(ty==='conf'){if(!tx)return fail('Write the conference name.');S.events.push({id:uid(),name:tx,place:'',start:k,end:'',link:'',status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:'',talks:[],tasks:[]});ok='Conference added. Set its end date under Conferences → Edit conference details.'}
-else if(ty==='visit'){if(!tx)return fail('Write a title.');S.visits.push({id:uid(),name:tx,kind:'Visit (I travel)',status:'Planned',place:'',start:k,end:'',note:'',cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',tasks:[]});ok='Visit added. Set its end date under Conferences & Visits → Edit details.'}
-else if(ty==='seminar'){if(!tx)return fail('Write a title.');S.visits.push({id:uid(),name:tx,kind:'Seminar (I give)',status:'Planned',place:'',start:k,end:'',note:'',cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',tasks:[]});ok='Added. Set its type under Lectures & Seminars → Edit details.'}
-DMSG=ok;save();render()}
-document.getElementById('dayp').addEventListener('click',function(e){var oc=e.target.closest('[data-open]');if(oc)openFromStr(oc.dataset.open)});
-document.getElementById('legend').addEventListener('click',function(e){var l=e.target.closest('[data-cat]');if(!l)return;l.classList.toggle('off');document.getElementById('cal').classList.toggle('hide-'+l.dataset.cat)});
-document.getElementById('cal').addEventListener('click',function(e){var oc=e.target.closest('[data-open]');if(oc){openFromStr(oc.dataset.open);return}var d=e.target.closest('[data-day]');if(d){SELDAY=d.dataset.day;DMSG='';renderCal()}});
-var VK=['Visit (I travel)','Visit (hosting)','Seminar (I give)','Seminar (I attend)','Meeting','Other'],VST=['Idea','Planned','Confirmed','Done','Cancelled'],
-VT=['Agree dates and schedule with host','Check visa requirements','Send / receive invitation letter','Book travel','Book accommodation','Prepare seminar / talk','Travel order / budget approval','Submit expense report'],
-VTH=['Send invitation letter','Arrange accommodation','Reserve room and plan schedule','Announce the seminar','Arrange reimbursement','Write follow-up and thank-you'];
-var SK=['Lecture (I give)','Lecture (I attend)','Seminar (I give)','Seminar (I attend)','Meeting','Other'],VTS=['Confirm date, room and format','Prepare slides / talk','Send title and abstract','Announce the event','Arrange travel (if needed)','Collect feedback and follow up'],VTM=['Agree the agenda','Send invitation / meeting link','Prepare materials','Write minutes and follow up'];
-VK=['Visit (I travel)','Visit (hosting)'].concat(SK);
-function vTpl(k){return /hosting/.test(k)?VTH:/^Visit/.test(k)?VT:/^Meeting/.test(k)?VTM:VTS}
-function costItems(){return S.events.concat(S.visits)}
-function vIcon(k){return /^Visit/.test(k)?'&#9992; ':/^(Seminar|Lecture)/.test(k)?'&#127891; ':'&#128101; '}
-function vEdit(v,id){return '<details data-o="x'+v.id+'"'+(OPEN['x'+v.id]?' open':'')+' style="margin-top:10px"><summary>Edit details</summary><div class="sub"><input placeholder="Title" '+id+' data-f="name" value="'+esc(v.name)+'" style="min-width:240px"><select '+id+' data-f="kind" style="width:auto">'+opts(VK,v.kind)+'</select><input placeholder="Place / institution" '+id+' data-f="place" value="'+esc(v.place)+'"></div><div class="sub"><label style="margin:0">Starts</label><input type="date" '+id+' data-f="start" value="'+esc(v.start)+'"><label style="margin:0">Ends</label><input type="date" '+id+' data-f="end" value="'+esc(v.end)+'"></div><div class="sub"><input placeholder="Link / note" '+id+' data-f="note" value="'+esc(v.note)+'" style="min-width:300px"></div></details>'}
-function visitCard(v){var id='data-v="'+v.id+'"',when=v.start?esc(v.start)+(v.end&&v.end!==v.start?' → '+esc(v.end):''):'',lk=/^https?:\/\//.test(v.note||'')?'<a href="'+esc(v.note)+'" target="_blank" rel="noopener">link ↗</a>':esc(v.note||'');
-return '<div class="card" id="it-'+v.id+'"><div class="row"><div><strong>'+vIcon(v.kind)+esc(v.name)+'</strong><br><span class="tag">'+esc(v.kind)+'</span>'+(v.place?'<span class="tag">'+esc(v.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+'<span class="mu">'+lk+'</span></div><div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(VST,v.status)+'</select> <button class="btn sm" data-act="delv" '+id+'>Delete</button></div></div>'+peopleLine('v',v.id)+taskBlock(v,id)+
-'<div class="mu" style="margin-top:10px">Funding</div><div class="sub"><input type="number" min="0" step="any" placeholder="Estimated cost" style="width:140px" '+id+' data-f="cost" value="'+esc(v.cost)+'"><select '+id+' data-f="cur">'+opts(CUR,v.cur||'EUR')+'</select><select '+id+' data-f="fundSrc">'+srcOpts(v.fundSrc)+'</select><select '+id+' data-f="fundStatus">'+opts(FS,v.fundStatus)+'</select></div>'+vEdit(v,id)+'</div>'}
-function renderVisits(){
-['vcont','scont'].forEach(function(id){var e=document.getElementById(id),v=e.value;e.innerHTML='<option value="">— none —</option>'+S.contacts.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join('');e.value=v});
-var a=document.getElementById('vfk'),b=document.getElementById('vfs'),v2=a.value,v3=b.value;
-a.innerHTML='<option value="">All types</option>'+SK.map(function(x){return '<option>'+x+'</option>'}).join('');a.value=v2;
-b.innerHTML='<option value="">All statuses</option>'+VST.map(function(x){return '<option>'+x+'</option>'}).join('');b.value=v3;
-var q=document.getElementById('vq').value.toLowerCase();
-var vs=S.visits.filter(function(v){if(isVisit(v))return false;if(v2&&v.kind!==v2)return false;if(v3&&v.status!==v3)return false;return (v.name+' '+(v.place||'')+' '+(v.note||'')).toLowerCase().indexOf(q)>-1}).sort(function(x,y){var rx=(x.status==='Done'||x.status==='Cancelled'?'1':'0')+(x.start||'9999'),ry=(y.status==='Done'||y.status==='Cancelled'?'1':'0')+(y.start||'9999');return rx<ry?-1:1});
-document.getElementById('vlist').innerHTML=vs.length?vs.map(visitCard).join(''):'<p class="mu">'+(S.visits.filter(function(v){return !isVisit(v)}).length?'Nothing matches.':'No lectures, seminars or meetings yet. Add the first one above.')+'</p>'}
-function vAct(t,type){var v=S.visits.find(function(x){return x.id===t.dataset.v});if(!v)return;var a=t.dataset.act;
-if(type==='change'){if(t.dataset.t){var k=(v.tasks||[]).find(function(x){return x.id===t.dataset.t});if(k)k.done=t.checked}else if(t.dataset.f){if(t.dataset.f==='name'&&!t.value.trim()){render();return}v[t.dataset.f]=t.value}else return}
-else if(a==='delv'){if(!t.dataset.armed){t.dataset.armed='1';t.textContent='Click again to delete';return}S.visits=S.visits.filter(function(x){return x!==v})}
-else if(a==='addt'){var p=t.parentNode,tx=p.querySelector('[data-n=text]').value.trim();if(!tx)return;(v.tasks=v.tasks||[]).push({id:uid(),text:tx,date:p.querySelector('[data-n=tdate]').value,done:false})}
-else if(a==='tpl'){v.tasks=v.tasks||[];vTpl(v.kind).forEach(function(x){v.tasks.push({id:uid(),text:x,date:'',done:false})})}
-else if(a==='delt')v.tasks=(v.tasks||[]).filter(function(x){return x.id!==t.dataset.t});
-else return;save();render()}
-bind('vlist',vAct);
-document.getElementById('vlist').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
-document.getElementById('vq').oninput=renderVisits;document.getElementById('vfk').onchange=renderVisits;document.getElementById('vfs').onchange=renderVisits;
-function addAct(ev,kind){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
-var v={id:uid(),name:o.name,kind:kind||o.kind,status:o.status,place:o.place,start:o.start,end:o.end,note:o.note,cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',tasks:[]};
-S.visits.push(v);if(o.cont){var c=S.contacts.find(function(x){return x.id===o.cont});if(c){c.links=c.links||[];c.links.push('v:'+v.id)}}save();ev.target.reset();render()}
-document.getElementById('fv').onsubmit=function(ev){addAct(ev,document.getElementById('ctype').value==='host'?'Visit (hosting)':'Visit (I travel)')};
-document.getElementById('fs').onsubmit=function(ev){addAct(ev)};
-document.getElementById('ctype').onchange=function(){var c=this.value==='conf';document.getElementById('addconf').style.display=c?'':'none';document.getElementById('addvisit').style.display=c?'none':''};
-document.getElementById('cvfilter').onchange=renderList;document.getElementById('cq').oninput=renderList;
-function render(){renderUpcoming();renderContacts();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderNotes()}
-
-document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
-var c={id:uid(),name:o.name,place:o.place,start:o.start,end:o.end,link:o.link,status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:''};
-if(o.date)c.deadlines.push({id:uid(),kind:o.kind,date:o.date,done:false});S.events.push(c);save();ev.target.reset();render()};
-document.getElementById('fg').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={id:uid(),miles:[]};f.forEach(function(v,k){o[k]=v});S.grants.push(o);save();ev.target.reset();render()};
-document.getElementById('fn').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={id:uid()};f.forEach(function(v,k){o[k]=v});
-o.refs=(o.refs||'').split('\n').map(parseRef).filter(Boolean);
-o.ideas=(o.ideas||'').split('\n').map(function(x){x=x.trim();return x?{id:uid(),text:x,done:false}:null}).filter(Boolean);
-S.notes.push(o);save();ev.target.reset();render()};
-document.getElementById('exp').onclick=doBackup;document.getElementById('bkgo').onclick=doBackup;
-document.getElementById('imp').onchange=function(ev){var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.events&&d.notes){S=d;S.papers=S.papers||[];migrate();save();render()}}catch(e){}};r.readAsText(ev.target.files[0])};
-render();
-(async function(){
-try{
-if(!window.claude||!window.claude.use){setStatus('Saved only in this browser.');return}
-var user=await window.claude.use('user'),db=await window.claude.use('db');
-if(!user||!db){setStatus('Saved only in this browser (sign in to save to your account).');return}
-var id=await user.id();
-if(!id){setStatus('Saved only in this browser.');return}
-var ref=db.doc('data/users/'+id+'/planner'),snap=await ref.get(),rem=snap.exists?snap.data():null;
-if(rem&&(rem.updated||0)>(S.updated||0)){
-S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
-try{localStorage.setItem('np1',JSON.stringify(S))}catch(e){}
-migrate();render();setStatus('Loaded from your account');REM=ref;
-}else{
-REM=ref;
-if(S.events.length+S.notes.length+S.papers.length+S.grants.length+S.contacts.length+S.visits.length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
-else setStatus('Connected to your account');
-}
-}catch(e){setStatus('Saved only in this browser.')}
-})();
+  (function(){
+    const toggle=document.querySelector('.menu-toggle');
+    const menu=document.getElementById('site-menu');
+    if(!toggle || !menu) return;
+    toggle.addEventListener('click',function(){
+      const open=this.getAttribute('aria-expanded')==='true';
+      this.setAttribute('aria-expanded',String(!open));
+      menu.classList.toggle('open',!open);
+    });
+    menu.querySelectorAll('a').forEach(function(link){
+      link.addEventListener('click',function(){
+        toggle.setAttribute('aria-expanded','false');
+        menu.classList.remove('open');
+      });
+    });
+  })();
 </script>
-<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script>
+
 </body>
+
 </html>
