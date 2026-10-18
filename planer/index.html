@@ -51,9 +51,20 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 </style>
 </head>
 <body>
+<div id="auth" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:50;background:var(--bg);overflow:auto"><div class="wrap" style="max-width:420px;padding-top:60px">
+<div class="eb">Academic Planner</div><h1>Sign in</h1>
+<div class="card"><form id="authform" style="display:block">
+<label>Email</label><input type="email" id="aemail" autocomplete="username" required>
+<label style="margin-top:8px">Password</label><input type="password" id="apass" autocomplete="current-password" required minlength="6">
+<div class="sub" style="margin-top:12px"><button class="btn pri" type="submit" id="asignin">Sign in</button><button class="btn" type="button" id="asignup">Create account</button><button class="btn sm" type="button" id="areset">Forgot password</button></div>
+<div class="mu" id="amsg" style="margin-top:8px"></div>
+</form></div>
+<p class="mu">Your planner data is private to your account.</p>
+</div></div>
 <div class="wrap">
 <div class="eb">Conferences · Grants · Papers · Notes</div>
 <h1>Academic Planner</h1>
+<div id="acct" style="display:none;gap:8px;align-items:center;margin-bottom:8px"><span class="mu" id="acctmail"></span><button class="btn sm" id="resendv" style="display:none">Resend verification email</button><button class="btn sm" id="signout">Sign out</button></div>
 <div class="mu" id="sync" style="margin-bottom:12px">Data is saved in this browser.</div>
 <div id="backup" class="card" style="display:none;border-color:var(--am)"><div class="row"><div id="bkmsg"></div><div class="sub" style="margin:0"><button class="btn sm pri" id="bkgo">Export backup now</button><button class="btn sm" id="bklater">Remind me in a week</button></div></div></div>
 <div class="tabs">
@@ -203,6 +214,8 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <div><label>Repeats</label><select name="every"><option value="">Does not repeat</option><option value="week">Every week</option><option value="2weeks">Every 2 weeks</option><option value="month">Every month</option></select></div>
 <div><label>Stop after (times)</label><input type="number" min="1" name="count" placeholder="optional"></div>
 <div><label>Or stop on date</label><input type="date" name="until"></div>
+<div class="full"><label>Abstract (optional)</label><textarea name="abstract" style="min-height:200px" placeholder="Paste or write the abstract"></textarea><div class="mu" style="margin-top:4px">If you give the talk, the abstract is saved to your library automatically. For talks you only attend, it stays on the card.</div></div>
+<div class="full"><label>…or reuse an abstract from</label><select name="from" id="sfrom"></select></div>
 <div class="full"><label>Link / note</label><input name="note"></div>
 <div class="full"><button class="btn pri" type="submit">Add</button></div>
 </form>
@@ -228,7 +241,19 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <div id="plist"></div>
 </section>
 
-<section id="abs" class="hide"><input id="aq" placeholder="Search abstracts..." style="margin-bottom:10px"><div id="alist"></div></section>
+<section id="abs" class="hide">
+<details id="absnew" open style="margin-bottom:12px"><summary>Add a new abstract to the library</summary>
+<form id="fa" style="margin-top:8px">
+<div class="full"><label>Title</label><input name="title" required placeholder="Title of the talk or abstract"></div>
+<div><label>Type</label><select name="type"><option>Talk</option><option>Invited talk</option><option>Poster</option><option>Seminar</option><option>Lecture</option><option>Other</option></select></div>
+<div><label>Conference / place (optional)</label><input name="where"></div>
+<div><label>Date (optional)</label><input type="date" name="date"></div>
+<div class="full"><label>Abstract</label><textarea name="abstract" required style="min-height:220px" placeholder="Paste or write the abstract here"></textarea></div>
+<div class="full"><button class="btn pri" type="submit">Save to library</button></div>
+</form></details>
+<p class="mu">Abstracts of talks and seminars you give are added to the library automatically. Abstracts of talks you only attend stay on their own card.</p>
+<input id="aq" placeholder="Search abstracts..." style="margin-bottom:10px"><div id="alist"></div>
+</section>
 
 <section id="beleske" class="hide">
 <div class="subnav" id="nvtabs"></div>
@@ -256,8 +281,9 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 </section>
 
 <section id="podaci" class="hide">
+<div class="card" id="acctcard" style="display:none"><strong>Account</strong><p class="mu" id="acctinfo"></p><div class="sub"><button class="btn sm" id="chpw">Change password (email link)</button><button class="btn sm" id="delacct">Delete my account and data</button></div><div class="mu" id="acctmsg" style="margin-top:6px"></div></div>
 <div class="card">
-<p>Your data is saved only in this browser, on this device. Nobody else can see it, but clearing the browser data deletes it, and it does not appear on other devices. Export a backup file regularly: it is also how you move your data to another computer or phone (use Import JSON there).</p>
+<p id="datanote">Your data is saved only in this browser, on this device. Nobody else can see it, but clearing the browser data deletes it, and it does not appear on other devices. Export a backup file regularly: it is also how you move your data to another computer or phone (use Import JSON there).</p>
 <p class="mu">Install as an app: in Chrome or Edge click the install icon in the address bar (or menu → Install). On iPhone use Share → Add to Home Screen.</p>
 <button class="btn" id="exp">Export JSON</button><span class="mu" id="bkinfo" style="margin-left:8px"></span>
 <label style="margin-top:10px">Import JSON</label><input type="file" id="imp" accept=".json">
@@ -266,10 +292,15 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 </div>
 
 <script>
+// ---- Cloud accounts (optional) ----
+// Leave this as null to keep the planner local-only. To switch on sign-in and per-user cloud data,
+// replace null with the Firebase web config (see firebase-setup.txt).
+var FIREBASE_CONFIG=null;
+var STORE_KEY=FIREBASE_CONFIG?'np1_signed_out':'np1';
 var S={events:[],notes:[]};
-try{var raw=localStorage.getItem('np1');if(raw)S=JSON.parse(raw);}catch(e){}
+try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw);}catch(e){}
 S.events=S.events||[];S.notes=S.notes||[];S.papers=S.papers||[];
-function migrate(){S.events=S.events||[];S.grants=S.grants||[];S.contacts=S.contacts||[];S.visits=S.visits||[];S.papers=S.papers||[];S.notes=S.notes||[];var M={'Planirano':'Planned','U izradi':'In progress','Poslato':'Submitted','Prihvaćeno':'Accepted','Odbijeno':'Rejected','Priprema':'Draft','Pod recenzijom':'Under review','Male izmene':'Minor revision','Velike izmene':'Major revision','Objavljeno':'Published'};
+function migrate(){S.events=S.events||[];S.grants=S.grants||[];S.contacts=S.contacts||[];S.visits=S.visits||[];S.abstracts=S.abstracts||[];S.papers=S.papers||[];S.notes=S.notes||[];var M={'Planirano':'Planned','U izradi':'In progress','Poslato':'Submitted','Prihvaćeno':'Accepted','Odbijeno':'Rejected','Priprema':'Draft','Pod recenzijom':'Under review','Male izmene':'Minor revision','Velike izmene':'Major revision','Objavljeno':'Published'};
 var K={'Apstrakt':'Abstract','Prijava predavanja':'Talk submission','Registracija':'Registration','Prijava granta':'Grant application','Izveštaj':'Report','Događaj':'Event'};
 S.events.forEach(function(e){if(M[e.status])e.status=M[e.status];if(K[e.kind])e.kind=K[e.kind]});
 S.papers.forEach(function(p){if(M[p.stage])p.stage=M[p.stage];(p.log||[]).forEach(function(l){if(M[l.text])l.text=M[l.text]})})
@@ -286,9 +317,10 @@ migrate();
 var REM=null,remTimer=null,remBusy=false,remDirty=false;
 function setStatus(t){var e=document.getElementById('sync');if(e)e.textContent=t}
 function schedRemote(){if(!REM)return;remDirty=true;clearTimeout(remTimer);remTimer=setTimeout(flushRemote,800)}
+function payload(){return{events:S.events,notes:S.notes,papers:S.papers,grants:S.grants,contacts:S.contacts,visits:S.visits,abstracts:S.abstracts||[],waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}}
 function flushRemote(){if(remBusy){remTimer=setTimeout(flushRemote,500);return}remBusy=true;remDirty=false;setStatus('Saving to your account…');
-REM.set({events:S.events,notes:S.notes,papers:S.papers,grants:S.grants,contacts:S.contacts,visits:S.visits,waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}).then(function(){setStatus('Saved to your account')},function(err){setStatus('Saving to your account failed ('+((err&&err.code)||'error')+'). Data is saved in this browser.')}).then(function(){remBusy=false;if(remDirty)schedRemote()})}
-function save(){S.updated=Date.now();try{localStorage.setItem('np1',JSON.stringify(S));}catch(e){}schedRemote()}
+REM.set(payload()).then(function(){setStatus('Saved to your account')},function(err){setStatus('Saving to your account failed ('+((err&&err.code)||'error')+'). Data is saved in this browser.')}).then(function(){remBusy=false;if(remDirty)schedRemote()})}
+function save(){syncAbs();S.updated=Date.now();try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}schedRemote()}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -315,10 +347,20 @@ var PST=['Submitted','Accepted','Rejected','Presented'],PTY=['Talk','Invited tal
 function allTalks(){var o=[];S.events.forEach(function(c){(c.talks||[]).forEach(function(p){o.push({c:c,p:p})})});return o}
 function wc(t){t=(t||'').trim();return t?t.split(/\s+/).length:0}
 function copyTa(t,ta){ta=ta||t.closest('details').querySelector('textarea');ta.select();try{navigator.clipboard.writeText(ta.value).then(function(){t.textContent='Copied'},function(){try{document.execCommand('copy')}catch(e){}})}catch(e){try{document.execCommand('copy')}catch(e2){}}}
-function fromOpts(){return '<option value="">— reuse abstract from… —</option>'+allTalks().filter(function(x){return x.p.abstract}).map(function(x){return '<option value="'+x.p.id+'">'+esc(x.p.title)+' ('+esc(x.c.name)+')</option>'}).join('')}
+function isGive(v){return /\(I give\)/.test(v.kind||'')}
+function syncAbs(){S.abstracts=S.abstracts||[];
+var up=function(src,o){var e=S.abstracts.find(function(x){return x.src===src});
+if(!e){S.abstracts.push({id:uid(),src:src,title:o.title,abstract:o.abstract,type:o.type,where:o.where,date:o.date,status:o.status,syn:o.abstract});return}
+e.title=o.title;e.type=o.type;e.where=o.where;e.date=o.date;e.status=o.status;if(e.syn!==o.abstract){e.abstract=o.abstract;e.syn=o.abstract}};
+allTalks().forEach(function(x){if(x.p.abstract)up('p:'+x.p.id,{title:x.p.title,abstract:x.p.abstract,type:x.p.type,where:x.c.name,date:x.p.date||x.c.start||'',status:x.p.status})});
+S.visits.forEach(function(v){if(!isVisit(v)&&isGive(v)&&v.abstract)up('v:'+v.id,{title:v.name,abstract:v.abstract,type:v.kind,where:v.place||'',date:v.start||'',status:v.status})})}
+function absSources(){var live=function(e){if(!e.src)return '';var id=e.src.slice(2);if(e.src[0]==='p'){var c=S.events.find(function(c){return (c.talks||[]).some(function(t){return t.id===id})});return c?'rokovi|'+c.id:''}var v=S.visits.find(function(v){return v.id===id});return v?'visits|'+v.id:''};
+return (S.abstracts||[]).map(function(e){return{id:e.id,title:e.title,abstract:e.abstract,where:e.where||'',date:e.date||'',type:e.type||'',status:e.status||'',open:live(e),src:e.src||'',e:e}})}
+function absBlock(v,id){if(isVisit(v))return '';return '<details data-o="a'+v.id+'"'+(OPEN['a'+v.id]?' open':'')+' style="margin-top:8px"><summary>Abstract ('+wc(v.abstract)+' words)'+(isGive(v)?' · saved to the library':' · not saved to the library')+'</summary><textarea '+id+' data-f="abstract" placeholder="Paste or write the abstract here" style="min-height:180px;margin-top:6px">'+esc(v.abstract||'')+'</textarea><div class="sub"><button class="btn sm" data-act="copya" '+id+'>Copy abstract</button></div></details>'}
+function fromOpts(){return '<option value="">— reuse abstract from… —</option>'+absSources().map(function(x){return '<option value="'+x.id+'">'+esc(x.title)+' ('+esc(x.where||x.type)+')</option>'}).join('')}
 function talkRows(c,id){return (c.talks||[]).map(function(p){var a=id+' data-p="'+p.id+'"',nn=S.notes.filter(function(n){return n.pres===p.id}),lk=/^https?:\/\//.test(p.link||'')?' <a href="'+esc(p.link)+'" target="_blank" rel="noopener">slides ↗</a>':'';
 return '<div class="card" style="margin:6px 0;background:var(--bg)"><div class="row"><div><strong>'+esc(p.title)+'</strong> <span class="tag">'+esc(p.type)+'</span>'+lk+'</div><div><select '+a+' data-f="status" style="width:auto">'+opts(PST,p.status)+'</select> <button class="btn sm" data-act="delp" '+a+'>×</button></div></div><div class="sub"><input placeholder="Title" '+a+' data-f="title" value="'+esc(p.title)+'" style="min-width:240px"><select '+a+' data-f="type" style="width:auto">'+opts(PTY,p.type)+'</select></div><div class="sub"><label style="margin:0">Date</label><input type="date" '+a+' data-f="date" value="'+esc(p.date)+'"><input placeholder="Slides / poster link" '+a+' data-f="link" value="'+esc(p.link)+'" style="min-width:200px"></div>'+'<details data-o="a'+p.id+'"'+(OPEN['a'+p.id]?' open':'')+' style="margin-top:6px"><summary>Abstract ('+wc(p.abstract)+' words)</summary><textarea '+a+' data-f="abstract" placeholder="Paste or write the abstract here" style="min-height:130px;margin-top:6px">'+esc(p.abstract||'')+'</textarea><div class="sub"><button class="btn sm" data-act="copya">Copy abstract</button></div></details>'+(nn.length?'<div class="mu" style="margin-top:6px">Notes: '+nn.map(function(n){return esc(n.title)}).join(', ')+'</div>':'')+'</div>'}).join('')}
-function presBlock(c,id){return '<div class="mu" style="margin-top:10px">My presentations ('+(c.talks||[]).length+')</div>'+talkRows(c,id)+'<div class="sub"><input placeholder="Talk / poster title" data-n="pt" style="min-width:200px"><select data-n="ptype">'+opts(PTY,'Talk')+'</select><select data-n="pstat">'+opts(PST,'Submitted')+'</select><input type="date" data-n="pdate"><input placeholder="Slides / poster link" data-n="plink"><select data-n="pfrom" style="width:auto">'+fromOpts()+'</select><button class="btn sm" data-act="addp" '+id+'>Add</button></div>'}
+function presBlock(c,id){return '<div class="mu" style="margin-top:10px">My presentations ('+(c.talks||[]).length+')</div>'+talkRows(c,id)+'<div class="sub"><input placeholder="Talk / poster title" data-n="pt" style="min-width:200px"><select data-n="ptype">'+opts(PTY,'Talk')+'</select><select data-n="pstat">'+opts(PST,'Submitted')+'</select><input type="date" data-n="pdate"><input placeholder="Slides / poster link" data-n="plink"><textarea data-n="pabs" placeholder="Abstract (optional): write a new one here, or reuse one with the menu" style="width:100%;min-height:100px"></textarea><select data-n="pfrom" style="width:auto">'+fromOpts()+'</select><button class="btn sm" data-act="addp" '+id+'>Add</button></div>'}
 function tdone(o){var a=o.tasks||[];return a.filter(function(x){return x.done}).length+'/'+a.length}
 function trows(arr,ids,del){return arr.map(function(t){return '<div class="sub"><input type="checkbox" style="width:auto" '+ids+' data-t="'+t.id+'"'+(t.done?' checked':'')+'><span style="min-width:140px;'+(t.done?'text-decoration:line-through;opacity:.6':'')+'">'+esc(t.text)+'</span>'+(t.date?'<span class="due '+(t.done?'ok':cl(t.date))+'">'+esc(t.date)+' · '+(t.done?'done':cd(t.date))+'</span>':'')+'<button class="btn sm" data-act="'+del+'" '+ids+' data-t="'+t.id+'">×</button></div>'}).join('')}
 function taskBlock(o,ids){var has=o.tasks&&o.tasks.length;return '<div class="mu" style="margin-top:10px">Tasks ('+tdone(o)+')</div>'+trows(o.tasks||[],ids,'delt')+(has?'':'<div class="sub"><button class="btn sm" data-act="tpl" '+ids+'>Add standard checklist</button></div>')+'<div class="sub"><input placeholder="e.g. Book flights" data-n="text"><input type="date" data-n="tdate"><button class="btn sm" data-act="addt" '+ids+'>Add task</button></div>'}
@@ -381,7 +423,7 @@ else if(a==='addd'){var p=t.parentNode,dt=p.querySelector('[data-n=date]').value
 else if(a==='addt'){var p2=t.parentNode,tx=p2.querySelector('[data-n=text]').value.trim();if(!tx)return;c.tasks=c.tasks||[];c.tasks.push({id:uid(),text:tx,date:p2.querySelector('[data-n=tdate]').value,done:false})}
 else if(a==='tpl'){c.tasks=c.tasks||[];CT.forEach(function(x){c.tasks.push({id:uid(),text:x,date:'',done:false})})}
 else if(a==='delt')c.tasks=(c.tasks||[]).filter(function(x){return x.id!==t.dataset.t})
-else if(a==='addp'){var p3=t.parentNode,fr=allTalks().find(function(x){return x.p.id===p3.querySelector('[data-n=pfrom]').value}),pt=p3.querySelector('[data-n=pt]').value.trim()||(fr?fr.p.title:'');if(!pt)return;(c.talks=c.talks||[]).push({id:uid(),title:pt,type:p3.querySelector('[data-n=ptype]').value,status:p3.querySelector('[data-n=pstat]').value,date:p3.querySelector('[data-n=pdate]').value,link:p3.querySelector('[data-n=plink]').value.trim(),abstract:fr?(fr.p.abstract||''):''})}
+else if(a==='addp'){var p3=t.parentNode,fr=absSources().find(function(x){return x.id===p3.querySelector('[data-n=pfrom]').value}),pt=p3.querySelector('[data-n=pt]').value.trim()||(fr?fr.title:'');if(!pt)return;(c.talks=c.talks||[]).push({id:uid(),title:pt,type:p3.querySelector('[data-n=ptype]').value,status:p3.querySelector('[data-n=pstat]').value,date:p3.querySelector('[data-n=pdate]').value,link:p3.querySelector('[data-n=plink]').value.trim(),abstract:p3.querySelector('[data-n=pabs]').value.trim()||(fr?(fr.abstract||''):'')})}
 else if(a==='delp'){c.talks=(c.talks||[]).filter(function(x){return x.id!==t.dataset.p});S.notes.forEach(function(n){if(n.pres===t.dataset.p)n.pres=''})}
 else return;save();render()}
 function gAct(t,type){var g=S.grants.find(function(x){return x.id===t.dataset.g});if(!g)return;var a=t.dataset.act;
@@ -624,13 +666,19 @@ document.getElementById('xout').value=out;document.getElementById('xinfo').textC
 document.getElementById('xcopy').onclick=function(){var ta=document.getElementById('xout');ta.select();try{navigator.clipboard.writeText(ta.value).then(function(){document.getElementById('xinfo').textContent='Copied'},function(){try{document.execCommand('copy')}catch(e){}})}catch(e){try{document.execCommand('copy')}catch(e2){}}};
 document.getElementById('xsave').onclick=function(){var f=document.getElementById('xfmt').value,nm={txt:'cv-export.txt',md:'cv-export.md',html:'cv-export.html',bib:'papers.bib'}[f];saveFile(nm,document.getElementById('xout').value).then(function(m){if(m&&m!=='ok')document.getElementById('xinfo').textContent=m})};
 function renderAbs(){
-var q=document.getElementById('aq').value.toLowerCase(),all=allTalks();
-var dt=function(x){return x.p.date||x.c.start||''};
-var rows=all.filter(function(x){return x.p.abstract&&(x.p.title+' '+x.p.abstract+' '+x.c.name).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return dt(b)<dt(a)?-1:1});
-var miss=all.filter(function(x){return !x.p.abstract}).length;
-document.getElementById('alist').innerHTML=(rows.length?rows.map(function(x){return '<div class="card"><div class="row"><div><strong>'+esc(x.p.title)+'</strong><br><span class="tag">'+esc(x.p.type)+'</span><span class="tag">'+esc(x.c.name)+'</span><span class="tag">'+esc(x.p.status)+'</span><span class="mu">'+esc(dt(x))+' · '+wc(x.p.abstract)+' words</span></div><button class="btn sm" data-act="copya">Copy</button></div><textarea readonly style="min-height:130px;margin-top:8px">'+esc(x.p.abstract)+'</textarea></div>'}).join(''):(q?'<p class="mu">No abstracts match your search.</p>':'<p class="mu">No abstracts yet. Open one of your presentations on a conference card and paste its abstract.</p>'))+(miss?'<p class="mu">'+miss+' presentation'+(miss===1?'':'s')+' without an abstract.</p>':'')}
+var q=document.getElementById('aq').value.toLowerCase(),all=absSources();
+var rows=all.filter(function(x){return (x.title+' '+x.abstract+' '+x.where).toLowerCase().indexOf(q)>-1}).sort(function(a,b){return b.date<a.date?-1:1});
+var miss=allTalks().filter(function(x){return !x.p.abstract}).length+S.visits.filter(function(v){return !isVisit(v)&&isGive(v)&&!v.abstract}).length,ET=['Talk','Invited talk','Poster','Seminar','Lecture','Other'];
+document.getElementById('alist').innerHTML=(rows.length?rows.map(function(x){var e=x.e,id='data-ab="'+e.id+'"';
+return '<div class="card"><div class="row"><div'+(x.open?' data-open="'+esc(x.open)+'" style="cursor:pointer"':'')+'><strong>'+esc(x.title)+'</strong><br>'+(x.type?'<span class="tag">'+esc(x.type)+'</span>':'')+(x.where?'<span class="tag">'+esc(x.where)+'</span>':'')+(x.status?'<span class="tag">'+esc(x.status)+'</span>':'')+'<span class="mu">'+esc(x.date)+' · '+wc(x.abstract)+' words'+(e.src?(x.open?' · saved automatically from your talk':' · the talk was deleted, the abstract stays here'):' · added by hand')+'</span></div><div style="text-align:right"><button class="btn sm" data-act="copya">Copy</button>'+(x.open?'':' <button class="btn sm" data-act="dela" '+id+'>Delete</button>')+'</div></div><textarea '+id+' data-af="abstract" style="min-height:130px;margin-top:8px">'+esc(x.abstract)+'</textarea>'+
+(x.open?'':'<details data-o="ab'+e.id+'"'+(OPEN['ab'+e.id]?' open':'')+' style="margin-top:6px"><summary>Edit details</summary><div class="sub"><input placeholder="Title" '+id+' data-af="title" value="'+esc(e.title)+'" style="min-width:240px"><select '+id+' data-af="type" style="width:auto">'+opts(ET,e.type||'Talk')+'</select><input placeholder="Conference / place" '+id+' data-af="where" value="'+esc(e.where)+'"><input type="date" '+id+' data-af="date" value="'+esc(e.date)+'"></div></details>')+'</div>'}).join(''):(q?'<p class="mu">No abstracts match your search.</p>':'<p class="mu">No abstracts yet. Add one above, or write an abstract on one of your presentations or on a lecture or seminar you give.</p>'))+(miss?'<p class="mu">'+miss+' of your presentations or talks you give have no abstract yet.</p>':'')}
 document.getElementById('aq').oninput=renderAbs;
-document.getElementById('alist').addEventListener('click',function(e){var t=e.target.closest('[data-act=copya]');if(t)copyTa(t,t.closest('.card').querySelector('textarea'))});
+document.getElementById('alist').addEventListener('change',function(e){var t=e.target,id=t.dataset.ab;if(!id)return;var en=(S.abstracts||[]).find(function(x){return x.id===id});if(!en)return;var f=t.dataset.af;if(f==='title'&&!t.value.trim()){render();return}en[f]=t.value;save();render()});
+document.getElementById('alist').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
+document.getElementById('fa').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});S.abstracts=S.abstracts||[];S.abstracts.push({id:uid(),src:'',title:o.title,abstract:o.abstract,type:o.type,where:o.where,date:o.date,status:'',syn:''});save();ev.target.reset();render()};
+document.getElementById('alist').addEventListener('click',function(e){var t=e.target.closest('[data-act=copya]');if(t){copyTa(t,t.closest('.card').querySelector('textarea'));return}
+var d=e.target.closest('[data-act=dela]');if(d){if(!d.dataset.armed){d.dataset.armed='1';d.textContent='Click again to delete';return}S.abstracts=(S.abstracts||[]).filter(function(x){return x.id!==d.dataset.ab});save();render();return}
+if(e.target.closest('textarea'))return;var oc=e.target.closest('[data-open]');if(oc)openFromStr(oc.dataset.open)});
 document.getElementById('list').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
 function icsEsc(v){return String(v||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
 function icsFold(l){var o=[];while(l.length>70){o.push(l.slice(0,70));l=' '+l.slice(70)}o.push(l);return o.join('\r\n')}
@@ -823,10 +871,11 @@ function costItems(){return S.events.concat(S.visits)}
 function vIcon(k){return /^Visit/.test(k)?'&#9992; ':/^(Seminar|Lecture)/.test(k)?'&#127891; ':'&#128101; '}
 function vEdit(v,id){return '<details data-o="x'+v.id+'"'+(OPEN['x'+v.id]?' open':'')+' style="margin-top:10px"><summary>Edit details</summary><div class="sub"><input placeholder="Title" '+id+' data-f="name" value="'+esc(v.name)+'" style="min-width:240px"><select '+id+' data-f="kind" style="width:auto">'+opts(VK,v.kind)+'</select><input placeholder="Place / institution" '+id+' data-f="place" value="'+esc(v.place)+'"></div><div class="sub"><label style="margin:0">Starts</label><input type="date" '+id+' data-f="start" value="'+esc(v.start)+'"><label style="margin:0">Ends</label><input type="date" '+id+' data-f="end" value="'+esc(v.end)+'"></div>'+timeEdit(v,id)+repEdit(v,id)+'<div class="sub"><input placeholder="Link / note" '+id+' data-f="note" value="'+esc(v.note)+'" style="min-width:300px"></div></details>'}
 function visitCard(v){var id='data-v="'+v.id+'"',when=v.start?esc(v.start)+(v.end&&v.end!==v.start?' → '+esc(v.end):''):'',lk=/^https?:\/\//.test(v.note||'')?'<a href="'+esc(v.note)+'" target="_blank" rel="noopener">link ↗</a>':esc(v.note||'');
-return '<div class="card" id="it-'+v.id+'"><div class="row"><div><strong>'+vIcon(v.kind)+esc(v.name)+'</strong><br><span class="tag">'+esc(v.kind)+'</span>'+(v.place?'<span class="tag">'+esc(v.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+(v.tstart&&!isVisit(v)?'<span class="tag">&#128337; '+esc(vTime(v))+'</span>':'')+(v.rep&&v.rep.every&&!isVisit(v)?'<span class="tag">↻ '+repLabel(v)+'</span>':'')+'<span class="mu">'+lk+'</span></div><div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(VST,v.status)+'</select> <button class="btn sm" data-act="delv" '+id+'>Delete</button></div></div>'+peopleLine('v',v.id)+repBlock(v,id)+taskBlock(v,id)+
+return '<div class="card" id="it-'+v.id+'"><div class="row"><div><strong>'+vIcon(v.kind)+esc(v.name)+'</strong><br><span class="tag">'+esc(v.kind)+'</span>'+(v.place?'<span class="tag">'+esc(v.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+(v.tstart&&!isVisit(v)?'<span class="tag">&#128337; '+esc(vTime(v))+'</span>':'')+(v.rep&&v.rep.every&&!isVisit(v)?'<span class="tag">↻ '+repLabel(v)+'</span>':'')+'<span class="mu">'+lk+'</span></div><div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(VST,v.status)+'</select> <button class="btn sm" data-act="delv" '+id+'>Delete</button></div></div>'+peopleLine('v',v.id)+repBlock(v,id)+absBlock(v,id)+taskBlock(v,id)+
 '<div class="mu" style="margin-top:10px">Funding</div><div class="sub"><input type="number" min="0" step="any" placeholder="Estimated cost" style="width:140px" '+id+' data-f="cost" value="'+esc(v.cost)+'"><select '+id+' data-f="cur">'+opts(CUR,v.cur||'EUR')+'</select><select '+id+' data-f="fundSrc">'+srcOpts(v.fundSrc)+'</select><select '+id+' data-f="fundStatus">'+opts(FS,v.fundStatus)+'</select></div>'+vEdit(v,id)+'</div>'}
 function renderVisits(){
 ['vcont','scont'].forEach(function(id){var e=document.getElementById(id),v=e.value;e.innerHTML='<option value="">— none —</option>'+S.contacts.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join('');e.value=v});
+var sf=document.getElementById('sfrom'),sv=sf.value;sf.innerHTML='<option value="">— none —</option>'+absSources().map(function(x){return '<option value="'+x.id+'">'+esc(x.title)+' ('+esc(x.where||x.type)+')</option>'}).join('');sf.value=sv;
 var a=document.getElementById('vfk'),b=document.getElementById('vfs'),v2=a.value,v3=b.value;
 a.innerHTML='<option value="">All types</option>'+SK.map(function(x){return '<option>'+x+'</option>'}).join('');a.value=v2;
 b.innerHTML='<option value="">All statuses</option>'+VST.map(function(x){return '<option>'+x+'</option>'}).join('');b.value=v3;
@@ -841,19 +890,20 @@ else if(a==='tpl'){v.tasks=v.tasks||[];vTpl(v.kind).forEach(function(x){v.tasks.
 else if(a==='delt')v.tasks=(v.tasks||[]).filter(function(x){return x.id!==t.dataset.t});
 else if(a==='skipd')(v.skip=v.skip||[]).push(t.dataset.d);
 else if(a==='unskip')v.skip=(v.skip||[]).filter(function(x){return x!==t.dataset.d});
+else if(a==='copya'){copyTa(t);return}
 else return;save();render()}
 bind('vlist',vAct);
 document.getElementById('vlist').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
 document.getElementById('vq').oninput=renderVisits;document.getElementById('vfk').onchange=renderVisits;document.getElementById('vfs').onchange=renderVisits;
 function addAct(ev,kind){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
-var v={id:uid(),name:o.name,kind:kind||o.kind,tstart:o.tstart||'',tend:o.tend||'',status:o.status,place:o.place,start:o.start,end:o.end,note:o.note,cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',tasks:[]};
+var v={id:uid(),name:o.name,kind:kind||o.kind,abstract:o.abstract||(function(){var f=absSources().find(function(x){return x.id===o.from});return f?f.abstract:''})(),tstart:o.tstart||'',tend:o.tend||'',status:o.status,place:o.place,start:o.start,end:o.end,note:o.note,cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',tasks:[]};
 if(o.every&&o.start){v.rep={every:o.every,count:o.count||'',until:o.until||''};v.skip=[]}
 S.visits.push(v);if(o.cont){var c=S.contacts.find(function(x){return x.id===o.cont});if(c){c.links=c.links||[];c.links.push('v:'+v.id)}}save();ev.target.reset();render()}
 document.getElementById('fv').onsubmit=function(ev){addAct(ev,document.getElementById('ctype').value==='host'?'Visit (hosting)':'Visit (I travel)')};
 document.getElementById('fs').onsubmit=function(ev){addAct(ev)};
 document.getElementById('ctype').onchange=function(){var c=this.value==='conf';document.getElementById('addconf').style.display=c?'':'none';document.getElementById('addvisit').style.display=c?'none':''};
 document.getElementById('cvfilter').onchange=renderList;document.getElementById('cq').oninput=renderList;
-function render(){renderUpcoming();renderContacts();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderNotes()}
+function render(){syncAbs();renderUpcoming();renderContacts();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderNotes()}
 
 document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
 var c={id:uid(),name:o.name,place:o.place,start:o.start,end:o.end,link:o.link,status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:''};
@@ -866,23 +916,73 @@ S.notes.push(o);save();ev.target.reset();render()};
 document.getElementById('exp').onclick=doBackup;document.getElementById('bkgo').onclick=doBackup;
 document.getElementById('imp').onchange=function(ev){var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.events&&d.notes){S=d;S.papers=S.papers||[];migrate();save();render()}}catch(e){}};r.readAsText(ev.target.files[0])};
 render();
+var FBBASE='https://www.gstatic.com/firebasejs/9.23.0/',FB=null,FBU=null,FBLAST={},FBPARTS=['events','visits','grants','papers','notes','contacts','abstracts'];
+function loadScript(src){return new Promise(function(res,rej){var e=document.createElement('script');e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)})}
+function emptyState(){return{events:[],notes:[],papers:[],grants:[],contacts:[],visits:[],abstracts:[]}}
+function authMsg(t){document.getElementById('amsg').textContent=t}
+function showAuth(on){document.getElementById('auth').style.display=on?'block':'none';document.body.style.overflow=on?'hidden':''}
+var AUTHERR={'auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/invalid-email':'That email address is not valid.','auth/email-already-in-use':'An account with this email already exists. Try signing in.','auth/weak-password':'Choose a password with at least 6 characters.','auth/missing-password':'Enter your password.','auth/too-many-requests':'Too many attempts. Wait a few minutes and try again.','auth/network-request-failed':'No connection. Check your internet and try again.','auth/operation-not-allowed':'Creating accounts is switched off for this planner.'};
+function authErr(e){return AUTHERR[e&&e.code]||('Something went wrong ('+((e&&e.code)||'error')+').')}
+function fbRef(uid){var col=function(){return FB.db.collection('planners').doc(uid).collection('parts')};
+return{get:async function(){var snap=await col().get(),d={},ex=false;FBLAST={};snap.forEach(function(doc){ex=true;var x=doc.data();FBLAST[doc.id]=x.json;var v=JSON.parse(x.json);if(doc.id==='meta')Object.keys(v).forEach(function(k){d[k]=v[k]});else d[doc.id]=v});return{exists:ex,data:function(){return d}}},
+set:async function(o){var meta={},parts={},ch=[],b=FB.db.batch();Object.keys(o).forEach(function(k){if(FBPARTS.indexOf(k)<0)meta[k]=o[k]});
+FBPARTS.forEach(function(k){parts[k]=JSON.stringify(o[k]||[])});parts.meta=JSON.stringify(meta);
+Object.keys(parts).forEach(function(k){if(new TextEncoder().encode(parts[k]).length>900000)throw{code:'too-large:'+k};if(FBLAST[k]!==parts[k]){b.set(col().doc(k),{json:parts[k],updated:o.updated||Date.now()});ch.push(k)}});
+if(!ch.length)return;await b.commit();ch.forEach(function(k){FBLAST[k]=parts[k]})}}}
+async function onSignedIn(u){FBU=u;try{await u.reload()}catch(e){}STORE_KEY='np1_u_'+u.uid;FBLAST={};S=emptyState();
+try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw)}catch(e){}
+migrate();document.getElementById('acct').style.display='flex';document.getElementById('acctmail').textContent='Signed in as '+(u.email||'')+(u.emailVerified?'':' (email not verified yet)');document.getElementById('resendv').style.display=u.emailVerified?'none':'';document.getElementById('acctcard').style.display='block';document.getElementById('acctinfo').textContent='Signed in as '+(u.email||'')+'. Your data is private to this account.';document.getElementById('acctmsg').textContent='';
+var dn=document.getElementById('datanote');if(dn)dn.textContent='Your data is saved to your account in the cloud (only you can read it) and cached in this browser while you are signed in. Use Import JSON to bring in data from an older version, and export a backup file now and then.';
+showAuth(false);render();setStatus('Loading your data…');
+try{var ref=fbRef(u.uid),snap=await ref.get();await syncWith(ref,snap)}catch(e){setStatus('Could not reach your account ('+((e&&e.code)||'error')+').'+(e&&e.code==='permission-denied'&&!u.emailVerified?' Verify your email (see the link we sent), then reload this page.':'')+' Working from the copy saved in this browser.')}}
+function onSignedOut(){FBU=null;REM=null;clearTimeout(remTimer);remDirty=false;STORE_KEY='np1_signed_out';S=emptyState();FBLAST={};document.getElementById('acct').style.display='none';document.getElementById('acctcard').style.display='none';render();showAuth(true);authMsg('')}
+async function doSignOut(){var keep=false;
+if(REM){try{await REM.set(payload())}catch(e){if(!confirm('Your latest changes could not be saved to your account. Sign out anyway? They stay in this browser, but they are not in your account.'))return;keep=true}}
+if(!keep){try{localStorage.removeItem(STORE_KEY)}catch(e){}}
+FB.auth.signOut()}
+async function authDo(kind){var em=document.getElementById('aemail').value.trim(),pw=document.getElementById('apass').value;
+if(!FB){authMsg('The sign-in service is still loading. Try again in a moment.');return}
+if(!em||!pw){authMsg('Enter your email and password.');return}
+authMsg(kind==='up'?'Creating your account…':'Signing in…');
+try{if(kind==='up'){var c=await FB.auth.createUserWithEmailAndPassword(em,pw);try{await c.user.sendEmailVerification()}catch(e2){}}else await FB.auth.signInWithEmailAndPassword(em,pw);document.getElementById('apass').value=''}catch(e){authMsg(authErr(e))}}
+async function authReset(){var em=document.getElementById('aemail').value.trim();if(!FB)return;if(!em){authMsg('Enter your email first.');return}try{await FB.auth.sendPasswordResetEmail(em);authMsg('If an account exists for this email, a reset link has been sent.')}catch(e){authMsg(authErr(e))}}
+async function fbStart(){showAuth(true);authMsg('Loading…');
+try{if(!window.firebase){await loadScript(FBBASE+'firebase-app-compat.js');await loadScript(FBBASE+'firebase-auth-compat.js');await loadScript(FBBASE+'firebase-firestore-compat.js')}}catch(e){authMsg('Could not load the sign-in service. Check your connection and reload the page.');return}
+try{firebase.initializeApp(FIREBASE_CONFIG);FB={auth:firebase.auth(),db:firebase.firestore()}}catch(e){authMsg('The Firebase settings in this page are not valid.');return}
+authMsg('');if(document.addEventListener)document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')pullIfNewer()});FB.auth.onAuthStateChanged(function(u){if(u)onSignedIn(u);else onSignedOut()})}
+document.getElementById('authform').onsubmit=function(ev){ev.preventDefault();authDo('in')};
+document.getElementById('asignup').onclick=function(){authDo('up')};
+document.getElementById('areset').onclick=authReset;
+document.getElementById('signout').onclick=doSignOut;
+window.addEventListener('online',function(){if(!FBU)return;if(!REM)onSignedIn(FBU);else schedRemote()});
+document.getElementById('resendv').onclick=async function(){var t=this;try{await FBU.sendEmailVerification();t.textContent='Sent. Check your inbox'}catch(e){setStatus(authErr(e))}};
+document.getElementById('chpw').onclick=async function(){var m=document.getElementById('acctmsg');if(!FBU)return;try{await FB.auth.sendPasswordResetEmail(FBU.email);m.textContent='We sent a link to '+FBU.email+' for choosing a new password.'}catch(e){m.textContent=authErr(e)}};
+async function delAccount(){if(!FBU)return;var m=document.getElementById('acctmsg');
+if(!confirm('Delete your account and ALL your planner data? This cannot be undone. Export a backup file first if you might need it.'))return;
+var pw=prompt('To confirm, enter your password:');if(!pw)return;
+try{await FBU.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(FBU.email,pw))}catch(e){m.textContent=authErr(e);return}
+try{var col=FB.db.collection('planners').doc(FBU.uid).collection('parts'),b=FB.db.batch();FBPARTS.concat(['meta']).forEach(function(k){b.delete(col.doc(k))});await b.commit();var key=STORE_KEY;await FBU.delete();try{localStorage.removeItem(key)}catch(e){}}catch(e){m.textContent='Could not delete the account ('+((e&&e.code)||'error')+').'}}
+document.getElementById('delacct').onclick=delAccount;
+async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap)}catch(e){}}
+async function syncWith(ref,snap){var rem=snap.exists?snap.data():null;
+if(rem&&(rem.updated||0)>(S.updated||0)){
+S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
+try{localStorage.setItem(STORE_KEY,JSON.stringify(S))}catch(e){}
+migrate();render();setStatus('Loaded from your account');REM=ref;
+}else{
+REM=ref;
+if(S.events.length+S.notes.length+S.papers.length+S.grants.length+S.contacts.length+S.visits.length+(S.abstracts||[]).length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
+else setStatus('Connected to your account');
+}}
 (async function(){
+if(FIREBASE_CONFIG){fbStart();return}
 try{
 if(!window.claude||!window.claude.use){setStatus('Saved only in this browser.');return}
 var user=await window.claude.use('user'),db=await window.claude.use('db');
 if(!user||!db){setStatus('Saved only in this browser (sign in to save to your account).');return}
 var id=await user.id();
 if(!id){setStatus('Saved only in this browser.');return}
-var ref=db.doc('data/users/'+id+'/planner'),snap=await ref.get(),rem=snap.exists?snap.data():null;
-if(rem&&(rem.updated||0)>(S.updated||0)){
-S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
-try{localStorage.setItem('np1',JSON.stringify(S))}catch(e){}
-migrate();render();setStatus('Loaded from your account');REM=ref;
-}else{
-REM=ref;
-if(S.events.length+S.notes.length+S.papers.length+S.grants.length+S.contacts.length+S.visits.length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
-else setStatus('Connected to your account');
-}
+var ref=db.doc('data/users/'+id+'/planner'),snap=await ref.get();await syncWith(ref,snap)
 }catch(e){setStatus('Saved only in this browser.')}
 })();
 </script>
