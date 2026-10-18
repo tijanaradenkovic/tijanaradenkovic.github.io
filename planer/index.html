@@ -74,7 +74,6 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <button data-t="visits">Lectures &amp; Seminars</button>
 <button data-t="grants">Projects &amp; Grants</button>
 <button data-t="expenses">Expenses</button>
-<button data-t="cvx">Export</button>
 <button data-t="radovi">Papers</button>
 <button data-t="abs">Abstracts</button>
 <button data-t="beleske">Notes</button>
@@ -166,22 +165,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <div id="exlist"></div>
 </section>
 
-<section id="cvx" class="hide">
-<div class="card">
-<div class="sub"><label style="margin:0">Period</label><select id="xp"><option value="all">All time</option><option value="12m">Last 12 months</option><option value="ly">Last year (calendar year)</option><option value="lm">Last month (calendar month)</option><option value="custom">Custom range</option></select><span id="xcustom" class="sub" style="display:none;margin:0"><input type="date" id="xf"><input type="date" id="xt"></span></div>
-<div class="sub"><label style="margin:0">Format</label><select id="xfmt"><option value="txt">Plain text</option><option value="md">Markdown</option><option value="html">HTML (for a website)</option><option value="bib">BibTeX (papers only)</option></select></div>
-<div class="sub">
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-p" checked style="width:auto">Papers</label>
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-t" checked style="width:auto">Presentations</label>
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-c" checked style="width:auto">Conferences &amp; visits</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-v" checked style="width:auto">Lectures &amp; seminars</label>
-<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-g" checked style="width:auto">Projects &amp; grants</label>
-</div>
-<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xpend" style="width:auto">Include pending items (submitted / under review)</label></div>
-</div>
-<div class="sub" style="margin:10px 0"><button class="btn sm" id="xcopy">Copy</button><button class="btn sm" id="xsave">Save as file</button><span class="mu" id="xinfo"></span></div>
-<textarea id="xout" readonly style="min-height:340px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px"></textarea>
-<p class="mu">Papers are dated by when you moved them to their current stage (accepted, published...), presentations by their date or the conference start.</p>
-</section>
+
 
 <section id="contacts" class="hide">
 <form id="fk">
@@ -288,6 +272,22 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <button class="btn" id="exp">Export JSON</button><span class="mu" id="bkinfo" style="margin-left:8px"></span>
 <label style="margin-top:10px">Import JSON</label><input type="file" id="imp" accept=".json">
 </div>
+<div id="cvx"><h2 style="margin-top:24px">Research activity export</h2><p class="mu">Create a formatted summary of your papers, presentations, conferences, visits, seminars and grants for a CV, annual report or website. Choose a period and format, then copy or save the result. This is different from Export JSON above: JSON is a full planner backup for restoring or moving your editable data; these formats are for sharing and reporting, not restoring your planner.</p>
+<div class="card">
+<div class="sub"><label style="margin:0">Period</label><select id="xp"><option value="all">All time</option><option value="12m">Last 12 months</option><option value="ly">Last year (calendar year)</option><option value="lm">Last month (calendar month)</option><option value="custom">Custom range</option></select><span id="xcustom" class="sub" style="display:none;margin:0"><input type="date" id="xf"><input type="date" id="xt"></span></div>
+<div class="sub"><label style="margin:0">Format</label><select id="xfmt"><option value="txt">Plain text</option><option value="md">Markdown</option><option value="html">HTML (for a website)</option><option value="bib">BibTeX (papers only)</option></select></div>
+<div class="sub">
+<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-p" checked style="width:auto">Papers</label>
+<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-t" checked style="width:auto">Presentations</label>
+<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-c" checked style="width:auto">Conferences &amp; visits</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-v" checked style="width:auto">Lectures &amp; seminars</label>
+<label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xs-g" checked style="width:auto">Projects &amp; grants</label>
+</div>
+<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="xpend" style="width:auto">Include pending items (submitted / under review)</label></div>
+</div>
+<div class="sub" style="margin:10px 0"><button class="btn sm" id="xcopy">Copy</button><button class="btn sm" id="xsave">Save as file</button><span class="mu" id="xinfo"></span></div>
+<textarea id="xout" readonly style="min-height:340px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px"></textarea>
+<p class="mu">Papers are dated by when you moved them to their current stage (accepted, published...), presentations by their date or the conference start.</p>
+</div>
 </section>
 </div>
 
@@ -335,7 +335,7 @@ function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
 var today=iso(new Date());
 function daysTo(s){return Math.round((new Date(s+'T00:00:00')-new Date(today+'T00:00:00'))/864e5)}
 
-var TABS=['upcoming','rokovi','visits','kalendar','grants','expenses','cvx','radovi','abs','beleske','contacts','podaci'];
+var TABS=['upcoming','rokovi','visits','kalendar','grants','expenses','radovi','abs','beleske','contacts','podaci'];
 function showTab(t){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.toggle('on',x.dataset.t===t)});TABS.forEach(function(id){document.getElementById(id).classList.toggle('hide',id!==t)});render()}
 document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){showTab(b.dataset.t)}});
 function openFromStr(s){var a=String(s).split('|');openItem(a[0],a[1])}
