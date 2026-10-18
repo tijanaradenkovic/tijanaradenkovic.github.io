@@ -295,7 +295,15 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 // ---- Cloud accounts (optional) ----
 // Leave this as null to keep the planner local-only. To switch on sign-in and per-user cloud data,
 // replace null with the Firebase web config (see firebase-setup.txt).
-var FIREBASE_CONFIG=null;
+var FIREBASE_CONFIG={
+  apiKey: "AIzaSyDc62txTLflaqQlNFHK0T_TG7gsKa5g0x0",
+  authDomain: "academic-planer.firebaseapp.com",
+  projectId: "academic-planer",
+  storageBucket: "academic-planer.firebasestorage.app",
+  messagingSenderId: "425669397731",
+  appId: "1:425669397731:web:261e6077ea5b01043349d6",
+  measurementId: "G-KSGG7LFN89"
+};
 var STORE_KEY=FIREBASE_CONFIG?'np1_signed_out':'np1';
 var S={events:[],notes:[]};
 try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw);}catch(e){}
