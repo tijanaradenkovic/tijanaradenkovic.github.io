@@ -384,7 +384,7 @@ function confCard(c){
 var when=c.start?esc(c.start)+(c.end?' → '+esc(c.end):''):'';
 var link=/^https?:\/\//.test(c.link||'')?'<a href="'+esc(c.link)+'" target="_blank" rel="noopener">website</a>':esc(c.link);
 var id='data-c="'+c.id+'"';
-return '<div class="card" id="it-'+c.id+'"><div class="row"><div><strong>'+esc(c.name)+'</strong><br>'+(c.place?'<span class="tag">'+esc(c.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+(c.link||c.note?'<span class="mu">'+(c.link?link:'')+(c.link&&c.note?' · ':'')+esc(c.note)+'</span>':'')</div>'+
+return '<div class="card" id="it-'+c.id+'"><div class="row"><div><strong>'+esc(c.name)+'</strong><br>'+(c.place?'<span class="tag">'+esc(c.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+(c.link||c.note?'<span class="mu">'+(c.link?link:'')+(c.link&&c.note?' · ':'')+esc(c.note)+'</span>':'')+'</div>'+
 '<div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(CST,c.status)+'</select> <button class="btn sm" data-act="delc" '+id+'>Delete</button></div></div>'+
 (c.deadlines&&c.deadlines.length?'<div class="mu">'+c.deadlines.length+' deadline(s)</div>':'')+'<details style="margin-top:10px"><summary>Edit event</summary>'+peopleLine('c',c.id)+'<div class="mu" style="margin-top:8px">Deadlines</div>'+rows(c.deadlines,id,'deld')+
 '<div class="sub"><select data-n="kind">'+opts(DKS,'Abstract')+'</select><input type="date" data-n="date"><button class="btn sm" data-act="addd" '+id+'>Add deadline</button></div>'+
