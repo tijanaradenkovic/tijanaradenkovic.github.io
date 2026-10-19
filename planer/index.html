@@ -12,9 +12,9 @@
 <title>Academic Planner</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#f6f3ee;--card:#fcfaf6;--tx:#16203a;--mu:#667085;--bd:#e4e0d9;--ac:#6b3a64;--on:#fff;--rd:#b4433a;--gr:#2a7f7c;--am:#b7791f;--k-conf:#6b3a64;--k-visit:#2a7f7c;--k-sem:#2f5d9e;--k-grant:#b7791f;--k-paper:#b4433a;--k-contact:#4f8a3a;--k-note:#6b7385}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a2b;--card:#1a2438;--tx:#ece8e1;--mu:#9aa3b5;--bd:#2b364d;--ac:#c79bc0;--on:#121a2b;--rd:#ef7f76;--gr:#5fc1bb;--am:#e0a84a;--k-conf:#c79bc0;--k-visit:#5fc1bb;--k-sem:#86a9e6;--k-grant:#e0a84a;--k-paper:#ef7f76;--k-contact:#8fcf7f;--k-note:#98a3b8}}
-:root[data-theme="dark"]{--bg:#121a2b;--card:#1a2438;--tx:#ece8e1;--mu:#9aa3b5;--bd:#2b364d;--ac:#c79bc0;--on:#121a2b;--rd:#ef7f76;--gr:#5fc1bb;--am:#e0a84a;--k-conf:#c79bc0;--k-visit:#5fc1bb;--k-sem:#86a9e6;--k-grant:#e0a84a;--k-paper:#ef7f76;--k-contact:#8fcf7f;--k-note:#98a3b8}
+--bg:#f6f3ee;--card:#fcfaf6;--tx:#16203a;--mu:#667085;--bd:#e4e0d9;--ac:#6b3a64;--on:#fff;--rd:#b4433a;--gr:#2a7f7c;--am:#b7791f;--k-conf:#6b3a64;--k-visit:#2a7f7c;--k-sem:#2f5d9e;--k-grant:#b7791f;--k-paper:#b4433a;--k-ref:#7b5598;--k-contact:#4f8a3a;--k-note:#6b7385}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a2b;--card:#1a2438;--tx:#ece8e1;--mu:#9aa3b5;--bd:#2b364d;--ac:#c79bc0;--on:#121a2b;--rd:#ef7f76;--gr:#5fc1bb;--am:#e0a84a;--k-conf:#c79bc0;--k-visit:#5fc1bb;--k-sem:#86a9e6;--k-grant:#e0a84a;--k-paper:#ef7f76;--k-ref:#bda2ec;--k-contact:#8fcf7f;--k-note:#98a3b8}}
+:root[data-theme="dark"]{--bg:#121a2b;--card:#1a2438;--tx:#ece8e1;--mu:#9aa3b5;--bd:#2b364d;--ac:#c79bc0;--on:#121a2b;--rd:#ef7f76;--gr:#5fc1bb;--am:#e0a84a;--k-conf:#c79bc0;--k-visit:#5fc1bb;--k-sem:#86a9e6;--k-grant:#e0a84a;--k-paper:#ef7f76;--k-ref:#bda2ec;--k-contact:#8fcf7f;--k-note:#98a3b8}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -47,7 +47,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 .sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}.sub select,.sub input:not([type=checkbox]){width:auto}
 .subnav{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.subnav button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit}.subnav button.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
 .tb{width:100%;border-collapse:collapse;font-size:14px}.tb th,.tb td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}.tb th:first-child,.tb td:first-child{text-align:left}.tb th{color:var(--mu);font-weight:600;font-size:12px}.tb tr.tot td{font-weight:700;border-top:2px solid var(--bd)}
-.ev.k-conf{background:var(--k-conf)}#cal.hide-conf .k-conf{display:none}.ev.k-visit{background:var(--k-visit)}#cal.hide-visit .k-visit{display:none}.ev.k-sem{background:var(--k-sem)}#cal.hide-sem .k-sem{display:none}.ev.k-grant{background:var(--k-grant)}#cal.hide-grant .k-grant{display:none}.ev.k-paper{background:var(--k-paper)}#cal.hide-paper .k-paper{display:none}.ev.k-contact{background:var(--k-contact)}#cal.hide-contact .k-contact{display:none}.ev.k-note{background:var(--k-note)}#cal.hide-note .k-note{display:none}.lg{cursor:pointer;display:inline-flex;gap:6px;align-items:center;font-size:13px;margin-right:10px}.lg i{width:12px;height:12px;border-radius:3px;display:inline-block}.lg.off{opacity:.4;text-decoration:line-through}.ev{cursor:pointer}@keyframes fl{0%,60%{box-shadow:0 0 0 3px var(--ac)}100%{box-shadow:0 0 0 0 transparent}}.flash{animation:fl 1.8s}
+.ev.k-conf{background:var(--k-conf)}#cal.hide-conf .k-conf{display:none}.ev.k-visit{background:var(--k-visit)}#cal.hide-visit .k-visit{display:none}.ev.k-sem{background:var(--k-sem)}#cal.hide-sem .k-sem{display:none}.ev.k-grant{background:var(--k-grant)}#cal.hide-grant .k-grant{display:none}.ev.k-paper{background:var(--k-paper)}#cal.hide-paper .k-paper{display:none}.ev.k-ref{background:var(--k-ref)}#cal.hide-ref .k-ref{display:none}.ev.k-contact{background:var(--k-contact)}#cal.hide-contact .k-contact{display:none}.ev.k-note{background:var(--k-note)}#cal.hide-note .k-note{display:none}.lg{cursor:pointer;display:inline-flex;gap:6px;align-items:center;font-size:13px;margin-right:10px}.lg i{width:12px;height:12px;border-radius:3px;display:inline-block}.lg.off{opacity:.4;text-decoration:line-through}.ev{cursor:pointer}@keyframes fl{0%,60%{box-shadow:0 0 0 3px var(--ac)}100%{box-shadow:0 0 0 0 transparent}}.flash{animation:fl 1.8s}
 </style>
 </head>
 <body>
@@ -74,7 +74,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <button data-t="visits">Lectures &amp; Seminars</button>
 <button data-t="grants">Projects &amp; Grants</button>
 <button data-t="expenses">Expenses</button>
-<button data-t="radovi">Papers</button>
+<button data-t="radovi">Papers &amp; Reviews</button>
 <button data-t="abs">Abstracts</button>
 <button data-t="beleske">Notes</button>
 <button data-t="contacts">Contacts</button>
@@ -88,7 +88,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <details id="icsd" style="margin-top:16px"><summary>Export to calendar (.ics)</summary>
 <div class="card" style="margin-top:8px">
 <div class="mu">Include</div>
-<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-c" checked style="width:auto">Conference deadlines &amp; tasks</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-t" checked style="width:auto">Conference dates &amp; my presentations</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-g" checked style="width:auto">Grant milestones &amp; tasks</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-p" checked style="width:auto">Paper deadlines</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-f" checked style="width:auto">Contact follow-ups</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-v" checked style="width:auto">Visits</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-s" checked style="width:auto">Lectures, seminars &amp; meetings</label></div>
+<div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-c" checked style="width:auto">Conference deadlines &amp; tasks</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-t" checked style="width:auto">Conference dates &amp; my presentations</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-g" checked style="width:auto">Grant milestones &amp; tasks</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-p" checked style="width:auto">Paper deadlines</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-r" style="width:auto">Peer review deadlines (optional, private)</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-f" checked style="width:auto">Contact follow-ups</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-v" checked style="width:auto">Visits</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-s" checked style="width:auto">Lectures, seminars &amp; meetings</label></div>
 <div class="mu" style="margin-top:10px">Reminders (each at 09:00)</div>
 <div class="sub"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ia-w" checked style="width:auto">1 week before</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ia-d" checked style="width:auto">1 day before</label><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ia-0" style="width:auto">On the day</label></div>
 <div class="sub" style="margin-top:10px"><label style="display:flex;gap:6px;align-items:center;margin:0;color:var(--tx);font-size:14px"><input type="checkbox" id="ic-past" style="width:auto">Include dates in the past</label></div>
@@ -155,7 +155,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <div class="row" style="margin-bottom:8px">
 <button class="btn sm" id="pm">‹</button><strong id="ml"></strong><button class="btn sm" id="nm">›</button>
 </div>
-<div id="legend" style="margin:8px 0"><span class="lg" data-cat="conf"><i style="background:var(--k-conf)"></i>Conferences</span><span class="lg" data-cat="visit"><i style="background:var(--k-visit)"></i>Visits</span><span class="lg" data-cat="sem"><i style="background:var(--k-sem)"></i>Lectures &amp; seminars</span><span class="lg" data-cat="grant"><i style="background:var(--k-grant)"></i>Projects &amp; grants</span><span class="lg" data-cat="paper"><i style="background:var(--k-paper)"></i>Papers</span><span class="lg" data-cat="contact"><i style="background:var(--k-contact)"></i>Contact follow-ups</span><span class="lg" data-cat="note"><i style="background:var(--k-note)"></i>Notes</span></div>
+<div id="legend" style="margin:8px 0"><span class="lg" data-cat="conf"><i style="background:var(--k-conf)"></i>Conferences</span><span class="lg" data-cat="visit"><i style="background:var(--k-visit)"></i>Visits</span><span class="lg" data-cat="sem"><i style="background:var(--k-sem)"></i>Lectures &amp; seminars</span><span class="lg" data-cat="grant"><i style="background:var(--k-grant)"></i>Projects &amp; grants</span><span class="lg" data-cat="paper"><i style="background:var(--k-paper)"></i>Papers</span><span class="lg" data-cat="ref"><i style="background:var(--k-ref)"></i>Peer reviews</span><span class="lg" data-cat="contact"><i style="background:var(--k-contact)"></i>Contact follow-ups</span><span class="lg" data-cat="note"><i style="background:var(--k-note)"></i>Notes</span></div>
 <div class="cal" id="cal"></div>
 <div id="dayp" style="margin-top:12px"></div>
 </section>
@@ -208,6 +208,8 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 </section>
 
 <section id="radovi" class="hide">
+<div id="reviewTabs" class="subnav"><button data-rview="papers" class="on">My papers</button><button data-rview="reviews">Reviews I do</button></div>
+<div id="papersPanel">
 <div class="sub" style="margin-bottom:10px"><label style="margin:0">Flag papers waiting for a decision longer than</label><input type="number" id="wd" min="1" style="width:80px"><span class="mu">days</span></div>
 <form id="fp">
 <div class="full"><label>Paper title</label><input name="title" required></div>
@@ -222,7 +224,26 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <div class="full"><label>Co-authors / note</label><input name="note"></div>
 <div class="full"><button class="btn pri" type="submit">Add paper</button></div>
 </form>
-<div id="plist"></div>
+<div id="plist"></div></div>
+<div id="reviewsPanel" class="hide">
+<p class="mu">Private review assignments, decisions and correspondence. Avoid copying confidential manuscript or editorial content into the planner. JSON backups are unencrypted.</p>
+<form id="fref">
+<div class="full"><label>Manuscript title or private reference</label><input name="title" required placeholder="e.g. MS-2026-041"></div>
+<div><label>Journal / publisher</label><input name="journal"></div>
+<div><label>Manuscript ID</label><input name="msid"></div>
+<div><label>Editor / contact</label><input name="editor"></div>
+<div><label>Invitation date</label><input name="invited" type="date"></div>
+<div><label>Reply deadline</label><input name="replyBy" type="date"></div>
+<div><label>Review deadline</label><input name="due" type="date"></div>
+<div><label>Round</label><select name="round"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div><label>Status</label><select name="status"><option>Invited</option><option>Accepted</option><option>In progress</option><option>Review submitted</option><option>Revision received</option><option>Re-review in progress</option><option>Completed</option><option>Declined</option><option>Cancelled</option></select></div>
+<div class="full"><label>Private note</label><textarea name="note" placeholder="Your to-dos, without unpublished manuscript text"></textarea></div>
+<div class="full"><button class="btn pri" type="submit">Add review</button></div>
+</form>
+<div class="sub" style="margin:8px 0"><input id="refQ" placeholder="Search reviews..." style="flex:1;min-width:170px"><select id="refFilter" style="width:auto"><option value="all">All</option><option value="active">Active</option><option value="closed">Closed / submitted</option></select></div>
+<div class="mu" id="refStats" style="margin:8px 0"></div>
+<div id="refList"></div>
+</div>
 </section>
 
 <section id="abs" class="hide">
@@ -308,7 +329,7 @@ var STORE_KEY=FIREBASE_CONFIG?'np1_signed_out':'np1';
 var S={events:[],notes:[]};
 try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw);}catch(e){}
 S.events=S.events||[];S.notes=S.notes||[];S.papers=S.papers||[];
-function migrate(){S.events=S.events||[];S.grants=S.grants||[];S.contacts=S.contacts||[];S.visits=S.visits||[];S.abstracts=S.abstracts||[];S.papers=S.papers||[];S.notes=S.notes||[];var M={'Planirano':'Planned','U izradi':'In progress','Poslato':'Submitted','Prihvaćeno':'Accepted','Odbijeno':'Rejected','Priprema':'Draft','Pod recenzijom':'Under review','Male izmene':'Minor revision','Velike izmene':'Major revision','Objavljeno':'Published'};
+function migrate(){S.events=S.events||[];S.grants=S.grants||[];S.contacts=S.contacts||[];S.visits=S.visits||[];S.abstracts=S.abstracts||[];S.papers=S.papers||[];S.refereeReviews=S.refereeReviews||[];S.notes=S.notes||[];var M={'Planirano':'Planned','U izradi':'In progress','Poslato':'Submitted','Prihvaćeno':'Accepted','Odbijeno':'Rejected','Priprema':'Draft','Pod recenzijom':'Under review','Male izmene':'Minor revision','Velike izmene':'Major revision','Objavljeno':'Published'};
 var K={'Apstrakt':'Abstract','Prijava predavanja':'Talk submission','Registracija':'Registration','Prijava granta':'Grant application','Izveštaj':'Report','Događaj':'Event'};
 S.events.forEach(function(e){if(M[e.status])e.status=M[e.status];if(K[e.kind])e.kind=K[e.kind]});
 S.papers.forEach(function(p){if(M[p.stage])p.stage=M[p.stage];(p.log||[]).forEach(function(l){if(M[l.text])l.text=M[l.text]})})
@@ -325,7 +346,7 @@ migrate();
 var REM=null,remTimer=null,remBusy=false,remDirty=false;
 function setStatus(t){var e=document.getElementById('sync');if(e)e.textContent=t}
 function schedRemote(){if(!REM)return;remDirty=true;clearTimeout(remTimer);remTimer=setTimeout(flushRemote,800)}
-function payload(){return{events:S.events,notes:S.notes,papers:S.papers,grants:S.grants,contacts:S.contacts,visits:S.visits,abstracts:S.abstracts||[],waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}}
+function payload(){return{events:S.events,notes:S.notes,papers:S.papers,refereeReviews:S.refereeReviews||[],grants:S.grants,contacts:S.contacts,visits:S.visits,abstracts:S.abstracts||[],waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}}
 function flushRemote(){if(remBusy){remTimer=setTimeout(flushRemote,500);return}remBusy=true;remDirty=false;setStatus('Saving to your account…');
 REM.set(payload()).then(function(){setStatus('Saved to your account')},function(err){setStatus('Saving to your account failed ('+((err&&err.code)||'error')+'). Data is saved in this browser.')}).then(function(){remBusy=false;if(remDirty)schedRemote()})}
 function save(){syncAbs();S.updated=Date.now();try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}schedRemote()}
@@ -339,7 +360,7 @@ var TABS=['upcoming','rokovi','visits','kalendar','grants','expenses','radovi','
 function showTab(t){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.toggle('on',x.dataset.t===t)});TABS.forEach(function(id){document.getElementById(id).classList.toggle('hide',id!==t)});render()}
 document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){showTab(b.dataset.t)}});
 function openFromStr(s){var a=String(s).split('|');openItem(a[0],a[1])}
-function openItem(t,id){['vq','vfk','vfs','cq','kq','kst','kpu','q','nfc','nfp'].forEach(function(x){var e=document.getElementById(x);if(e)e.value=''});var cf=document.getElementById('cvfilter');if(cf)cf.value='all';TAGF='';NV='notes';showTab(t);
+function openItem(t,id){if(t==='radovi')RVVIEW=(S.refereeReviews||[]).some(function(r){return r.id===id})?'reviews':'papers';['vq','vfk','vfs','cq','kq','kst','kpu','q','nfc','nfp'].forEach(function(x){var e=document.getElementById(x);if(e)e.value=''});var cf=document.getElementById('cvfilter');if(cf)cf.value='all';TAGF='';NV='notes';showTab(t);
 var e=document.getElementById('it-'+id);if(e){if(e.scrollIntoView)e.scrollIntoView({behavior:'smooth',block:'center'});e.classList.add('flash');setTimeout(function(){e.classList.remove('flash')},2000)}}
 
 var CST=['Considering','Submitted','Accepted','Rejected','Attended'],FS=['Not requested','Requested','Approved','Rejected','Paid'],CUR=['EUR','USD','RSD','GBP'],DKS=['Abstract','Talk submission','Registration','Funding application','Other'];
@@ -452,7 +473,7 @@ document.getElementById('glist').addEventListener('toggle',function(e){var d=e.t
 var cm=new Date();cm.setDate(1);
 document.getElementById('pm').onclick=function(){cm.setMonth(cm.getMonth()-1);renderCal()};
 document.getElementById('nm').onclick=function(){cm.setMonth(cm.getMonth()+1);renderCal()};
-var CATS=['conf','visit','sem','grant','paper','contact','note'];
+var CATS=['conf','visit','sem','grant','paper','ref','contact','note'];
 function isVisit(v){return /^Visit/.test(v.kind)}
 function calEntries(k){var o=[],A=function(cat,label,icon,text,tip,open,tm){o.push({cat:cat,label:label,icon:icon,text:text,tip:tip||text,open:open,tm:tm||''})};
 S.events.forEach(function(c){var op='rokovi|'+c.id;if(c.start&&c.start<=k&&k<=(c.end&&c.end>c.start?c.end:c.start))A('conf','Conference',c.start===k?'&#127908; ':'↳ ',c.name,c.name+(c.end&&c.end>c.start?' ('+c.start+' – '+c.end+')':''),op);
@@ -464,6 +485,7 @@ var oc=occCover(v,k),tt=!vis&&v.tstart;if(oc>=0)A(cat,v.kind,oc===0?vIcon(v.kind
 (v.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)A(cat,'Task','',v.name+': '+t.text,'',op)})});
 S.grants.forEach(function(g){var op='grants|'+g.id;g.miles.forEach(function(m){if(m.date===k&&!m.done)A('grant','Milestone','',g.name+': '+m.label,'',op)});(g.tasks||[]).forEach(function(t){if(t.date===k&&!t.done)A('grant','Task','',g.name+': '+t.text,'',op)})});
 S.papers.forEach(function(p){if(p.deadline===k)A('paper','Paper deadline','&#128196; ',p.title,'','radovi|'+p.id)});
+(S.refereeReviews||[]).forEach(function(r){var op='radovi|'+r.id;if(r.status==='Invited'&&r.replyBy===k)A('ref','Invitation reply due','',reviewLabel(r),'',op);if(!reviewClosed(r)&&r.status!=='Invited'&&r.due===k)A('ref','Review due','',reviewLabel(r),'',op);(r.messages||[]).forEach(function(m){if(m.followup===k&&!m.done)A('ref','Editor follow-up','',reviewLabel(r)+': '+(m.subject||'Follow up'),'',op)})});
 S.contacts.forEach(function(c){if(c.next===k&&c.status!=='Dormant')A('contact','Follow-up','&#9742; ',c.name+(c.nextNote?' — '+c.nextNote:''),'','contacts|'+c.id)});
 S.notes.forEach(function(n){if(n.date===k)A('note','Note','&#128221; ',n.title,'','beleske|'+n.id)});
 return o.sort(function(a,b){return (a.tm||'99:99')<(b.tm||'99:99')?-1:1})}
@@ -594,6 +616,10 @@ var el=document.getElementById('ulist'),items=[];
 S.events.forEach(function(c){c.deadlines.forEach(function(d){if(d.date&&!d.done)items.push({date:d.date,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:d.kind,k:'c',i:c.id,d:d.id})});(c.tasks||[]).forEach(function(t){if(t.date&&!t.done)items.push({date:t.date,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:'Task: '+t.text,k:'ct',i:c.id,d:t.id})});(c.talks||[]).forEach(function(p){if(p.date&&daysTo(p.date)>=0&&p.status!=='Rejected'&&p.status!=='Presented')items.push({date:p.date,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:'Your '+p.type.toLowerCase()+': '+p.title,k:''})});if(c.start&&daysTo(c.start)>=0)items.push({date:c.start,type:'Conference',o:'rokovi|'+c.id,title:c.name,label:'Conference starts',k:''})});
 S.grants.forEach(function(g){g.miles.forEach(function(m){if(m.date&&!m.done)items.push({date:m.date,type:'Grant',o:'grants|'+g.id,title:g.name,label:m.label,k:'g',i:g.id,d:m.id})});(g.tasks||[]).forEach(function(t){if(t.date&&!t.done)items.push({date:t.date,type:'Grant',o:'grants|'+g.id,title:g.name,label:'Task: '+t.text,k:'gt',i:g.id,d:t.id})})});
 S.papers.forEach(function(p){var fin=['Published','Rejected','Accepted'].indexOf(p.stage)>-1;if(p.deadline&&!fin)items.push({date:p.deadline,type:'Paper',o:'radovi|'+p.id,title:p.title,label:'Deadline ('+p.stage+')',k:''})});
+(S.refereeReviews||[]).forEach(function(r){var op='radovi|'+r.id,ti=reviewLabel(r);
+if(r.status==='Invited'&&r.replyBy)items.push({date:r.replyBy,type:'Peer review',o:op,title:ti,label:'Reply to the invitation',k:''});
+if(!reviewClosed(r)&&r.status!=='Invited'&&r.due)items.push({date:r.due,type:'Peer review',o:op,title:ti,label:'Submit review (round '+(r.round||1)+')',k:''});
+(r.messages||[]).forEach(function(m){if(m.followup&&!m.done)items.push({date:m.followup,type:'Peer review',o:op,title:ti,label:'Follow up: '+(m.subject||'Editor'),k:'rf',i:r.id,d:m.id})})});
 S.visits.forEach(function(v){if(v.status==='Cancelled')return;var nd0=nextOcc(v);if(nd0&&v.status!=='Done')items.push({date:nd0,tm:v.tstart||'',type:v.kind.split(' ')[0],o:(isVisit(v)?'rokovi|':'visits|')+v.id,title:v.name,label:v.kind+(v.place?' — '+v.place:'')+(v.tstart&&!isVisit(v)?' · '+vTime(v):'')+(v.rep&&v.rep.every?' · next in series':' starts'),k:''});(v.tasks||[]).forEach(function(t){if(t.date&&!t.done)items.push({date:t.date,type:v.kind.split(' ')[0],o:(isVisit(v)?'rokovi|':'visits|')+v.id,title:v.name,label:'Task: '+t.text,k:'vt',i:v.id,d:t.id})})});
 S.contacts.forEach(function(k){if(k.next&&k.status!=='Dormant')items.push({date:k.next,type:'Contact',o:'contacts|'+k.id,title:k.name,label:'Follow-up'+(k.nextNote?': '+k.nextNote:''),k:'f',i:k.id})});
 items.sort(function(a,b){return (a.date+(a.tm||'99:99'))<(b.date+(b.tm||'99:99'))?-1:1});
@@ -608,7 +634,7 @@ var d=daysTo(it.date),c=d<0?'late':d<=14?'soon':'',tx=d<0?(-d)+' d overdue':d===
 var chk=it.k?'<input type="checkbox" style="width:auto;margin-right:8px" title="Mark as done" data-u="'+it.k+'" data-i="'+it.i+'" data-d="'+it.d+'">':'';
 return '<div class="card"'+(it.o?' data-open="'+esc(it.o)+'" style="cursor:pointer"':'')+'><div class="row"><div>'+chk+'<strong>'+esc(it.title)+'</strong><br><span class="tag">'+it.type+'</span><span class="mu">'+esc(it.label)+'</span></div><div class="due '+c+'">'+esc(it.date)+(it.tm?' '+esc(it.tm):'')+' · '+tx+'</div></div></div>'}).join('');
 }
-document.getElementById('ulist').addEventListener('change',function(e){var t=e.target,u=t.dataset.u;if(!u)return;if(u==='f'){var ct=S.contacts.find(function(x){return x.id===t.dataset.i});if(ct){ct.next='';ct.nextNote='';save();render()}return}if(u==='vt'){var vv=S.visits.find(function(x){return x.id===t.dataset.i}),tk=vv&&(vv.tasks||[]).find(function(x){return x.id===t.dataset.d});if(tk){tk.done=t.checked;save();render()}return}var o=(u[0]==='c'?S.events:S.grants).find(function(x){return x.id===t.dataset.i});if(!o)return;var d=(u==='c'?o.deadlines:u==='g'?o.miles:(o.tasks||[])).find(function(x){return x.id===t.dataset.d});if(d){d.done=t.checked;save();render()}});
+document.getElementById('ulist').addEventListener('change',function(e){var t=e.target,u=t.dataset.u;if(!u)return;if(u==='f'){var ct=S.contacts.find(function(x){return x.id===t.dataset.i});if(ct){ct.next='';ct.nextNote='';save();render()}return}if(u==='rf'){var rr=(S.refereeReviews||[]).find(function(x){return x.id===t.dataset.i}),mm=rr&&(rr.messages||[]).find(function(x){return x.id===t.dataset.d});if(mm){mm.done=t.checked;save();render()}return}if(u==='vt'){var vv=S.visits.find(function(x){return x.id===t.dataset.i}),tk=vv&&(vv.tasks||[]).find(function(x){return x.id===t.dataset.d});if(tk){tk.done=t.checked;save();render()}return}var o=(u[0]==='c'?S.events:S.grants).find(function(x){return x.id===t.dataset.i});if(!o)return;var d=(u==='c'?o.deadlines:u==='g'?o.miles:(o.tasks||[])).find(function(x){return x.id===t.dataset.d});if(d){d.done=t.checked;save();render()}});
 document.getElementById('ulist').addEventListener('click',function(e){if(e.target.closest('input'))return;var oc=e.target.closest('[data-open]');if(oc)openFromStr(oc.dataset.open)});
 document.getElementById('uw').onchange=function(){UPW=this.value;renderUpcoming()};
 var EY='all',XST=['Not requested','Requested','Approved','Paid','Rejected'];
@@ -698,6 +724,7 @@ if(K('ic-c'))S.events.forEach(function(c){c.deadlines.forEach(function(d){if(d.d
 if(K('ic-t'))S.events.forEach(function(c){if(c.start&&c.status!=='Rejected')it.push({uid:'cs-'+c.id,date:c.start,end:c.end&&c.end>c.start?c.end:'',title:c.name+(c.status==='Considering'?' [considering]':''),loc:c.place,desc:/^https?:\/\//.test(c.link||'')?c.link:'',cat:'Conference'});(c.talks||[]).forEach(function(p){if(p.date&&p.status!=='Rejected'&&p.status!=='Presented')it.push({uid:'pr-'+p.id,date:p.date,title:p.type+': '+p.title+' ('+c.name+')',loc:c.place,cat:'Presentation'})})});
 if(K('ic-g'))S.grants.forEach(function(g){g.miles.forEach(function(m){if(m.date&&!m.done)it.push({uid:'m-'+m.id,date:m.date,title:g.name+' — '+m.label,cat:'Grant'})});(g.tasks||[]).forEach(function(t){if(t.date&&!t.done)it.push({uid:'gt-'+t.id,date:t.date,title:g.name+' — '+t.text,cat:'Task'})})});
 if(K('ic-p'))S.papers.forEach(function(p){var fin=['Published','Rejected','Accepted'].indexOf(p.stage)>-1;if(p.deadline&&!fin)it.push({uid:'pp-'+p.id,date:p.deadline,title:p.title+' — deadline ('+p.stage+')',desc:p.venue||'',cat:'Paper'})});
+if(K('ic-r'))(S.refereeReviews||[]).forEach(function(r){var nm='Peer review'+(r.journal?' — '+r.journal:'');if(r.status==='Invited'&&r.replyBy)it.push({uid:'rvi-'+r.id,date:r.replyBy,title:nm+' (invitation reply)',cat:'Peer review'});if(!reviewClosed(r)&&r.status!=='Invited'&&r.due)it.push({uid:'rvd-'+r.id,date:r.due,title:nm+' (report due)',cat:'Peer review'});(r.messages||[]).forEach(function(m){if(m.followup&&!m.done)it.push({uid:'rvf-'+m.id,date:m.followup,title:nm+' (editorial follow-up)',cat:'Peer review'})})});
 S.visits.forEach(function(v){if(v.status==='Cancelled')return;if(isVisit(v)?!K('ic-v'):!K('ic-s'))return;if(v.start)it.push({uid:'vs-'+v.id,date:v.start,end:v.end&&v.end>v.start?v.end:'',title:v.kind+': '+v.name+(v.status==='Idea'||v.status==='Planned'?' ['+v.status.toLowerCase()+']':''),loc:v.place,cat:'Visit',tstart:isVisit(v)?'':(v.tstart||''),tend:isVisit(v)?'':(v.tend||''),rrule:rruleOf(v),ex:v.skip||[],last:v.rep&&v.rep.every?lastOcc(v):''});(v.tasks||[]).forEach(function(t){if(t.date&&!t.done)it.push({uid:'vt-'+t.id,date:t.date,title:v.name+' — '+t.text,cat:'Task'})})});
 if(K('ic-f'))S.contacts.forEach(function(c){if(c.next&&c.status!=='Dormant')it.push({uid:'ct-'+c.id,date:c.next,title:'Follow up: '+c.name+(c.nextNote?' — '+c.nextNote:''),desc:[c.affil,c.email].filter(Boolean).join(', '),cat:'Contact'})});
 if(!K('ic-past'))it=it.filter(function(e){return e.rrule?(!e.last||e.last>=today):(e.end||e.date)>=today});
@@ -707,12 +734,12 @@ if(K('ia-w'))al.push('-P6DT15H');if(K('ia-d'))al.push('-PT15H');if(K('ia-0'))al.
 its.forEach(function(e){var a=['BEGIN:VEVENT','UID:'+e.uid+'@academic-planner','DTSTAMP:'+now,'SEQUENCE:'+seq,(e.tstart?'DTSTART:'+d8(e.date)+'T'+t6(e.tstart):'DTSTART;VALUE=DATE:'+d8(e.date)),(e.tstart?'DTEND:'+d8(e.end||e.date)+'T'+t6(e.tend&&((e.end||e.date)>e.date||e.tend>e.tstart)?e.tend:addMin(e.tstart,60)):'DTEND;VALUE=DATE:'+d8(nextDay(e.end||e.date))),'SUMMARY:'+icsEsc(e.title)];if(e.rrule){a.push('RRULE:'+e.rrule);if((e.ex||[]).length)a.push(e.tstart?'EXDATE:'+e.ex.map(function(d){return d8(d)+'T'+t6(e.tstart)}).join(','):'EXDATE;VALUE=DATE:'+e.ex.map(d8).join(','))}if(e.desc)a.push('DESCRIPTION:'+icsEsc(e.desc));if(e.loc)a.push('LOCATION:'+icsEsc(e.loc));a.push('CATEGORIES:'+icsEsc(e.cat),'TRANSP:TRANSPARENT');(e.tstart?alT(e.tstart):al).forEach(function(t){a.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(e.title),'TRIGGER:'+t,'END:VALARM')});a.push('END:VEVENT');a.forEach(function(x){L.push(icsFold(x))})});
 L.push('END:VCALENDAR');return{text:L.join('\r\n')+'\r\n',n:its.length}}
 function renderIcs(){document.getElementById('icsinfo').textContent=buildIcs().n+' event'+(buildIcs().n===1?'':'s')}
-['ic-c','ic-t','ic-g','ic-p','ic-f','ic-v','ic-s','ic-past','ia-w','ia-d','ia-0'].forEach(function(id){document.getElementById(id).onchange=renderIcs});
+['ic-c','ic-t','ic-g','ic-p','ic-r','ic-f','ic-v','ic-s','ic-past','ia-w','ia-d','ia-0'].forEach(function(id){document.getElementById(id).onchange=renderIcs});
 document.getElementById('icscopy').onclick=function(){var t=this,l=t.textContent;copyText(t,buildIcs().text);setTimeout(function(){t.textContent=l},2000)};
 document.getElementById('icssave').onclick=function(){saveFile('academic-planner-deadlines.ics',buildIcs().text,'Saving .ics files is not possible in this view. Use Copy text, paste it into a text editor and save it as deadlines.ics.').then(function(m){if(m&&m!=='ok')document.getElementById('icsinfo').textContent=m})};
 var BK=30;
 function doBackup(){return saveFile('academic-planner.json',JSON.stringify(S,null,1)).then(function(m){if(m==='ok'){S.lastExport=today;S.snooze='';save();render()}else if(m)setStatus(m)})}
-function renderBackup(){var b=document.getElementById('backup'),n=S.events.length+S.notes.length+S.papers.length+S.grants.length;
+function renderBackup(){var b=document.getElementById('backup'),n=S.events.length+S.notes.length+S.papers.length+(S.refereeReviews||[]).length+S.grants.length;
 if(!S.created)S.created=today;
 var ref=S.lastExport||S.created,d=-daysTo(ref);
 document.getElementById('bkinfo').textContent=S.lastExport?'Last backup file: '+S.lastExport+' ('+(-daysTo(S.lastExport))+' days ago)':'No backup file saved yet.';
@@ -912,7 +939,7 @@ document.getElementById('fv').onsubmit=function(ev){addAct(ev,document.getElemen
 document.getElementById('fs').onsubmit=function(ev){addAct(ev)};
 document.getElementById('ctype').onchange=function(){var c=this.value==='conf';document.getElementById('addconf').style.display=c?'':'none';document.getElementById('addvisit').style.display=c?'none':''};
 document.getElementById('cvfilter').onchange=renderList;document.getElementById('cq').oninput=renderList;
-function render(){syncAbs();renderUpcoming();renderContacts();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderNotes()}
+function render(){syncAbs();renderUpcoming();renderContacts();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderRefReviews();renderNotes()}
 
 document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
 var c={id:uid(),name:o.name,place:o.place,start:o.start,end:o.end,link:o.link,status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:''};
@@ -925,9 +952,9 @@ S.notes.push(o);save();ev.target.reset();render()};
 document.getElementById('exp').onclick=doBackup;document.getElementById('bkgo').onclick=doBackup;
 document.getElementById('imp').onchange=function(ev){var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.events&&d.notes){S=d;S.papers=S.papers||[];migrate();save();render()}}catch(e){}};r.readAsText(ev.target.files[0])};
 render();
-var FBBASE='https://www.gstatic.com/firebasejs/9.23.0/',FB=null,FBU=null,FBLAST={},FBPARTS=['events','visits','grants','papers','notes','contacts','abstracts'];
+var FBBASE='https://www.gstatic.com/firebasejs/9.23.0/',FB=null,FBU=null,FBLAST={},FBPARTS=['events','visits','grants','papers','refereeReviews','notes','contacts','abstracts'];
 function loadScript(src){return new Promise(function(res,rej){var e=document.createElement('script');e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)})}
-function emptyState(){return{events:[],notes:[],papers:[],grants:[],contacts:[],visits:[],abstracts:[]}}
+function emptyState(){return{events:[],notes:[],papers:[],refereeReviews:[],grants:[],contacts:[],visits:[],abstracts:[]}}
 function authMsg(t){document.getElementById('amsg').textContent=t}
 function showAuth(on){document.getElementById('auth').style.display=on?'block':'none';document.body.style.overflow=on?'hidden':''}
 var AUTHERR={'auth/invalid-credential':'Wrong email or password.','auth/wrong-password':'Wrong email or password.','auth/user-not-found':'Wrong email or password.','auth/invalid-email':'That email address is not valid.','auth/email-already-in-use':'An account with this email already exists. Try signing in.','auth/weak-password':'Choose a password with at least 6 characters.','auth/missing-password':'Enter your password.','auth/too-many-requests':'Too many attempts. Wait a few minutes and try again.','auth/network-request-failed':'No connection. Check your internet and try again.','auth/operation-not-allowed':'Creating accounts is switched off for this planner.'};
@@ -938,10 +965,10 @@ set:async function(o){var meta={},parts={},ch=[],b=FB.db.batch();Object.keys(o).
 FBPARTS.forEach(function(k){parts[k]=JSON.stringify(o[k]||[])});parts.meta=JSON.stringify(meta);
 Object.keys(parts).forEach(function(k){if(new TextEncoder().encode(parts[k]).length>900000)throw{code:'too-large:'+k};if(FBLAST[k]!==parts[k]){b.set(col().doc(k),{json:parts[k],updated:o.updated||Date.now()});ch.push(k)}});
 if(!ch.length)return;await b.commit();ch.forEach(function(k){FBLAST[k]=parts[k]})}}}
-function guestTransferCandidate(){try{var raw=localStorage.getItem('np1_signed_out');if(!raw)return null;var d=JSON.parse(raw);if(!d||typeof d!=='object')return null;var keys=['events','notes','papers','grants','contacts','visits','abstracts'];return keys.some(function(k){return Array.isArray(d[k])&&d[k].length})?d:null}catch(e){return null}}
-function mergeGuestData(account,guest){var keys=['events','notes','papers','grants','contacts','visits','abstracts'],out=JSON.parse(JSON.stringify(account));keys.forEach(function(k){var a=Array.isArray(out[k])?out[k]:[],seen=new Set(a.map(function(x){return String(x.id)}));(Array.isArray(guest[k])?guest[k]:[]).forEach(function(x){if(!x||typeof x!=='object')return;var id=String(x.id);if(!seen.has(id)){a.push(x);seen.add(id)}});out[k]=a});out.updated=Date.now();return out}
-async function offerGuestTransfer(ref){var guest=guestTransferCandidate();if(!guest)return;var count=['events','notes','papers','grants','contacts','visits','abstracts'].reduce(function(n,k){return n+(Array.isArray(guest[k])?guest[k].length:0)},0);if(!confirm('You have '+count+' item(s) saved as a guest in this browser. Import them into your account and sync across devices? Existing account data will be kept. Your guest copy will remain in this browser until the transfer succeeds.')){setStatus('Connected to your account. Guest data is still saved separately in this browser.');return}
-var original=S;var merged=mergeGuestData(S,guest);setStatus('Importing guest data to your account…');try{await ref.set({events:merged.events,notes:merged.notes,papers:merged.papers,grants:merged.grants,contacts:merged.contacts,visits:merged.visits,abstracts:merged.abstracts,waitDays:merged.waitDays||90,lastExport:merged.lastExport||'',created:merged.created||'',snooze:merged.snooze||'',updated:merged.updated});S=merged;localStorage.setItem(STORE_KEY,JSON.stringify(S));localStorage.removeItem('np1_signed_out');render();setStatus('Guest data imported and synced to your account.')}catch(e){S=original;render();setStatus('Guest import failed ('+((e&&e.code)||'error')+'). Guest data is still safely stored in this browser.')}}
+function guestTransferCandidate(){try{var raw=localStorage.getItem('np1_signed_out');if(!raw)return null;var d=JSON.parse(raw);if(!d||typeof d!=='object')return null;var keys=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'];return keys.some(function(k){return Array.isArray(d[k])&&d[k].length})?d:null}catch(e){return null}}
+function mergeGuestData(account,guest){var keys=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'],out=JSON.parse(JSON.stringify(account));keys.forEach(function(k){var a=Array.isArray(out[k])?out[k]:[],seen=new Set(a.map(function(x){return String(x.id)}));(Array.isArray(guest[k])?guest[k]:[]).forEach(function(x){if(!x||typeof x!=='object')return;var id=String(x.id);if(!seen.has(id)){a.push(x);seen.add(id)}});out[k]=a});out.updated=Date.now();return out}
+async function offerGuestTransfer(ref){var guest=guestTransferCandidate();if(!guest)return;var count=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'].reduce(function(n,k){return n+(Array.isArray(guest[k])?guest[k].length:0)},0);if(!confirm('You have '+count+' item(s) saved as a guest in this browser. Import them into your account and sync across devices? Existing account data will be kept. Your guest copy will remain in this browser until the transfer succeeds.')){setStatus('Connected to your account. Guest data is still saved separately in this browser.');return}
+var original=S;var merged=mergeGuestData(S,guest);setStatus('Importing guest data to your account…');try{await ref.set({events:merged.events,notes:merged.notes,papers:merged.papers,refereeReviews:merged.refereeReviews||[],grants:merged.grants,contacts:merged.contacts,visits:merged.visits,abstracts:merged.abstracts,waitDays:merged.waitDays||90,lastExport:merged.lastExport||'',created:merged.created||'',snooze:merged.snooze||'',updated:merged.updated});S=merged;localStorage.setItem(STORE_KEY,JSON.stringify(S));localStorage.removeItem('np1_signed_out');render();setStatus('Guest data imported and synced to your account.')}catch(e){S=original;render();setStatus('Guest import failed ('+((e&&e.code)||'error')+'). Guest data is still safely stored in this browser.')}}
 async function onSignedIn(u){FBU=u;try{await u.reload()}catch(e){}STORE_KEY='np1_u_'+u.uid;FBLAST={};S=emptyState();
 try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw)}catch(e){}
 migrate();document.getElementById('guestacct').style.display='none';document.getElementById('guestdata').style.display='none';document.getElementById('acct').style.display='flex';document.getElementById('acctmail').textContent='Signed in as '+(u.email||'')+(u.emailVerified?'':' (email not verified yet)');document.getElementById('resendv').style.display=u.emailVerified?'none':'';document.getElementById('acctcard').style.display='block';document.getElementById('acctinfo').textContent='Signed in as '+(u.email||'')+'. Your data is private to this account.';document.getElementById('acctmsg').textContent='';
@@ -980,12 +1007,12 @@ document.getElementById('delacct').onclick=delAccount;
 async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap)}catch(e){}}
 async function syncWith(ref,snap){var rem=snap.exists?snap.data():null;
 if(rem&&(rem.updated||0)>(S.updated||0)){
-S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
+S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),refereeReviews:JSON.parse(JSON.stringify(rem.refereeReviews||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
 try{localStorage.setItem(STORE_KEY,JSON.stringify(S))}catch(e){}
 migrate();render();setStatus('Loaded from your account');REM=ref;
 }else{
 REM=ref;
-if(S.events.length+S.notes.length+S.papers.length+S.grants.length+S.contacts.length+S.visits.length+(S.abstracts||[]).length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
+if(S.events.length+S.notes.length+S.papers.length+(S.refereeReviews||[]).length+S.grants.length+S.contacts.length+S.visits.length+(S.abstracts||[]).length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
 else setStatus('Connected to your account');
 }}
 (async function(){
