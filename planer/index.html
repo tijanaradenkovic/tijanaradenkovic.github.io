@@ -604,6 +604,72 @@ el.querySelectorAll('[data-rx]').forEach(function(b){b.onclick=function(){var o=
 el.querySelectorAll('[data-ra]').forEach(function(b){b.onclick=function(){var box=b.parentNode,p=S.papers.find(function(x){return x.id===b.dataset.ra});var c=box.querySelector('[data-f=comment]').value.trim();if(!c||!p)return;p.reviews=p.reviews||[];p.reviews.push({id:uid(),who:box.querySelector('[data-f=who]').value,comment:c,response:'',done:false,round:p.round});OPEN[p.id]=true;save();render()}});
 }
 document.getElementById('fp').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={id:uid()};f.forEach(function(v,k){o[k]=v});o.log=[{date:(o.sent&&o.stage!=='Draft')?o.sent:today,text:o.stage}];S.papers.push(o);save();ev.target.reset();render()};
+
+var RVVIEW='papers';
+var RSTAT=['Invited','Accepted','In progress','Review submitted','Revision received','Re-review in progress','Completed','Declined','Cancelled'];
+var RTYPES=['Invitation','Acceptance / decline','Editor message','My reply','Extension request','Extension granted','Review submitted','Author response','Revised manuscript','Decision / closure','Other'];
+function reviewClosed(r){return ['Review submitted','Completed','Declined','Cancelled'].indexOf(r.status)>-1}
+function reviewLabel(r){return r.title||r.msid||r.journal||'Peer review'}
+function reviewTabs(){
+document.getElementById('papersPanel').classList.toggle('hide',RVVIEW!=='papers');
+document.getElementById('reviewsPanel').classList.toggle('hide',RVVIEW!=='reviews');
+document.querySelectorAll('#reviewTabs [data-rview]').forEach(function(b){b.classList.toggle('on',b.dataset.rview===RVVIEW)})
+}
+document.getElementById('reviewTabs').addEventListener('click',function(e){var b=e.target.closest('[data-rview]');if(b){RVVIEW=b.dataset.rview;reviewTabs()}});
+function reviewCard(r){
+var id='data-rid="'+esc(r.id)+'"',dl=r.status==='Invited'?r.replyBy:reviewClosed(r)?'':r.due;
+var deadline=dl?'<div class="due '+(daysTo(dl)<0?'late':daysTo(dl)<=14?'soon':'')+'">'+(r.status==='Invited'?'Reply by':'Review due')+': '+esc(dl)+' · '+cd(dl)+'</div>':'';
+var entries=(r.messages||[]).slice().sort(function(a,b){return (b.date||'')<(a.date||'')?-1:1}).map(function(m){
+var mid='data-mid="'+esc(m.id)+'"';
+return '<div class="card" style="background:var(--bg);margin:8px 0"><div class="row"><div><strong>'+esc(m.subject||m.kind||'Correspondence')+'</strong> <span class="tag">'+esc(m.direction||'Received')+'</span><div class="mu">'+esc(m.date)+(m.kind?' · '+esc(m.kind):'')+'</div></div><button class="btn sm" data-ref-act="delmsg" '+id+' '+mid+'>Delete</button></div>'+
+(m.note?'<p style="white-space:pre-wrap">'+esc(m.note)+'</p>':'')+
+(m.followup?'<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" style="width:auto" data-ref-done '+id+' '+mid+(m.done?' checked':'')+'> Follow-up '+esc(m.followup)+(m.done?' · done':'')+'</label>':'')+
+'<details><summary>Edit correspondence</summary><div class="sub"><label>Date<input type="date" data-msg-field="date" '+id+' '+mid+' value="'+esc(m.date)+'"></label><label>Follow-up<input type="date" data-msg-field="followup" '+id+' '+mid+' value="'+esc(m.followup)+'"></label></div><input data-msg-field="subject" '+id+' '+mid+' placeholder="Subject" value="'+esc(m.subject)+'"><textarea data-msg-field="note" '+id+' '+mid+' style="min-height:70px">'+esc(m.note)+'</textarea></details></div>'
+}).join('');
+return '<div class="card" id="it-'+esc(r.id)+'"><div class="row"><div><strong>'+esc(reviewLabel(r))+'</strong><div class="mu">'+esc(r.journal)+(r.msid?' · ID '+esc(r.msid):'')+(r.editor?' · Editor: '+esc(r.editor):'')+'</div><span class="tag">Round '+esc(r.round||'1')+'</span>'+(r.submitted?'<span class="tag">Submitted '+esc(r.submitted)+'</span>':'')+'</div><div>'+deadline+'<select '+id+' data-ref-field="status" style="width:auto">'+opts(RSTAT,r.status)+'</select></div></div>'+
+(r.note?'<div class="mu" style="white-space:pre-wrap">'+esc(r.note)+'</div>':'')+
+'<details data-o="peer'+esc(r.id)+'"'+(OPEN['peer'+r.id]?' open':'')+' style="margin-top:10px"><summary>Edit review &amp; correspondence ('+(r.messages||[]).length+')</summary>'+
+'<div class="sub"><label>Title / private reference<input '+id+' data-ref-field="title" value="'+esc(r.title)+'" style="min-width:220px"></label><label>Journal<input '+id+' data-ref-field="journal" value="'+esc(r.journal)+'"></label><label>Manuscript ID<input '+id+' data-ref-field="msid" value="'+esc(r.msid)+'"></label></div>'+
+'<div class="sub"><label>Editor<input '+id+' data-ref-field="editor" value="'+esc(r.editor)+'"></label><label>Round<select '+id+' data-ref-field="round">'+opts(['1','2','3','4','5'],String(r.round||'1'))+'</select></label></div>'+
+'<div class="sub"><label>Invitation date<input type="date" '+id+' data-ref-field="invited" value="'+esc(r.invited)+'"></label><label>Reply deadline<input type="date" '+id+' data-ref-field="replyBy" value="'+esc(r.replyBy)+'"></label><label>Review deadline<input type="date" '+id+' data-ref-field="due" value="'+esc(r.due)+'"></label><label>Submitted date<input type="date" '+id+' data-ref-field="submitted" value="'+esc(r.submitted)+'"></label></div>'+
+'<label style="margin-top:8px">Private note</label><textarea '+id+' data-ref-field="note" style="min-height:70px">'+esc(r.note)+'</textarea>'+
+'<div class="mu" style="margin-top:12px">Correspondence (received / sent, editor replies, author response, extensions)</div>'+entries+
+'<div class="sub"><label>Direction<select data-new="direction"><option>Received</option><option>Sent</option></select></label><label>Type<select data-new="kind">'+opts(RTYPES,'Editor message')+'</select></label><label>Date<input type="date" data-new="date" value="'+today+'"></label><label>Follow-up due<input type="date" data-new="followup"></label></div>'+
+'<input data-new="subject" placeholder="Subject, e.g. Extension granted" style="margin-top:8px"><textarea data-new="note" placeholder="Brief summary, my reply or next steps" style="min-height:85px;margin-top:6px"></textarea>'+
+'<div class="sub"><button class="btn sm pri" data-ref-act="addmsg" '+id+'>Add correspondence</button><button class="btn sm" data-ref-act="delref" '+id+'>Delete assignment</button></div>'+
+'</details></div>'
+}
+function renderRefReviews(){
+reviewTabs();
+var all=S.refereeReviews||[],q=document.getElementById('refQ').value.toLowerCase(),f=document.getElementById('refFilter').value;
+var active=all.filter(function(r){return !reviewClosed(r)}).length,overdue=all.filter(function(r){var d=r.status==='Invited'?r.replyBy:reviewClosed(r)?'':r.due;return d&&daysTo(d)<0}).length;
+document.getElementById('refStats').textContent=all.length+' assignments · '+active+' active · '+overdue+' overdue';
+var filtered=all.filter(function(r){if(f==='active'&&reviewClosed(r)||f==='closed'&&!reviewClosed(r))return false;return [r.title,r.journal,r.msid,r.editor,r.status,r.note].concat((r.messages||[]).map(function(m){return m.subject+' '+m.note})).join(' ').toLowerCase().indexOf(q)>-1}).sort(function(a,b){var da=reviewClosed(a)?'9999':a.status==='Invited'?(a.replyBy||'9999'):(a.due||'9999'),db=reviewClosed(b)?'9999':b.status==='Invited'?(b.replyBy||'9999'):(b.due||'9999');return da<db?-1:da>db?1:0});
+document.getElementById('refList').innerHTML=filtered.length?filtered.map(reviewCard).join(''):'<p class="mu">'+(all.length?'No reviews match the filter.':'No peer-review assignments yet.')+'</p>'
+}
+document.getElementById('refQ').oninput=renderRefReviews;
+document.getElementById('refFilter').onchange=renderRefReviews;
+document.getElementById('fref').onsubmit=function(e){e.preventDefault();var f=new FormData(e.target),o={id:uid(),submitted:'',messages:[]};f.forEach(function(v,k){o[k]=v});S.refereeReviews.push(o);RVVIEW='reviews';save();e.target.reset();render()};
+document.getElementById('refList').addEventListener('toggle',function(e){var d=e.target;if(d.dataset&&d.dataset.o)OPEN[d.dataset.o]=d.open},true);
+document.getElementById('refList').addEventListener('change',function(e){
+var t=e.target,r=(S.refereeReviews||[]).find(function(x){return x.id===t.dataset.rid});if(!r)return;
+var m=(r.messages||[]).find(function(x){return x.id===t.dataset.mid});
+if(t.hasAttribute('data-ref-done')){if(!m)return;m.done=t.checked}
+else if(t.dataset.msgField){if(!m)return;m[t.dataset.msgField]=t.value}
+else if(t.dataset.refField){if(t.dataset.refField==='title'&&!t.value.trim()){render();return}r[t.dataset.refField]=t.value;if(t.dataset.refField==='status'&&t.value==='Review submitted'&&!r.submitted)r.submitted=today}
+else return;save();render()
+});
+document.getElementById('refList').addEventListener('click',function(e){
+var b=e.target.closest('[data-ref-act]');if(!b)return;var r=(S.refereeReviews||[]).find(function(x){return x.id===b.dataset.rid});if(!r)return;
+if(b.dataset.refAct==='delref'){if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Click again to delete';return}S.refereeReviews=S.refereeReviews.filter(function(x){return x!==r})}
+else if(b.dataset.refAct==='delmsg'){if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Click again to delete';return}r.messages=(r.messages||[]).filter(function(x){return x.id!==b.dataset.mid})}
+else if(b.dataset.refAct==='addmsg'){
+var box=b.closest('details[data-o]'),v=function(k){return box.querySelector('[data-new="'+k+'"]').value},subject=v('subject').trim(),note=v('note').trim();
+if(!subject&&!note)return;
+(r.messages=r.messages||[]).push({id:uid(),direction:v('direction'),kind:v('kind'),date:v('date'),subject:subject,note:note,followup:v('followup'),done:false});OPEN['peer'+r.id]=true
+}else return;save();render()
+});
+
 function waitSince(p){if(['Submitted','Under review'].indexOf(p.stage)<0)return '';var l=p.log||[],i=l.length-1,d='';while(i>=0&&(l[i].text==='Submitted'||l[i].text==='Under review')){d=l[i].date;i--}if(i<0&&p.sent&&(!d||p.sent<d))d=p.sent;return d||p.sent||''}
 function lateWaiting(){var th=S.waitDays||90;return S.papers.map(function(p){var d=waitSince(p);return d?{p:p,since:d,days:-daysTo(d)}:null}).filter(function(x){return x&&x.days>th}).sort(function(a,b){return b.days-a.days})}
 function queryText(p,since){return 'Subject: Status inquiry: manuscript "'+p.title+'"\n\nDear Editor,\n\nI am writing to ask about the status of our manuscript "'+p.title+'", submitted'+(p.venue?' to '+p.venue:'')+(since?' on '+since+' ('+(-daysTo(since))+' days ago)':'')+'. We would be grateful for an update on the review process, and we are happy to provide any additional information if needed.\n\nThank you for your time.\n\nBest regards,'}
