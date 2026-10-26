@@ -1,0 +1,29 @@
+name: Academic Planner Invitations Tests
+on:
+  pull_request:
+    paths:
+      - 'planer/index.html'
+      - 'planer/social.js'
+      - 'planer/tests/**'
+      - 'planer/firestore-invitations.rules'
+      - '.github/workflows/planner-invitations-tests.yml'
+  push:
+    branches: [feature/mutual-contact-conference-invitations]
+    paths:
+      - 'planer/index.html'
+      - 'planer/social.js'
+      - 'planer/tests/**'
+      - 'planer/firestore-invitations.rules'
+      - '.github/workflows/planner-invitations-tests.yml'
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test conference invitations
+        run: node --test planer/tests/social.test.cjs
