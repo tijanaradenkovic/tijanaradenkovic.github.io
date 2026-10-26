@@ -557,7 +557,7 @@
     events.forEach(function(event){
       const start=event.getAttribute('data-start-date');
       const end=event.getAttribute('data-end-date');
-      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(start) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(end) || end<start) return;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end) || end<start) return;
       const previous=event.querySelector('.event-status');
       if(previous) previous.remove();
       if(today>end){
