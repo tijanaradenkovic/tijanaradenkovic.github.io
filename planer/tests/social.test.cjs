@@ -42,6 +42,7 @@ function harness({ mutual = true, verified = true } = {}) {
   });
   const collection = key => ({
     doc: id => makeRef(key + '/' + id),
+    orderBy: () => ({ limit: () => ({ onSnapshot: cb => { callbacks[key] = cb; return () => { delete callbacks[key]; }; } }) }),
     get: async () => ({
       docs: [...storage].filter(([k]) => k.startsWith(key + '/') &&
         !k.slice(key.length + 1).includes('/')).map(([k, value]) => ({
@@ -105,7 +106,7 @@ test('Sharing only exposes conference public details and prevents duplicate send
   const t = harness();
   t.social.start(); await t.flush();
   const target = { dataset: { socialSend: 'conference1' }, hasAttribute: () => false,
-    closest: () => ({ querySelector: () => ({ value: t.friend }) }) };
+    closest: selector => selector === '.card' ? { querySelector: () => ({ value: t.friend }) } : target };
   t.listeners.click({ target }); await t.flush();
   const key = 'plannerInvitations/' + t.friend + '/inbox/' + t.sender + '_conference1';
   const item = t.storage.get(key);
@@ -134,7 +135,7 @@ test('Accepted invitation adds a minimal conference once', async () => {
     docs: [{ id: 'invite123', data: () => received }]
   });
   const answer = { dataset: { socialAnswer: 'accepted', socialInvite: 'invite123' },
-    hasAttribute: k => k === 'data-social-answer', closest: () => null };
+    hasAttribute: k => k === 'data-social-answer', closest: selector => selector === '.card' ? null : answer };
   t.listeners.click({ target: answer }); await t.flush();
   assert.equal(t.state.events.length, 2);
   assert.equal(t.state.events[1].name, 'Geometry Conference');
