@@ -1074,7 +1074,7 @@ var pw=prompt('To confirm, enter your password:');if(!pw)return;
 try{await FBU.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(FBU.email,pw))}catch(e){m.textContent=authErr(e);return}
 try{var col=FB.db.collection('planners').doc(FBU.uid).collection('parts'),b=FB.db.batch();FBPARTS.concat(['meta']).forEach(function(k){b.delete(col.doc(k))});await b.commit();var key=STORE_KEY;await FBU.delete();try{localStorage.removeItem(key)}catch(e){}}catch(e){m.textContent='Could not delete the account ('+((e&&e.code)||'error')+').'}}
 document.getElementById('delacct').onclick=delAccount;
-async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap)}catch(e){}}
+async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap);PlannerSocial.syncLinks()}catch(e){}}
 async function syncWith(ref,snap){var rem=snap.exists?snap.data():null;
 if(rem&&(rem.updated||0)>(S.updated||0)){
 S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),refereeReviews:JSON.parse(JSON.stringify(rem.refereeReviews||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
