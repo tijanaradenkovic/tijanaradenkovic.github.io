@@ -337,6 +337,42 @@
       padding:0 0 1.25rem;
     }
 
+    /* Automated status markers for planned and ongoing conferences */
+    .event-status{
+      display:inline-flex;
+      align-items:center;
+      gap:.3rem;
+      margin-left:.5rem;
+      padding:.12rem .45rem;
+      border-radius:999px;
+      font-size:.72rem;
+      font-weight:700;
+      vertical-align:middle;
+      line-height:1.65;
+      white-space:nowrap;
+    }
+    .event-status--planned{
+      background:var(--soft);
+      color:var(--accent);
+    }
+    .event-status--current{
+      background:var(--soft-teal);
+      color:var(--accent2);
+    }
+    .event-status__sparkle{
+      color:#B48B4F;
+      font-size:1.05em;
+      animation:conference-twinkle 2.8s ease-in-out infinite;
+    }
+    @keyframes conference-twinkle{
+      0%,100%{opacity:.65;transform:scale(.88)}
+      50%{opacity:1;transform:scale(1.16)}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .event-status__sparkle{animation:none}
+    }
+    #planned-conferences-section:not([hidden]){margin-bottom:2.7rem}
+
     .button{
       display:inline-block;
       padding:.7rem 1rem;
@@ -452,8 +488,8 @@
       <p class="intro">Selected conferences, workshops, training schools and scientific meetings.</p>
       <a class="back-link" href="index.html">← Back to home</a>
     </div>
-  </header><main><section class="tint"><div class="wrap"><div class="eyebrow">Academic activity</div><h2>Selected schools & conferences</h2><div class="events">
-      <div class="event"><div class="meta">26–30 October 2026 · Online (Waterloo, Canada)</div><strong><a href="https://events.perimeterinstitute.ca/event/2058/">Relativity Reframed: Quantum Reference Frames and Gravity</a></strong><div class="subtle">Perimeter Institute for Theoretical Physics · Virtual participation · <a href="https://events.perimeterinstitute.ca/event/2058/timetable/">Programme</a></div></div>
+  </header><main><section class="tint"><div class="wrap"><div id="planned-conferences-section" hidden><div class="eyebrow">Upcoming & ongoing</div><h2>Planned conferences</h2><div class="events" id="planned-conferences"></div></div><div class="eyebrow">Academic activity</div><h2>Selected schools & conferences</h2><div class="events" id="past-conferences">
+      <div class="event" data-start-date="2026-10-26" data-end-date="2026-10-30"><div class="meta">26–30 October 2026 · Online (Waterloo, Canada)</div><strong><a href="https://events.perimeterinstitute.ca/event/2058/">Relativity Reframed: Quantum Reference Frames and Gravity</a></strong><div class="subtle">Perimeter Institute for Theoretical Physics · Virtual participation · <a href="https://events.perimeterinstitute.ca/event/2058/timetable/">Programme</a></div></div>
       <div class="event"><div class="meta">20–22 October 2026 · Online</div><strong><a href="https://sciforum.net/event/IOCSYM2026">1st International Online Conference on Symmetry (IOCSYM 2026)</a></strong><div class="subtle"><em>Recent Advances in Mathematics and Physics</em> · <a href="https://sciforum.net/event/IOCSYM2026/program-overview">Programme</a></div></div>
       <div class="event"><div class="meta">22–26 June 2026 · Belgrade, Serbia</div><strong><a href="https://agenda.infn.it/event/49800/overview">2nd BridgeQG Training School</a></strong><div class="subtle"><em>Quantum and Classical Gravity in Low-Energy Quantum Systems</em></div></div>
       <div class="event"><div class="meta">10–12 November 2025 · Online</div><strong><a href="https://indico.dfa.unipd.it/event/1571/">Loop-the-Loop 2</a></strong><div class="subtle"><em>Feynman Calculus and its Applications to Gravity and Particle Physics</em></div></div>
@@ -500,6 +536,54 @@
         menu.classList.remove('open');
       });
     });
+  })();
+</script>
+
+<script>
+  /* Conference status is based on the visitor's local calendar date.
+     To add an event, give its .event element data-start-date and data-end-date
+     as YYYY-MM-DD. It will appear under Planned conferences until its final
+     day, with Planned / Currently attending status, then move to the archive. */
+  (function(){
+    const upcoming=document.getElementById('planned-conferences');
+    const archive=document.getElementById('past-conferences');
+    const section=document.getElementById('planned-conferences-section');
+    if(!upcoming || !archive || !section) return;
+    const now=new Date();
+    const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+    const events=Array.from(document.querySelectorAll('.event[data-start-date][data-end-date]'));
+    const planned=[];
+    const completed=[];
+    events.forEach(function(event){
+      const start=event.getAttribute('data-start-date');
+      const end=event.getAttribute('data-end-date');
+      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(start) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(end) || end<start) return;
+      const previous=event.querySelector('.event-status');
+      if(previous) previous.remove();
+      if(today>end){
+        completed.push(event);
+        return;
+      }
+      const status=document.createElement('span');
+      status.className='event-status '+(today<start?'event-status--planned':'event-status--current');
+      if(today>=start){
+        const star=document.createElement('span');
+        star.className='event-status__sparkle';
+        star.textContent='✦';
+        star.setAttribute('aria-hidden','true');
+        status.appendChild(star);
+      }
+      status.appendChild(document.createTextNode(today<start?'Planned':'Currently attending'));
+      const title=event.querySelector('strong');
+      if(title) title.insertAdjacentElement('afterend',status);
+      planned.push(event);
+    });
+    completed.sort((a,b)=>b.dataset.startDate.localeCompare(a.dataset.startDate));
+    const firstLegacy=archive.querySelector('.event:not([data-start-date])');
+    completed.forEach(function(event){archive.insertBefore(event,firstLegacy)});
+    planned.sort((a,b)=>a.dataset.startDate.localeCompare(b.dataset.startDate));
+    planned.forEach(function(event){upcoming.appendChild(event)});
+    section.hidden=upcoming.children.length===0;
   })();
 </script>
 
