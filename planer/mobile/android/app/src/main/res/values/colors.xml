@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6b3a64</color>
+    <color name="colorPrimaryDark">#6b3a64</color>
+    <color name="colorAccent">#6b3a64</color>
+    <color name="planner_background">#f6f3ee</color>
+</resources>
