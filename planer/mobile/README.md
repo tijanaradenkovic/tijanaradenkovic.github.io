@@ -26,6 +26,7 @@ The installable test file is `android/app/build/outputs/apk/debug/app-debug.apk`
 - Android document picker for JSON backups, calendar `.ics` and research exports. Canceling the picker does not mark a backup as saved. JSON import uses Android's file chooser.
 - Refresh of cloud data when returning to the app.
 - Existing planner icon and splash colors. No extra storage permissions.
+- Optional Android local notifications at 09:00 by default: 7 days, 1 day, and/or on the deadline date, with a configurable time. These are on-device alarms, not cloud push notifications. Includes reboot and app-update rescheduling.
 
 ## Test on a phone before release
 
@@ -33,8 +34,9 @@ The installable test file is `android/app/build/outputs/apk/debug/app-debug.apk`
 2. Reconnect and sign in with an existing planner account. Confirm conferences, papers, peer reviews and abstracts match the website.
 3. Change a test item, wait for “Saved to your account”, then confirm on the website. Test the reverse direction after returning to the app.
 4. Export JSON to Downloads. Cancel another export and confirm the backup date does not change. Import a disposable backup in guest mode.
-5. Check calendar and CV export, external links, keyboard, dark mode, rotation, system bars, back navigation and sign-out.
+5. On **Upcoming**, enable Android reminders and grant notification access. Set a disposable deadline several days ahead, choose 7 days / 1 day / same-day reminders, and verify the displayed number of scheduled alerts. Change or complete that deadline and confirm old reminders are cleared. Verify that signing out removes reminders belonging to the signed-in account. Test a reminder while the app is closed, and test reboot recovery on a device. Android battery management may delay delivery.
+6. Check calendar and CV export, external links, keyboard, dark mode, rotation, system bars, back navigation and sign-out.
 
 Uninstalling the app or clearing its data removes unsynced local information. Guest data in Chrome is separate from guest data in the APK: move it with JSON export/import, or sync through your account. Signed-in data loads from the same cloud account.
 
-Native notifications, widgets, conflict-resolution changes and Google Play publication are not part of this first build. Production signing and store metadata remain to be configured for a public release.
+Native local reminders are opt-in on each device/account. Changing a deadline on another device requires opening this app so the new data can sync and reminders can update. Android may delay inexact alarms, and force-stopping the app can prevent delivery until it is reopened. Peer-review alerts never expose manuscript titles. Widgets, conflict-resolution changes and Google Play publication are not part of this test build. Production signing and store metadata remain to be configured for a public release.
