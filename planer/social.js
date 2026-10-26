@@ -68,7 +68,7 @@
         } catch (e) { result[friendUid] = false; }
       }));
       if (token !== generation) return;
-      peers = result; synced = true; render();
+      peers = result; synced = true; context.render();
     }).catch(function (error) {
       if (token !== generation) return;
       notice('Could not verify mutual contacts (' + (error.code || 'network error') + ').');
