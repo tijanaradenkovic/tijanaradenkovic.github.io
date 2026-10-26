@@ -105,7 +105,7 @@ test('Mutual contacts have invite controls; one-way contacts do not', async () =
 test('Sharing only exposes conference public details and prevents duplicate sends', async () => {
   const t = harness();
   t.social.start(); await t.flush();
-  const target = { dataset: { socialSend: 'conference1' }, hasAttribute: () => false,
+  const target = { dataset: { socialSend: 'conference1' }, hasAttribute: k => k === 'data-social-send',
     closest: selector => selector === '.card' ? { querySelector: () => ({ value: t.friend }) } : target };
   t.listeners.click({ target }); await t.flush();
   const key = 'plannerInvitations/' + t.friend + '/inbox/' + t.sender + '_conference1';
