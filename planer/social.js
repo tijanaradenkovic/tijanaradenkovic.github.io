@@ -91,6 +91,7 @@
       (event.going ? '<div class="sub">' + select + '</div>' : '');
   }
   function contactField(contact) {
+    if (!context) return '';
     var uid = normalizedId(contact), status = uid
       ? (peers[uid] ? 'Mutual contact ✓' : 'Waiting for this person to add your Planner ID')
       : 'Both people must exchange and save their Planner IDs';
