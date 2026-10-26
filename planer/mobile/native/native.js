@@ -48,13 +48,13 @@
     });
     (state.refereeReviews || []).forEach(function (r) {
       if (r.status === 'Invited') add('reviewreply:' + r.id, r.replyBy, 'Peer review', 'Reply to a review invitation');
-      else if (['Submitted','Completed','Declined','Rejected'].indexOf(r.status) < 0)
+      else if (['Review submitted','Completed','Declined','Cancelled'].indexOf(r.status) < 0)
         add('reviewdue:' + r.id, r.due, 'Peer review', 'Submit a referee report');
       (r.messages || []).forEach(function (m) { if (!m.done) add('reviewfollow:' + m.id, m.followup, 'Peer review', 'Editorial follow-up'); });
     });
     (state.visits || []).forEach(function (v) {
       if (v.status === 'Cancelled' || v.status === 'Done') return;
-      add('visit:' + v.id, v.start, 'Academic event', v.name);
+      add('visit:' + v.id, typeof window.nextOcc === 'function' ? window.nextOcc(v) : v.start, 'Academic event', v.name);
       (v.tasks || []).forEach(function (t) { if (!t.done) add('vtask:' + t.id, t.date, 'Academic task', v.name + ' — ' + t.text); });
     });
     (state.contacts || []).forEach(function (c) {
