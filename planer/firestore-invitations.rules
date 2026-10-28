@@ -1,0 +1,74 @@
+// ADD THESE MATCH BLOCKS *inside* match /databases/{database}/documents
+// in the EXISTING deployed Firebase Firestore security rules.
+// This is an additive snippet, NOT a complete replacement for your planner's rules.
+// Existing rules for /planners/{userId}/parts/{partId} must remain unchanged.
+
+function verifiedPlannerUser() {
+  return request.auth != null && request.auth.token.email_verified == true;
+}
+
+// Users opt in by putting the other person's Firebase UID in a Contact's
+// "Planner ID" field. Only the owner creates/deletes their outgoing edge.
+// Another user can GET their own incoming edge, never LIST another user's contacts.
+match /plannerConnections/{ownerUid}/contacts/{friendUid} {
+  allow get: if verifiedPlannerUser() &&
+    (request.auth.uid == ownerUid || request.auth.uid == friendUid);
+  allow list: if verifiedPlannerUser() && request.auth.uid == ownerUid;
+  allow create, update: if verifiedPlannerUser() &&
+    request.auth.uid == ownerUid &&
+    friendUid != ownerUid &&
+    request.resource.data.keys().hasOnly(['active']) &&
+    request.resource.data.active == true;
+  allow delete: if verifiedPlannerUser() && request.auth.uid == ownerUid;
+}
+
+// The receiving user's inbox is private. A verified sender can only CREATE
+// one invitation for one conference when both directional edges exist.
+// No ability to read, list, modify or erase another user's incoming invitations.
+match /plannerInvitations/{recipientUid}/inbox/{inviteId} {
+  allow get, list: if verifiedPlannerUser() &&
+    request.auth.uid == recipientUid;
+
+  allow create: if verifiedPlannerUser() &&
+    request.auth.uid != recipientUid &&
+    request.resource.data.senderUid == request.auth.uid &&
+    request.resource.data.senderEmail == request.auth.token.email &&
+    exists(/databases/$(database)/documents/plannerConnections/$(request.auth.uid)/contacts/$(recipientUid)) &&
+    exists(/databases/$(database)/documents/plannerConnections/$(recipientUid)/contacts/$(request.auth.uid)) &&
+    inviteId == request.auth.uid + '_' + request.resource.data.conferenceId &&
+    request.resource.data.keys().hasAll([
+      'senderUid', 'senderEmail', 'conferenceId', 'conferenceName',
+      'start', 'end', 'place', 'url', 'status', 'sentAt'
+    ]) &&
+    request.resource.data.keys().hasOnly([
+      'senderUid', 'senderEmail', 'conferenceId', 'conferenceName',
+      'start', 'end', 'place', 'url', 'status', 'sentAt'
+    ]) &&
+    request.resource.data.conferenceId is string &&
+    request.resource.data.conferenceId.matches('^[A-Za-z0-9_-]{6,64}$') &&
+    request.resource.data.conferenceName is string &&
+    request.resource.data.conferenceName.size() > 0 &&
+    request.resource.data.conferenceName.size() <= 180 &&
+    request.resource.data.senderEmail is string &&
+    request.resource.data.place is string &&
+    request.resource.data.place.size() <= 180 &&
+    request.resource.data.url is string &&
+    request.resource.data.url.size() <= 400 &&
+    (request.resource.data.url == '' ||
+      request.resource.data.url.matches('^https://[^\\s]+$')) &&
+    request.resource.data.start is string &&
+    request.resource.data.start.size() <= 10 &&
+    request.resource.data.end is string &&
+    request.resource.data.end.size() <= 10 &&
+    request.resource.data.status == 'pending' &&
+    request.resource.data.sentAt == request.time;
+
+  allow update: if verifiedPlannerUser() &&
+    request.auth.uid == recipientUid &&
+    resource.data.status == 'pending' &&
+    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'respondedAt']) &&
+    request.resource.data.status in ['accepted', 'declined'] &&
+    request.resource.data.respondedAt == request.time;
+
+  allow delete: if verifiedPlannerUser() && request.auth.uid == recipientUid;
+}

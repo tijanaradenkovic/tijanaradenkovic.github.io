@@ -10,6 +10,7 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Academic Planner</title>
+<script src="social.js"></script>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 --bg:#f6f3ee;--card:#fcfaf6;--tx:#16203a;--mu:#667085;--bd:#e4e0d9;--ac:#6b3a64;--on:#fff;--rd:#b4433a;--gr:#2a7f7c;--am:#b7791f;--k-conf:#6b3a64;--k-visit:#2a7f7c;--k-sem:#2f5d9e;--k-grant:#b7791f;--k-paper:#b4433a;--k-ref:#7b5598;--k-contact:#4f8a3a;--k-note:#6b7385}
@@ -82,6 +83,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 </div>
 
 <section id="upcoming">
+<details class="card" id="social-invitations"><summary>Conference invitations</summary><div id="social-inbox" style="margin-top:8px"></div></details>
 <div class="row" style="margin-bottom:10px"><div class="mu" id="usum"></div><select id="uw" style="width:auto"><option value="30">Next 30 days</option><option value="60" selected>Next 60 days</option><option value="90">Next 90 days</option><option value="all">Everything</option></select></div>
 <div id="uattn"></div>
 <div id="ulist"></div>
@@ -168,11 +170,13 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 
 
 <section id="contacts" class="hide">
+<div class="card" id="social-myid"></div>
 <form id="fk">
 <div class="full"><label>Name</label><input name="name" required placeholder="First name Last name"></div>
 <div><label>Affiliation</label><input name="affil" placeholder="Institute, university"></div>
 <div><label>Email</label><input name="email" type="email"></div>
 <div class="full"><label>Link (website, ORCID, Google Scholar)</label><input name="link" placeholder="https://..."></div>
+<div class="full"><label>Friend’s Planner ID (optional)</label><input name="plannerUid" maxlength="128" placeholder="Exchange IDs only with people you trust"><span class="mu">You both need to add each other’s Planner IDs to send conference invitations.</span></div>
 <div><label>Purpose</label><select name="purpose"><option>Collaboration</option><option>Visit / host</option><option>Joint grant</option><option>Met at conference</option><option>Co-author</option><option>Other</option></select></div>
 <div><label>Status</label><select name="status"><option>Want to contact</option><option>Contacted</option><option>In touch</option><option>Collaborating</option><option>Dormant</option></select></div>
 <div><label>Follow-up date</label><input type="date" name="next"></div>
@@ -349,7 +353,7 @@ function schedRemote(){if(!REM)return;remDirty=true;clearTimeout(remTimer);remTi
 function payload(){return{events:S.events,notes:S.notes,papers:S.papers,refereeReviews:S.refereeReviews||[],grants:S.grants,contacts:S.contacts,visits:S.visits,abstracts:S.abstracts||[],waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}}
 function flushRemote(){if(remBusy){remTimer=setTimeout(flushRemote,500);return}remBusy=true;remDirty=false;setStatus('Saving to your account…');
 REM.set(payload()).then(function(){setStatus('Saved to your account')},function(err){setStatus('Saving to your account failed ('+((err&&err.code)||'error')+'). Data is saved in this browser.')}).then(function(){remBusy=false;if(remDirty)schedRemote()})}
-function save(){syncAbs();S.updated=Date.now();try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}schedRemote()}
+function save(){syncAbs();S.updated=Date.now();try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}schedRemote();PlannerSocial.syncLinks()}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -408,7 +412,7 @@ var link=/^https?:\/\//.test(c.link||'')?'<a href="'+esc(c.link)+'" target="_bla
 var id='data-c="'+c.id+'"';
 return '<div class="card" id="it-'+c.id+'"><div class="row"><div><strong>'+esc(c.name)+'</strong><br>'+(c.place?'<span class="tag">'+esc(c.place)+'</span>':'')+(when?'<span class="tag">'+when+'</span>':'')+'<span class="mu">'+link+' '+esc(c.note)+'</span></div>'+
 '<div style="text-align:right"><select '+id+' data-f="status" style="width:auto">'+opts(CST,c.status)+'</select> <button class="btn sm" data-act="delc" '+id+'>Delete</button></div></div>'+
-filledOverview(c,'conf')+'<details data-o="ec'+c.id+'"'+(OPEN['ec'+c.id]?' open':'')+' style="margin-top:10px"><summary>Edit event</summary>'+peopleLine('c',c.id)+'<div class="mu" style="margin-top:8px">Deadlines</div>'+rows(c.deadlines,id,'deld')+
+filledOverview(c,'conf')+PlannerSocial.shareControls(c)+'<details data-o="ec'+c.id+'"'+(OPEN['ec'+c.id]?' open':'')+' style="margin-top:10px"><summary>Edit event</summary>'+peopleLine('c',c.id)+'<div class="mu" style="margin-top:8px">Deadlines</div>'+rows(c.deadlines,id,'deld')+
 '<div class="sub"><select data-n="kind">'+opts(DKS,'Abstract')+'</select><input type="date" data-n="date"><button class="btn sm" data-act="addd" '+id+'>Add deadline</button></div>'+
 presBlock(c,id)+taskBlock(c,id)+'<div class="mu" style="margin-top:10px">Funding</div><div class="sub"><input type="number" min="0" step="any" placeholder="Estimated cost" style="width:140px" '+id+' data-f="cost" value="'+esc(c.cost)+'"><select '+id+' data-f="cur">'+opts(CUR,c.cur||'EUR')+'</select><select '+id+' data-f="fundSrc">'+srcOpts(c.fundSrc)+'</select><select '+id+' data-f="fundStatus">'+opts(FS,c.fundStatus)+'</select></div>'+confEdit(c,id)+'</details></div>'}
 function pjSel(p){return '<select data-pp="'+p.id+'" style="width:auto;margin-top:4px" title="Funded by project"><option value="">— no project —</option>'+S.grants.map(function(g){return '<option value="'+g.id+'"'+(g.id===p.proj?' selected':'')+'>'+esc(g.name)+'</option>'}).join('')+'</select> '}
@@ -831,7 +835,7 @@ return '<div class="card" id="it-'+k.id+'"><div class="row"><div><strong>'+esc(k
 '<div class="mu" style="margin-top:8px">Communication log ('+(k.log||[]).length+')</div>'+log+
 '<div class="sub"><input type="date" data-n="ld" value="'+today+'"><input placeholder="What did you discuss or send?" data-n="lt" style="min-width:220px"><button class="btn sm" data-act="addlog" '+id+'>Log contact</button></div>'+
 '<div class="sub"><label style="margin:0">Follow-up</label><input type="date" '+id+' data-f="next" value="'+esc(k.next)+'"><input placeholder="What to do next" '+id+' data-f="nextNote" value="'+esc(k.nextNote)+'" style="min-width:220px"></div>'+
-'<textarea '+id+' data-f="note" placeholder="Notes: research interests, ideas for collaboration..." style="min-height:70px;margin-top:6px">'+esc(k.note)+'</textarea>'+
+'<textarea '+id+' data-f="note" placeholder="Notes: research interests, ideas for collaboration..." style="min-height:70px;margin-top:6px">'+esc(k.note)+'</textarea>'+PlannerSocial.contactField(k)+
 (nn.length?'<div class="mu" style="margin-top:6px">Notes: '+nn.join(', ')+'</div>':'')+
 '<details data-o="k'+k.id+'"'+(OPEN['k'+k.id]?' open':'')+' style="margin-top:8px"><summary>Edit contact info</summary><div class="sub"><input placeholder="Name" '+id+' data-f="name" value="'+esc(k.name)+'"><input placeholder="Affiliation" '+id+' data-f="affil" value="'+esc(k.affil)+'"><input placeholder="Email" '+id+' data-f="email" value="'+esc(k.email)+'"><input placeholder="Link" '+id+' data-f="link" value="'+esc(k.link)+'"></div></details></div>'}
 function renderContacts(){
@@ -1005,7 +1009,7 @@ document.getElementById('fv').onsubmit=function(ev){addAct(ev,document.getElemen
 document.getElementById('fs').onsubmit=function(ev){addAct(ev)};
 document.getElementById('ctype').onchange=function(){var c=this.value==='conf';document.getElementById('addconf').style.display=c?'':'none';document.getElementById('addvisit').style.display=c?'none':''};
 document.getElementById('cvfilter').onchange=renderList;document.getElementById('cq').oninput=renderList;
-function render(){syncAbs();renderUpcoming();renderContacts();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderRefReviews();renderNotes()}
+function render(){syncAbs();renderUpcoming();renderContacts();PlannerSocial.render();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderRefReviews();renderNotes()}
 
 document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
 var c={id:uid(),name:o.name,place:o.place,start:o.start,end:o.end,link:o.link,status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:''};
@@ -1040,8 +1044,8 @@ try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw)}catch(e){}
 migrate();document.getElementById('guestacct').style.display='none';document.getElementById('guestdata').style.display='none';document.getElementById('acct').style.display='flex';document.getElementById('acctmail').textContent='Signed in as '+(u.email||'')+(u.emailVerified?'':' (email not verified yet)');document.getElementById('resendv').style.display=u.emailVerified?'none':'';document.getElementById('acctcard').style.display='block';document.getElementById('acctinfo').textContent='Signed in as '+(u.email||'')+'. Your data is private to this account.';document.getElementById('acctmsg').textContent='';
 var dn=document.getElementById('datanote');if(dn)dn.textContent='Your data is saved to your account in the cloud (only you can read it) and cached in this browser while you are signed in. Use Import JSON to bring in data from an older version, and export a backup file now and then.';
 showAuth(false);render();setStatus('Loading your data…');
-try{var ref=fbRef(u.uid),snap=await ref.get();await syncWith(ref,snap);await offerGuestTransfer(ref)}catch(e){setStatus('Could not reach your account ('+((e&&e.code)||'error')+').'+(e&&e.code==='permission-denied'&&!u.emailVerified?' Verify your email (see the link we sent), then reload this page.':'')+' Working from the copy saved in this browser.')}}
-function onSignedOut(){FBU=null;REM=null;clearTimeout(remTimer);remDirty=false;STORE_KEY='np1_signed_out';S=emptyState();try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw)}catch(e){}migrate();FBLAST={};document.getElementById('acct').style.display='none';document.getElementById('acctcard').style.display='none';document.getElementById('guestacct').style.display='block';document.getElementById('guestdata').style.display='flex';document.getElementById('datanote').textContent='You can use all planner features without registering. Guest data is stored only in this browser on this device and can be lost if browser storage is cleared. Sign in or create an account for cloud backup and synchronization across devices. Export JSON to keep a separate backup.';render();setStatus('Guest mode: saved only in this browser (not synced).');showAuth(false);authMsg('')}
+try{var ref=fbRef(u.uid),snap=await ref.get();await syncWith(ref,snap);await offerGuestTransfer(ref);PlannerSocial.start();render()}catch(e){setStatus('Could not reach your account ('+((e&&e.code)||'error')+').'+(e&&e.code==='permission-denied'&&!u.emailVerified?' Verify your email (see the link we sent), then reload this page.':'')+' Working from the copy saved in this browser.')}}
+function onSignedOut(){PlannerSocial.stop();FBU=null;REM=null;clearTimeout(remTimer);remDirty=false;STORE_KEY='np1_signed_out';S=emptyState();try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw)}catch(e){}migrate();FBLAST={};document.getElementById('acct').style.display='none';document.getElementById('acctcard').style.display='none';document.getElementById('guestacct').style.display='block';document.getElementById('guestdata').style.display='flex';document.getElementById('datanote').textContent='You can use all planner features without registering. Guest data is stored only in this browser on this device and can be lost if browser storage is cleared. Sign in or create an account for cloud backup and synchronization across devices. Export JSON to keep a separate backup.';render();setStatus('Guest mode: saved only in this browser (not synced).');showAuth(false);authMsg('')}
 async function doSignOut(){var keep=false;
 if(REM){try{await REM.set(payload())}catch(e){if(!confirm('Your latest changes could not be saved to your account. Sign out anyway? They stay in this browser, but they are not in your account.'))return;keep=true}}
 if(!keep){try{localStorage.removeItem(STORE_KEY)}catch(e){}}
@@ -1070,7 +1074,7 @@ var pw=prompt('To confirm, enter your password:');if(!pw)return;
 try{await FBU.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(FBU.email,pw))}catch(e){m.textContent=authErr(e);return}
 try{var col=FB.db.collection('planners').doc(FBU.uid).collection('parts'),b=FB.db.batch();FBPARTS.concat(['meta']).forEach(function(k){b.delete(col.doc(k))});await b.commit();var key=STORE_KEY;await FBU.delete();try{localStorage.removeItem(key)}catch(e){}}catch(e){m.textContent='Could not delete the account ('+((e&&e.code)||'error')+').'}}
 document.getElementById('delacct').onclick=delAccount;
-async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap)}catch(e){}}
+async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap);PlannerSocial.syncLinks()}catch(e){}}
 async function syncWith(ref,snap){var rem=snap.exists?snap.data():null;
 if(rem&&(rem.updated||0)>(S.updated||0)){
 S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),refereeReviews:JSON.parse(JSON.stringify(rem.refereeReviews||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
@@ -1081,6 +1085,7 @@ REM=ref;
 if(S.events.length+S.notes.length+S.papers.length+(S.refereeReviews||[]).length+S.grants.length+S.contacts.length+S.visits.length+(S.abstracts||[]).length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
 else setStatus('Connected to your account');
 }}
+PlannerSocial.init({user:function(){return FBU},db:function(){return FB&&FB.db},state:function(){return S},cloudReady:function(){return !!REM},escape:esc,newId:uid,save:save,render:render});
 (async function(){
 if(FIREBASE_CONFIG){fbStart();return}
 try{
