@@ -1,7 +1,7 @@
 // Academic Planner service worker: network first, falls back to the cached copy when offline.
 // Bump CACHE when you want to force old copies out.
-const CACHE = "planner-v1";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const CACHE = "planner-v2";
+const ASSETS = ["./", "./index.html", "./social.js", "./arxiv-radar.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }));

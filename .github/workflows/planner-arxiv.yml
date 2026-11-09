@@ -1,0 +1,44 @@
+name: Academic Planner arXiv Radar
+on:
+  schedule:
+    - cron: '37 11 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'planer/scripts/refresh_arxiv.py'
+      - '.github/workflows/planner-arxiv.yml'
+permissions:
+  contents: write
+concurrency:
+  group: planner-arxiv-feed
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh public arXiv feed
+        run: |
+          set -euo pipefail
+          feed="$RUNNER_TEMP/feed.json"
+          branch=planner-arxiv-data
+          if git ls-remote --exit-code --heads origin "$branch"; then
+            git fetch --depth=1 origin "$branch"
+            git show FETCH_HEAD:feed.json > "$feed"
+            existing=true
+          else
+            status=$?
+            if [ "$status" -ne 2 ]; then exit "$status"; fi
+            existing=false
+          fi
+          python3 planer/scripts/refresh_arxiv.py "$feed"
+          if [ "$existing" = true ]; then
+            git switch -C "$branch" FETCH_HEAD
+          else
+            git switch --orphan "$branch"
+          fi
+          cp "$feed" feed.json
+          git add feed.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Refresh public arXiv feed'
+          git push origin "HEAD:refs/heads/$branch"

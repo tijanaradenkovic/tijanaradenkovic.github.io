@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Academic Planner</title>
 <script src="social.js"></script>
+<script src="arxiv-radar.js"></script>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 --bg:#f6f3ee;--card:#fcfaf6;--tx:#16203a;--mu:#667085;--bd:#e4e0d9;--ac:#6b3a64;--on:#fff;--rd:#b4433a;--gr:#2a7f7c;--am:#b7791f;--k-conf:#6b3a64;--k-visit:#2a7f7c;--k-sem:#2f5d9e;--k-grant:#b7791f;--k-paper:#b4433a;--k-ref:#7b5598;--k-contact:#4f8a3a;--k-note:#6b7385}
@@ -76,6 +77,7 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <button data-t="grants">Projects &amp; Grants</button>
 <button data-t="expenses">Expenses</button>
 <button data-t="radovi">Papers &amp; Reviews</button>
+<button data-t="arxiv-radar">arXiv Radar</button>
 <button data-t="abs">Abstracts</button>
 <button data-t="beleske">Notes</button>
 <button data-t="contacts">Contacts</button>
@@ -289,6 +291,22 @@ label{font-size:12px;color:var(--mu);display:block;margin-bottom:2px}
 <div id="nv-ideas" class="hide"><div id="ideaslist"></div></div>
 </section>
 
+<section id="arxiv-radar" class="hide">
+<h2>arXiv Radar</h2>
+<details class="card"><summary>What I follow</summary>
+<form style="margin-top:12px">
+<fieldset class="full" style="border:1px solid var(--bd)"></fieldset>
+<div><label for="radar-keywords">Keywords (comma-separated)</label><input id="radar-keywords" name="keywords" maxlength="1000" placeholder="higher gauge theory, group field theory"></div>
+<div><label for="radar-authors">Authors (comma-separated)</label><input id="radar-authors" name="authors" maxlength="1000"></div>
+<label class="full"><input type="checkbox" name="matches" style="width:auto"> Only show matches when keywords or authors are set</label>
+<div class="full"><button class="btn pri" type="submit">Save preferences</button></div>
+</form></details>
+<details class="card"><summary>Reading list</summary><div id="radar-saved" style="margin-top:12px"></div></details>
+<div class="row"><p id="radar-status" class="mu" role="status"></p><button type="button" class="btn sm" data-refresh>Refresh feed</button></div>
+<div id="radar-feed"></div>
+<p class="mu">Source: <a href="https://arxiv.org/list/gr-qc/recent" target="_blank" rel="noopener">arXiv</a>. Original titles and abstracts.</p>
+</section>
+
 <section id="podaci" class="hide">
 <div class="card" id="acctcard" style="display:none"><strong>Account</strong><p class="mu" id="acctinfo"></p><div class="sub"><button class="btn sm" id="chpw">Change password (email link)</button><button class="btn sm" id="delacct">Delete my account and data</button></div><div class="mu" id="acctmsg" style="margin-top:6px"></div></div>
 <div class="card">
@@ -350,7 +368,7 @@ migrate();
 var REM=null,remTimer=null,remBusy=false,remDirty=false;
 function setStatus(t){var e=document.getElementById('sync');if(e)e.textContent=t}
 function schedRemote(){if(!REM)return;remDirty=true;clearTimeout(remTimer);remTimer=setTimeout(flushRemote,800)}
-function payload(){return{events:S.events,notes:S.notes,papers:S.papers,refereeReviews:S.refereeReviews||[],grants:S.grants,contacts:S.contacts,visits:S.visits,abstracts:S.abstracts||[],waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',updated:S.updated||Date.now()}}
+function payload(){return{events:S.events,notes:S.notes,papers:S.papers,refereeReviews:S.refereeReviews||[],grants:S.grants,contacts:S.contacts,visits:S.visits,abstracts:S.abstracts||[],waitDays:S.waitDays||90,lastExport:S.lastExport||'',created:S.created||'',snooze:S.snooze||'',radar:S.radar||null,updated:S.updated||Date.now()}}
 function flushRemote(){if(remBusy){remTimer=setTimeout(flushRemote,500);return}remBusy=true;remDirty=false;setStatus('Saving to your account…');
 REM.set(payload()).then(function(){setStatus('Saved to your account')},function(err){setStatus('Saving to your account failed ('+((err&&err.code)||'error')+'). Data is saved in this browser.')}).then(function(){remBusy=false;if(remDirty)schedRemote()})}
 function save(){syncAbs();S.updated=Date.now();try{localStorage.setItem(STORE_KEY,JSON.stringify(S));}catch(e){}schedRemote();PlannerSocial.syncLinks()}
@@ -360,7 +378,7 @@ function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
 var today=iso(new Date());
 function daysTo(s){return Math.round((new Date(s+'T00:00:00')-new Date(today+'T00:00:00'))/864e5)}
 
-var TABS=['upcoming','rokovi','visits','kalendar','grants','expenses','radovi','abs','beleske','contacts','podaci'];
+var TABS=['upcoming','rokovi','visits','kalendar','grants','expenses','radovi','arxiv-radar','abs','beleske','contacts','podaci'];
 function showTab(t){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.toggle('on',x.dataset.t===t)});TABS.forEach(function(id){document.getElementById(id).classList.toggle('hide',id!==t)});render()}
 document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){showTab(b.dataset.t)}});
 function openFromStr(s){var a=String(s).split('|');openItem(a[0],a[1])}
@@ -1009,7 +1027,7 @@ document.getElementById('fv').onsubmit=function(ev){addAct(ev,document.getElemen
 document.getElementById('fs').onsubmit=function(ev){addAct(ev)};
 document.getElementById('ctype').onchange=function(){var c=this.value==='conf';document.getElementById('addconf').style.display=c?'':'none';document.getElementById('addvisit').style.display=c?'none':''};
 document.getElementById('cvfilter').onchange=renderList;document.getElementById('cq').oninput=renderList;
-function render(){syncAbs();renderUpcoming();renderContacts();PlannerSocial.render();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderRefReviews();renderNotes()}
+function render(){syncAbs();renderUpcoming();renderContacts();PlannerSocial.render();renderVisits();renderIcs();renderBackup();renderList();renderGrants();renderExpenses();renderCv();renderAbs();renderCal();renderPapers();renderRefReviews();renderNotes();if(window.PlannerRadar)PlannerRadar.render()}
 
 document.getElementById('fr').onsubmit=function(ev){ev.preventDefault();var f=new FormData(ev.target),o={};f.forEach(function(v,k){o[k]=v});
 var c={id:uid(),name:o.name,place:o.place,start:o.start,end:o.end,link:o.link,status:'Considering',deadlines:[],cost:'',cur:'EUR',fundSrc:'',fundStatus:'Not requested',note:''};
@@ -1020,7 +1038,7 @@ o.refs=(o.refs||'').split('\n').map(parseRef).filter(Boolean);
 o.ideas=(o.ideas||'').split('\n').map(function(x){x=x.trim();return x?{id:uid(),text:x,done:false}:null}).filter(Boolean);
 S.notes.push(o);save();ev.target.reset();render()};
 document.getElementById('exp').onclick=doBackup;document.getElementById('bkgo').onclick=doBackup;
-document.getElementById('imp').onchange=function(ev){var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.events&&d.notes){S=d;S.papers=S.papers||[];migrate();save();render()}}catch(e){}};r.readAsText(ev.target.files[0])};
+document.getElementById('imp').onchange=function(ev){var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.events&&d.notes){if(!Object.prototype.hasOwnProperty.call(d,'radar'))d.radar=S.radar;S=d;S.papers=S.papers||[];migrate();save();render()}}catch(e){}};r.readAsText(ev.target.files[0])};
 render();
 var FBBASE='https://www.gstatic.com/firebasejs/9.23.0/',FB=null,FBU=null,FBLAST={},FBPARTS=['events','visits','grants','papers','refereeReviews','notes','contacts','abstracts'];
 function loadScript(src){return new Promise(function(res,rej){var e=document.createElement('script');e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)})}
@@ -1035,10 +1053,10 @@ set:async function(o){var meta={},parts={},ch=[],b=FB.db.batch();Object.keys(o).
 FBPARTS.forEach(function(k){parts[k]=JSON.stringify(o[k]||[])});parts.meta=JSON.stringify(meta);
 Object.keys(parts).forEach(function(k){if(new TextEncoder().encode(parts[k]).length>900000)throw{code:'too-large:'+k};if(FBLAST[k]!==parts[k]){b.set(col().doc(k),{json:parts[k],updated:o.updated||Date.now()});ch.push(k)}});
 if(!ch.length)return;await b.commit();ch.forEach(function(k){FBLAST[k]=parts[k]})}}}
-function guestTransferCandidate(){try{var raw=localStorage.getItem('np1_signed_out');if(!raw)return null;var d=JSON.parse(raw);if(!d||typeof d!=='object')return null;var keys=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'];return keys.some(function(k){return Array.isArray(d[k])&&d[k].length})?d:null}catch(e){return null}}
-function mergeGuestData(account,guest){var keys=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'],out=JSON.parse(JSON.stringify(account));keys.forEach(function(k){var a=Array.isArray(out[k])?out[k]:[],seen=new Set(a.map(function(x){return String(x.id)}));(Array.isArray(guest[k])?guest[k]:[]).forEach(function(x){if(!x||typeof x!=='object')return;var id=String(x.id);if(!seen.has(id)){a.push(x);seen.add(id)}});out[k]=a});out.updated=Date.now();return out}
-async function offerGuestTransfer(ref){var guest=guestTransferCandidate();if(!guest)return;var count=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'].reduce(function(n,k){return n+(Array.isArray(guest[k])?guest[k].length:0)},0);if(!confirm('You have '+count+' item(s) saved as a guest in this browser. Import them into your account and sync across devices? Existing account data will be kept. Your guest copy will remain in this browser until the transfer succeeds.')){setStatus('Connected to your account. Guest data is still saved separately in this browser.');return}
-var original=S;var merged=mergeGuestData(S,guest);setStatus('Importing guest data to your account…');try{await ref.set({events:merged.events,notes:merged.notes,papers:merged.papers,refereeReviews:merged.refereeReviews||[],grants:merged.grants,contacts:merged.contacts,visits:merged.visits,abstracts:merged.abstracts,waitDays:merged.waitDays||90,lastExport:merged.lastExport||'',created:merged.created||'',snooze:merged.snooze||'',updated:merged.updated});S=merged;localStorage.setItem(STORE_KEY,JSON.stringify(S));localStorage.removeItem('np1_signed_out');render();setStatus('Guest data imported and synced to your account.')}catch(e){S=original;render();setStatus('Guest import failed ('+((e&&e.code)||'error')+'). Guest data is still safely stored in this browser.')}}
+function guestTransferCandidate(){try{var raw=localStorage.getItem('np1_signed_out');if(!raw)return null;var d=JSON.parse(raw);if(!d||typeof d!=='object')return null;var keys=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'];return d.radar||keys.some(function(k){return Array.isArray(d[k])&&d[k].length})?d:null}catch(e){return null}}
+function mergeGuestData(account,guest){var keys=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'],out=JSON.parse(JSON.stringify(account));keys.forEach(function(k){var a=Array.isArray(out[k])?out[k]:[],seen=new Set(a.map(function(x){return String(x.id)}));(Array.isArray(guest[k])?guest[k]:[]).forEach(function(x){if(!x||typeof x!=='object')return;var id=String(x.id);if(!seen.has(id)){a.push(x);seen.add(id)}});out[k]=a});if(guest.radar){if(!out.radar)out.radar=guest.radar;else{var saved=out.radar.saved||[],ids=new Set(saved.map(function(p){return p.id}));out.radar.saved=saved.concat((guest.radar.saved||[]).filter(function(p){return p&&!ids.has(p.id)}))}}out.updated=Date.now();return out}
+async function offerGuestTransfer(ref){var guest=guestTransferCandidate();if(!guest)return;var count=['events','notes','papers','refereeReviews','grants','contacts','visits','abstracts'].reduce(function(n,k){return n+(Array.isArray(guest[k])?guest[k].length:0)},0);if(!confirm('Import your '+count+' planner item(s)'+(guest.radar?' and arXiv Radar data':'')+' from this browser into your account? Existing account preferences and data will be kept.')){setStatus('Connected to your account. Guest data is still saved separately in this browser.');return}
+var original=S;var merged=mergeGuestData(S,guest);setStatus('Importing guest data to your account…');try{await ref.set({events:merged.events,notes:merged.notes,papers:merged.papers,refereeReviews:merged.refereeReviews||[],grants:merged.grants,contacts:merged.contacts,visits:merged.visits,abstracts:merged.abstracts,waitDays:merged.waitDays||90,lastExport:merged.lastExport||'',created:merged.created||'',snooze:merged.snooze||'',radar:merged.radar||null,updated:merged.updated});S=merged;localStorage.setItem(STORE_KEY,JSON.stringify(S));localStorage.removeItem('np1_signed_out');render();setStatus('Guest data imported and synced to your account.')}catch(e){S=original;render();setStatus('Guest import failed ('+((e&&e.code)||'error')+'). Guest data is still safely stored in this browser.')}}
 async function onSignedIn(u){FBU=u;try{await u.reload()}catch(e){}STORE_KEY='np1_u_'+u.uid;FBLAST={};S=emptyState();
 try{var raw=localStorage.getItem(STORE_KEY);if(raw)S=JSON.parse(raw)}catch(e){}
 migrate();document.getElementById('guestacct').style.display='none';document.getElementById('guestdata').style.display='none';document.getElementById('acct').style.display='flex';document.getElementById('acctmail').textContent='Signed in as '+(u.email||'')+(u.emailVerified?'':' (email not verified yet)');document.getElementById('resendv').style.display=u.emailVerified?'none':'';document.getElementById('acctcard').style.display='block';document.getElementById('acctinfo').textContent='Signed in as '+(u.email||'')+'. Your data is private to this account.';document.getElementById('acctmsg').textContent='';
@@ -1077,14 +1095,15 @@ document.getElementById('delacct').onclick=delAccount;
 async function pullIfNewer(){if(!FBU||!REM||remDirty||remBusy)return;try{var snap=await REM.get();if(remDirty||remBusy)return;await syncWith(REM,snap);PlannerSocial.syncLinks()}catch(e){}}
 async function syncWith(ref,snap){var rem=snap.exists?snap.data():null;
 if(rem&&(rem.updated||0)>(S.updated||0)){
-S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),refereeReviews:JSON.parse(JSON.stringify(rem.refereeReviews||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',updated:rem.updated};
+S={events:JSON.parse(JSON.stringify(rem.events||[])),notes:JSON.parse(JSON.stringify(rem.notes||[])),papers:JSON.parse(JSON.stringify(rem.papers||[])),refereeReviews:JSON.parse(JSON.stringify(rem.refereeReviews||[])),grants:JSON.parse(JSON.stringify(rem.grants||[])),contacts:JSON.parse(JSON.stringify(rem.contacts||[])),visits:JSON.parse(JSON.stringify(rem.visits||[])),abstracts:JSON.parse(JSON.stringify(rem.abstracts||[])),waitDays:rem.waitDays||90,lastExport:rem.lastExport||'',created:rem.created||'',snooze:rem.snooze||'',radar:rem.radar||null,updated:rem.updated};
 try{localStorage.setItem(STORE_KEY,JSON.stringify(S))}catch(e){}
 migrate();render();setStatus('Loaded from your account');REM=ref;
 }else{
 REM=ref;
-if(S.events.length+S.notes.length+S.papers.length+(S.refereeReviews||[]).length+S.grants.length+S.contacts.length+S.visits.length+(S.abstracts||[]).length>0&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
+if((S.radar||S.events.length+S.notes.length+S.papers.length+(S.refereeReviews||[]).length+S.grants.length+S.contacts.length+S.visits.length+(S.abstracts||[]).length>0)&&(!rem||(S.updated||0)>(rem.updated||0))){S.updated=S.updated||Date.now();schedRemote()}
 else setStatus('Connected to your account');
 }}
+if(window.PlannerRadar)PlannerRadar.init({state:function(){return S},save:save,escape:esc});
 PlannerSocial.init({user:function(){return FBU},db:function(){return FB&&FB.db},state:function(){return S},cloudReady:function(){return !!REM},escape:esc,newId:uid,save:save,render:render});
 (async function(){
 if(FIREBASE_CONFIG){fbStart();return}
