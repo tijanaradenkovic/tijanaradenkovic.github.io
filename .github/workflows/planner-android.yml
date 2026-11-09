@@ -1,0 +1,44 @@
+name: Academic Planner Android
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/planner-android]
+    paths: ['planer/**', '.github/workflows/planner-android.yml']
+permissions:
+  contents: read
+concurrency:
+  group: planner-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: planer/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: planer/mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci
+      - run: npm run android:sync
+      - run: npm test
+      - run: bash ./gradlew assembleDebug lintDebug --no-daemon
+        working-directory: planer/mobile/android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: academic-planner-debug-apk
+          path: planer/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
