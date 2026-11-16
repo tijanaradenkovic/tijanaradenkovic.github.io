@@ -1,0 +1,7 @@
+{
+  "appId": "rs.tijanaradenkovic.academicplanner",
+  "appName": "Academic Planner",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" }
+}
